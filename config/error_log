@@ -1,0 +1,4 @@
+[26-Sep-2026 06:40:52 Asia/Jakarta] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/mbcconsu/aplikasisekolah.mbcconsulting.id/config/database.php:20
+Stack trace:
+#0 {main}
+  thrown in /home/mbcconsu/aplikasisekolah.mbcconsulting.id/config/database.php on line 20

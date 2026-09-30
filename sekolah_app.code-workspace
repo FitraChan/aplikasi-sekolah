@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../siap_back_up"
+		},
+		{
+			"path": "../gtk_back_up"
+		},
+		{
+			"path": "../cbt_back_up"
+		}
+	],
+	"settings": {}
+}
