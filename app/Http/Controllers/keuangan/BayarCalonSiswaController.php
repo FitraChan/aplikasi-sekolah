@@ -51,7 +51,6 @@ class BayarCalonSiswaController extends Controller
                 'gelombang',
                 'itemBayar',
                 'kelas'
-
             )
         );
     }

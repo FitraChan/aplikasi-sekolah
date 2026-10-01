@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class TemplateBayar extends Model
 {
@@ -48,6 +50,15 @@ class TemplateBayar extends Model
         return $this->belongsTo(
             Gelombang::class,
             'id_gelombang',
+            'id'
+        );
+    }
+
+    public function detTemplateBayar(): HasMany
+    {
+        return $this->hasMany(
+            DetTempBayar::class,
+            'id_template',
             'id'
         );
     }

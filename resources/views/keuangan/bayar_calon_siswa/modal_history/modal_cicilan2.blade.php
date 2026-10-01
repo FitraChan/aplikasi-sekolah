@@ -436,6 +436,12 @@
 
                 window.location.reload();
 
+                 window.open(
+                        "{{ url('/bayar-calon-siswa/createReportPdf') }}/" + document.getElementById('id_calon_siswa_cicilan').value,
+                        "_blank"
+                    );
+                //window.location.reload();
+
                 // reload tabel jika ada
                 // if (typeof table !== 'undefined') {
                

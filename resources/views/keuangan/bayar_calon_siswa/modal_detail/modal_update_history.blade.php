@@ -1,96 +1,211 @@
-<div id="modal-update-history-form" class="modal" tabindex="-1">
+<div
+    id="modal-update-history-form"
+    class="hidden fixed inset-0 z-[9999] items-center justify-center bg-slate-900/50 p-4"
+    tabindex="-1"
+>
+    <div class="w-full max-w-lg bg-white rounded-xl shadow-xl overflow-hidden">
 
-    <div class="modal-dialog">
+        <form id="form-bayar">
 
-        <div class="modal-content">
+            <input
+                type="hidden"
+                id="id_bayar_history"
+                name="id_bayar"
+            >
 
-            <form id="form-bayar">
+            <input
+                type="hidden"
+                id="id_siswa"
+                name="id_siswa"
+            >
 
-                <input type="hidden" id="id_bayar_history" name="id_bayar">
-                <input type="hidden" id="id_siswa" name="id_siswa">
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
 
-                <div class="modal-header">
-                    <h2 class="font-medium text-base">
-                        Data Pembayaran
-                    </h2>
-                </div>
+                <h2 class="text-lg font-semibold text-slate-800">
+                    Data Pembayaran
+                </h2>
 
-                <div class="modal-body">
+                <button
+                    type="button"
+                    onclick="closeModalUpdateHistory()"
+                    class="inline-flex items-center justify-center
+                           w-8 h-8 rounded-lg
+                           text-slate-400
+                           hover:text-slate-600
+                           hover:bg-slate-100
+                           transition-colors"
+                    aria-label="Tutup"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </button>
 
-                    <div class="grid grid-cols-12 gap-4">
+            </div>
 
-                        <!-- Tanggal Bayar -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                Tanggal Bayar
-                            </label>
+            {{-- Body --}}
+            <div class="px-6 py-5">
 
-                            <input
-                                type="date"
-                                id="tgl_bayar_history"
-                                name="tgl_bayar"
-                                class="form-control">
-                        </div>
+                <div class="grid grid-cols-12 gap-5">
 
-                        <!-- No Kwitansi -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                No Kwitansi
-                            </label>
+                    {{-- Tanggal Bayar --}}
+                    <div class="col-span-12">
 
-                            <input
-                                type="text"
-                                id="no_kwitansi_history"
-                                name="no_kwitansi"
-                                class="form-control"
-                                placeholder="Masukkan nomor kwitansi">
-                        </div>
+                        <label
+                            for="tgl_bayar_history"
+                            class="block text-sm font-medium text-slate-700 mb-1.5"
+                        >
+                            Tanggal Bayar
+                        </label>
 
-                        <!-- Keterangan -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                Keterangan
-                            </label>
+                        <input
+                            type="date"
+                            id="tgl_bayar_history"
+                            name="tgl_bayar"
+                            class="w-full rounded-lg border border-slate-300
+                                   bg-white px-3 py-2.5
+                                   text-sm text-slate-700
+                                   outline-none transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2 focus:ring-[#02BC9C]/20"
+                        >
 
-                            <textarea
-                                id="keterangan"
-                                name="keterangan"
-                                rows="3"
-                                class="form-control"
-                                placeholder="Masukkan keterangan"></textarea>
-                        </div>
+                    </div>
+
+                    {{-- No Kwitansi --}}
+                    <div class="col-span-12">
+
+                        <label
+                            for="no_kwitansi_history"
+                            class="block text-sm font-medium text-slate-700 mb-1.5"
+                        >
+                            No Kwitansi
+                        </label>
+
+                        <input
+                            type="text"
+                            id="no_kwitansi_history"
+                            name="no_kwitansi"
+                            placeholder="Masukkan nomor kwitansi"
+                            class="w-full rounded-lg border border-slate-300
+                                   bg-white px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2 focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+                    {{-- Keterangan --}}
+                    <div class="col-span-12">
+
+                        <label
+                            for="keterangan"
+                            class="block text-sm font-medium text-slate-700 mb-1.5"
+                        >
+                            Keterangan
+                        </label>
+
+                        <textarea
+                            id="keterangan"
+                            name="keterangan"
+                            rows="3"
+                            placeholder="Masukkan keterangan"
+                            class="w-full rounded-lg border border-slate-300
+                                   bg-white px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none transition resize-none
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2 focus:ring-[#02BC9C]/20"
+                        ></textarea>
 
                     </div>
 
                 </div>
 
-                <div class="modal-footer">
+            </div>
 
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-tw-dismiss="modal">
+            {{-- Footer --}}
+            <div
+                class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2
+                       px-6 py-4
+                       bg-slate-50
+                       border-t border-slate-200"
+            >
 
-                        Batal
+                <button
+                    type="button"
+                    onclick="closeModalUpdateHistory()"
+                    class="inline-flex items-center justify-center
+                           px-4 py-2.5
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           text-sm font-medium
+                           text-slate-700
+                           hover:bg-slate-100
+                           transition-colors"
+                >
+                    Batal
+                </button>
 
-                    </button>
+                <button
+                    type="button"
+                    onclick="saveHistoryBayar()"
+                    class="inline-flex items-center justify-center
+                           gap-2
+                           px-4 py-2.5
+                           rounded-lg
+                           bg-[#02BC9C]
+                           text-white
+                           text-sm font-medium
+                           hover:bg-[#00B686]
+                           focus:outline-none
+                           focus:ring-2
+                           focus:ring-[#02BC9C]/30
+                           transition"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4z"
+                        />
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17 3v5H7V3M7 21v-6h10v6"
+                        />
+                    </svg>
 
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        onclick="saveHistoryBayar()">
+                    Simpan
+                </button>
 
-                        <i data-lucide="save" class="w-4 h-4 mr-1"></i>
-                        Simpan
+            </div>
 
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
+        </form>
 
     </div>
-
 </div>

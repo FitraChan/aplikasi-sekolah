@@ -267,7 +267,9 @@
             'target',
             'broadcast',
             'ujian-calon-siswa',
-            'bukti'
+            'bukti',
+            'template-bayar-pendaftaran',
+            
             ]);
             @endphp
 
@@ -391,20 +393,7 @@
                         <span>Rekap Kelas</span>
                     </a>
 
-                    {{-- Daftar Siswa --}}
-                    <a href="{{ url('daftarSiswa') }}"
-                        class="sidebar-submenu {{ $side == 'daftar-siswa' ? 'sidebar-submenu-active' : '' }}">
-                        <svg class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <circle cx="9" cy="8" r="3"></circle>
-                            <path d="M3 20c0-3 2.5-5 6-5s6 2 6 5"></path>
-                            <path d="M16 11a2 2 0 1 0 0-4"></path>
-                        </svg>
-                        <span>Daftar Siswa</span>
-                    </a>
+                    
 
                     {{-- Kuota Siswa --}}
                     <a href="{{ url('target') }}"
@@ -454,21 +443,38 @@
 
                       {{-- Ujian Calon Siswa --}}
                    <a href="{{ route('listBuktiPembayaran') }}"
-    class="sidebar-submenu {{ $side == 'bukti' ? 'sidebar-submenu-active' : '' }}">
+                        class="sidebar-submenu {{ $side == 'bukti' ? 'sidebar-submenu-active' : '' }}">
 
-    <svg class="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        viewBox="0 0 24 24">
-        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-        <path d="M3 10h18"></path>
-        <path d="M7 15h3"></path>
-        <path d="M14 15h3"></path>
-    </svg>
+                        <svg class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                            <path d="M3 10h18"></path>
+                            <path d="M7 15h3"></path>
+                            <path d="M14 15h3"></path>
+                        </svg>
 
-    <span>Bukti Pembayaran</span>
-</a>
+                        <span>Bukti Pembayaran</span>
+                    </a>
+
+                    <a href="{{ route('templatePendaftaran.index') }}"
+                        class="sidebar-submenu {{ $side == 'template-bayar-pendaftaran' ? 'sidebar-submenu-active' : '' }}">
+
+                        <svg class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                            <path d="M3 10h18"></path>
+                            <path d="M7 15h3"></path>
+                            <path d="M14 15h3"></path>
+                        </svg>
+
+                        <span>Template Pembayaran</span>
+                    </a>
 
                 </div>
 

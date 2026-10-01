@@ -27,7 +27,7 @@ class GelombangController extends Controller
             $query->where('status_daftar', 0);
         },
     ])
-    ->orderBy('id', 'desc')
+    ->orderBy('id_tahun', 'desc')
     ->get()
     ->map(function ($item) {
 

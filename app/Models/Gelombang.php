@@ -36,4 +36,13 @@ class Gelombang extends Model
     {
         return $this->hasMany(UjianCalon::class, 'id_gelombang', 'id');
     }
+
+    public function templateBayar(): HasMany
+    {
+        return $this->hasMany(
+            TemplateBayar::class,
+            'id_gelombang',
+            'id'
+        );
+    }
 }

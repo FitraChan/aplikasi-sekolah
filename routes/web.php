@@ -16,6 +16,7 @@ use App\Http\Controllers\pendaftaran\CalonSiswaController;
 use App\Http\Controllers\pendaftaran\SetKelasController;
 use App\Http\Controllers\pendaftaran\BroadcastController;
 use App\Http\Controllers\pendaftaran\TargetController;
+use App\Http\Controllers\pendaftaran\TemplatePendaftaranController;
 
 use App\Http\Controllers\keuangan\KatItemBayarController;
 use App\Http\Controllers\keuangan\KatPeriodeBayarController;
@@ -296,7 +297,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::get('/bayar-calon-siswa/createReportPdf/{id}', [BayarCalonSiswaController::class, 'createReportPdf'])
         ->name('bayar-calon-siswa.createReportPdf');
-
 
     Route::post('det-bayar-calon-siswa/store', [DetBayarCalonSiswaController::class, 'store'])
         ->name('det-bayar-calon-siswa.store');
@@ -584,6 +584,22 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
                 SiswaController::class,
                 'setNipd'
             ])->name('setNipd');
+
+
+        Route::get(
+            'templatePendaftaran',
+            [TemplatePendaftaranController::class, 'index']
+        )->name('templatePendaftaran.index');  
+        
+        
+        Route::get(
+            'templatePendaftaran/data',
+            [TemplatePendaftaranController::class, 'data']
+        )->name('templatePendaftaran.data'); 
+
+
+
+
 
     // role admin
 });
