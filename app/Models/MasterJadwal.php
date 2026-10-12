@@ -18,7 +18,7 @@ class MasterJadwal extends Model
         'angkatan',
     ];
 
-      protected $appends = ['nkelas'];
+    protected $appends = ['nkelas'];
 
     protected function nkelas(): Attribute
     {

@@ -14,6 +14,10 @@ class Siswa extends Authenticatable
     protected $table = 'tb_siswa';
     protected $primaryKey = 'id';
     protected $appends = ['jenis_kelas'];
+    var $tahun, $smt;
+
+
+      
 
     public function getJenisKelasAttribute()
     {

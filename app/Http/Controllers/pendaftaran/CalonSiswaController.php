@@ -18,6 +18,9 @@ use App\Models\Siswa;
 use App\Models\Bayar;
 use App\Models\DetBayar;
 
+use App\Models\Konfig;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LogModel;
@@ -32,13 +35,32 @@ use App\Models\DetBayarCalonSiswa;
 
 class CalonSiswaController extends Controller
 {
+
+     var $tahun, $smt;
+  
+    public function __construct()
+    {
+        $konfig = Konfig::first();
+        $this->tahun = $konfig->id_thn_ppdb;
+        $this->smt = $konfig->smt;
+      
+    }
+
     public function index()
     {
         $side = 'calon-siswa';
+        $tahunSekarang = $this->tahun;
 
-        $gelombang = Gelombang::all();
+        $gelombang = Gelombang::where('id_tahun', $tahunSekarang)
+            ->orderBy('id', 'asc')
+            ->get();
 
-        $tahunAjaran = TahunAjaran::orderBy('id', 'desc')->get();
+       $tahunAjaran = TahunAjaran::whereBetween('id', [
+                        $tahunSekarang - 3,
+                        $tahunSekarang
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->get();
 
 
         $jurusan = Jurusan::all();
@@ -56,9 +78,17 @@ class CalonSiswaController extends Controller
     {
         $side = 'daftar-ulang';
 
-        $gelombang = Gelombang::all();
-        $tahunAjaran = TahunAjaran::all();
+        $tahunSekarang = $this->tahun;
 
+        $gelombang = Gelombang::where('id_tahun', $tahunSekarang)
+            ->orderBy('id', 'asc')
+            ->get();
+        $tahunAjaran = TahunAjaran::whereBetween('id', [
+                        $tahunSekarang - 3,
+                        $tahunSekarang
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->get();
 
         $jurusan = Jurusan::all();
 
@@ -318,6 +348,7 @@ class CalonSiswaController extends Controller
                     'nisn'            => $item->nisn,
                     'no_hp'           => $item->no_hp,
                     'no_daftar'       => $item->no_daftar,
+                    'status_daftar_id' => $item->status_daftar,
 
                     'status_daftar'   => $item->statusDaftar?->keterangan ?? '-',
 

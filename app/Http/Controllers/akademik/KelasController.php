@@ -40,14 +40,16 @@ class KelasController extends Controller
         return response()->json($data);
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
+        $idx = (Kelas::max('idx') ?? 0) + 1;
+
         $kelas = Kelas::create([
             'nama_kelas' => $request->nama_kelas,
             'id_jurusan' => $request->id_jurusan,
             'kelas'      => $request->kelas,
             'alias'      => $request->alias,
-            'idx'        => $request->idx,
+            'idx'        => $idx,
         ]);
 
         LogModel::create([
@@ -74,7 +76,7 @@ class KelasController extends Controller
             'id_jurusan' => $request->id_jurusan,
             'kelas'      => $request->kelas,
             'alias'      => $request->alias,
-            'idx'        => $request->idx,
+           
         ]);
 
         LogModel::create([

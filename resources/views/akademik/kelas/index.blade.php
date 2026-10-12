@@ -290,7 +290,7 @@
 
                     <input type="text"
                            id="kelas"
-                           placeholder="Contoh: 10"
+                           placeholder="X"
                            class="w-full rounded-xl
                                   border border-slate-300
                                   px-4 py-3
@@ -327,29 +327,7 @@
             </div>
 
 
-            {{-- Index --}}
-            <div>
-
-                <label for="idx"
-                       class="block text-sm font-semibold text-slate-700 mb-2">
-                    Index
-                </label>
-
-                <input type="number"
-                       id="idx"
-                       value="0"
-                       min="0"
-                       placeholder="0"
-                       class="w-full rounded-xl
-                              border border-slate-300
-                              px-4 py-3
-                              text-sm text-slate-800
-                              placeholder:text-slate-400
-                              focus:border-[#02BC9C]
-                              focus:ring-2 focus:ring-[#02BC9C]/20
-                              outline-none transition">
-
-            </div>
+           
 
         </div>
 
@@ -458,12 +436,7 @@ let table = new Tabulator("#table-kelas", {
             minWidth: 120
         },
 
-        {
-            title: "Idx",
-            field: "idx",
-            width: 80,
-            hozAlign: "center"
-        },
+      
 
         {
             title: "Aksi",
@@ -564,8 +537,7 @@ function openModalKelas(mode = 'add')
     document.getElementById('id_jurusan').value = '';
     document.getElementById('kelas').value = '';
     document.getElementById('alias').value = '';
-    document.getElementById('idx').value = 0;
-
+   
     document.getElementById('modal-title').textContent =
         'Tambah Kelas';
 
@@ -606,8 +578,7 @@ function editKelas(data)
     document.getElementById('alias').value =
         data.alias ?? '';
 
-    document.getElementById('idx').value =
-        data.idx ?? 0;
+    
 
     document.getElementById('modal-title').textContent =
         'Edit Kelas';
@@ -691,8 +662,7 @@ function saveData()
             alias:
                 document.getElementById('alias').value,
 
-            idx:
-                document.getElementById('idx').value
+           
 
         })
 

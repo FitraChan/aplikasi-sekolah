@@ -270,22 +270,18 @@
     @stack('styles')
 </head>
 
-<body class="bg-[#f8fafc] text-slate-700 font-sans antialiased">
-
-    <div class="min-h-screen flex w-full">
-
+<body class="bg-[#f8fafc] text-slate-700 font-sans antialiased overflow-hidden">
+    <div class="h-screen flex w-full overflow-hidden">
         {{-- SIDEBAR --}}
         @include('layout.sidebar')
 
         {{-- AREA KANAN --}}
-        <div class="flex-1 min-w-0 flex flex-col">
-
+        <div class="flex-1 min-w-0 h-screen flex flex-col overflow-hidden">
             {{-- TOP HEADER --}}
             @include('layout.header')
 
             {{-- CONTENT --}}
-            <main class="flex-1 min-w-0 w-full">
-              @include('layout.response')
+            <main class="flex-1 min-w-0 w-full overflow-y-auto">              @include('layout.response')
 
                 @yield('content')
             </main>

@@ -59,7 +59,7 @@ class AuthController extends Controller
         }
 
         if ($user->hasRole('guru')) {
-            return redirect()->route('dashboard');
+            return redirect()->route('jadwalGuru.index');
         }
 
         Auth::logout();

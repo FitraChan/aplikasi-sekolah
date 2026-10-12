@@ -67,11 +67,10 @@
           <div
             class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-[#02BC9C] flex-shrink-0 shadow-md shadow-emerald-800/10">
             <!-- Graduation Cap Icon -->
-            <svg class="w-6 h-6 text-[#02BC9C]" fill="currentColor" viewbox="0 0 24 24">
-              <path
-                d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18C5 19.94 8.13 22 12 22C15.87 22 19 19.94 19 17.18V13.18L12 17L5 13.18Z">
-              </path>
-            </svg>
+             <img src="{{ asset('public/images/Favicon_MOBIS_WARNA.png') }}"
+                        alt="Logo"
+                        class="w-8 h-8 object-contain">
+
           </div>
           <div>
             <div class="font-extrabold text-lg text-white tracking-tight leading-none">PPDB {{ date('Y')}}</div>

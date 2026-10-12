@@ -291,7 +291,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         </div>
                     </a>
                     <!-- Sub-Menu Wrapper -->
-                    <ul class="{{ in_array($side, ['pbm','jadwalGuru','ujianGuru','soalGuru']) ? 'menu__sub-open' : '' }}">
+                    <ul class="{{ in_array($side, ['pbm','jadwalGuru','ujianGuru','soalGuru','master-guru-profile','jadwal-wawancara-guru']) ? 'menu__sub-open' : '' }}">
                         <li>
                             <!-- Sub-Menu Gelombang -->
                             <a href="{{ route('pbm.index') }}" class="menu {{ $side == 'pbm' ? 'menu--active' : '' }}">
@@ -320,6 +320,21 @@ License: You must have a valid license purchased only from themeforest(the above
                             <a href="{{ route('soalGuru.index') }}" class="menu {{ $side == 'soalGuru' ? 'menu--active' : '' }}">
                                 <div class="menu__icon"> <i data-lucide="monitor"></i> </div>
                                 <div class="menu__title">Master Soal </div>
+                            </a>
+                        </li>   
+
+                         <li>
+                            <a href="{{ route('jadwalWawancaraGuru') }}" class="menu {{ $side == 'jadwal-wawancara-guru' ? 'menu--active' : '' }}">
+                                <div class="menu__icon"> <i data-lucide="monitor"></i> </div>
+                                <div class="menu__title">Jadwal Wawancara</div>
+                            </a>
+                        </li>  
+
+
+                         <li>
+                            <a href="{{ route('masterGuru.profile') }}" class="menu {{ $side == 'master-guru-profile' ? 'menu--active' : '' }}">
+                                <div class="menu__icon"> <i data-lucide="monitor"></i> </div>
+                                <div class="menu__title">Profile</div>
                             </a>
                         </li>   
 
@@ -656,7 +671,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         </div>
                     </a>
                     <!-- Sub-side-menu Wrapper -->
-                    <ul class="{{ in_array($side, ['pbm','jadwalGuru','ujianGuru','soalGuru']) ? 'side-menu__sub-open' : '' }}">
+                    <ul class="{{ in_array($side, ['pbm','jadwalGuru','ujianGuru','soalGuru','jadwal-wawancara-guru']) ? 'side-menu__sub-open' : '' }}">
                         <li>
                             <!-- Sub-side-menu Gelombang -->
                             <a href="{{ route('pbm.index') }}" class="side-menu {{ $side == 'pbm' ? 'side-menu--active' : '' }}">
@@ -689,6 +704,25 @@ License: You must have a valid license purchased only from themeforest(the above
                                 <div class="side-menu__title"> Master Soal </div>
                             </a>
                         </li>  
+
+
+                         <li>
+                            <!-- Sub-side-menu Gelombang -->
+                            <a href="{{ route('jadwalWawancaraGuru') }}" class="side-menu {{ $side == 'jadwal-wawancara-guru' ? 'side-menu--active' : '' }}">
+                                <div class="side-menu__icon"> <i data-lucide="monitor"></i> </div>
+                                <div class="side-menu__title"> Jadwal Wawancara </div>
+                            </a>
+                        </li>
+
+
+
+                        <li>
+                            <!-- Sub-side-menu Gelombang -->
+                            <a href="{{ route('masterGuru.profile') }}" class="side-menu {{ $side == 'master-guru-profile' ? 'side-menu--active' : '' }}">
+                                <div class="side-menu__icon"> <i data-lucide="monitor"></i> </div>
+                                <div class="side-menu__title"> Profile </div>
+                            </a>
+                        </li>
 
 
                     </ul>

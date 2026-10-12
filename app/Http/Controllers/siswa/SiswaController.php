@@ -13,9 +13,7 @@ use App\Models\Kelas;
 use App\Models\Gelombang;
 use App\Models\Bayar;
 use App\Models\DetBayar;
-
-
-
+use App\Models\Konfig;
 use App\Models\TahunAjaran;
 use App\Models\LogModel;
 use Illuminate\Http\Request;
@@ -29,11 +27,30 @@ class SiswaController extends Controller
     /**
      * Halaman daftar siswa.
      */
+
+
+    var $tahun, $smt;
+  
+    public function __construct()
+    {
+        $konfig = Konfig::first();
+        $this->tahun = $konfig->id_tahun;
+        $this->smt = $konfig->smt;
+      
+    }   
     public function index()
     {
+
+        $tahunSekarang = $this->tahun;
         $jurusan = Jurusan::orderBy('nama_jurusan')->get();
         $kelas = Kelas::orderBy('nama_kelas')->get();
-        $tahunAjaran = TahunAjaran::orderByDesc('id')->get();
+        $tahunAjaran = TahunAjaran::whereBetween('id', [
+                        $tahunSekarang - 3,
+                        $tahunSekarang
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->get();
+
         $status_siswa = DB::table('tb_sts_siswa')->orderBy('id', 'asc')->get();
 
 
@@ -122,6 +139,8 @@ class SiswaController extends Controller
      */
     public function data(Request $request)
     {
+
+        $tahun = $this->tahun;
         $query = Siswa::query()
             ->with([
                 'kelas',
@@ -152,7 +171,20 @@ class SiswaController extends Controller
                 });
             }
 
-        $data = $query->get()->map(function ($item) {
+        $data = $query->get()->map(function ($item) use($tahun) {
+
+         $kelas;
+         $selisih = $tahun - $item->id_thn_ajaran;
+
+         if ($selisih == 0) {
+             $kelas = 'X';
+         } elseif ($selisih == 1) { 
+             $kelas = 'XI';
+         } else {
+             $kelas = 'XII';
+         }
+
+
             return [
                 'id'             => $item->id,
                 'nipd'           => $item->nipd,
@@ -161,8 +193,7 @@ class SiswaController extends Controller
                 'jk'             => $item->jk,
                 'no_hp'          => $item->no_hp,
                 'email'          => $item->email,
-
-                'nama_kelas'     => $item->kelas->nama_kelas ?? '-',
+              
                 'nama_jurusan'   => $item->jurusan->nama_jurusan ?? '-',
                 'tahun_ajaran'   => $item->tahunAjaran->thn_ajaran ?? '-',
                 'agama'          => $item->agama->nama_agama ?? '-',
@@ -171,6 +202,7 @@ class SiswaController extends Controller
                 'id_jurusan'     => $item->id_jurusan,
                 'id_thn_ajaran'  => $item->id_thn_ajaran,
                 'status'         => $item->status,
+               'kelas' => trim($kelas . ' ' . ($item->kelas?->nama_kelas ?? '')),
             ];
         });
 

@@ -20,8 +20,7 @@
     function initTableDetailHistory() {
 
         window.tableHistoryDetail = new Tabulator(
-            "#tableHistoryBayarDetail",
-            {
+            "#tableHistoryBayarDetail", {
                 layout: "fitDataStretch",
                 height: "500px",
                 selectableRows: 1,
@@ -75,8 +74,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -93,8 +91,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -107,6 +104,81 @@
                         title: "Keterangan",
                         field: "keterangan",
                         width: 250
+                    },
+                    {
+                        title: "Bukti Bayar",
+                        field: "bukti_bayar",
+                        width: 130,
+                        hozAlign: "center",
+                        headerHozAlign: "center",
+
+                        formatter: function(cell) {
+
+                            const bukti =
+                                cell.getValue();
+
+
+
+
+                            if (!bukti) {
+
+                                return `
+                                <span
+                                    class="text-xs text-slate-400"
+                                >
+                                    Tidak ada
+                                </span>
+                            `;
+
+                            }
+
+                            return `
+                            <button
+                                type="button"
+                                class="inline-flex
+                                       items-center
+                                       gap-1.5
+                                       px-3
+                                       py-1.5
+                                       rounded-lg
+                                       bg-[#02BC9C]
+                                       hover:bg-[#00aF8F]
+                                       text-white
+                                       text-xs
+                                       font-medium
+                                       transition-colors"
+                                onclick="lihatBuktiBayar('${bukti}')"
+                            >
+
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"
+                                    />
+
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="2.5"
+                                    />
+
+                                </svg>
+
+                                Lihat
+
+                            </button>
+                        `;
+
+                        }
+
                     }
                 ]
             }
@@ -255,8 +327,7 @@
         try {
 
             const response = await fetch(
-                `{{ url('bayar-calon-siswa') }}/${selectedHistoryBayar.id}`,
-                {
+                `{{ url('bayar-calon-siswa') }}/${selectedHistoryBayar.id}`, {
                     method: 'DELETE',
 
                     headers: {
@@ -265,12 +336,11 @@
 
                         'Accept': 'application/json',
 
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector(
-                                    'meta[name="csrf-token"]'
-                                )
-                                .getAttribute('content')
+                        'X-CSRF-TOKEN': document
+                            .querySelector(
+                                'meta[name="csrf-token"]'
+                            )
+                            .getAttribute('content')
                     }
                 }
             );
@@ -281,9 +351,9 @@
 
             Swal.fire({
 
-                icon: result.success
-                    ? 'success'
-                    : 'error',
+                icon: result.success ?
+                    'success' :
+                    'error',
 
                 title: result.title,
 
@@ -349,8 +419,7 @@
     function initTableDetailBayar() {
 
         tableDetailBayar = new Tabulator(
-            "#tableDetailBayar",
-            {
+            "#tableDetailBayar", {
 
                 layout: "fitDataStretch",
 
@@ -382,8 +451,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -399,8 +467,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -416,8 +483,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -493,12 +559,11 @@
 
                     headers: {
 
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector(
-                                    'meta[name="csrf-token"]'
-                                )
-                                .getAttribute('content'),
+                        'X-CSRF-TOKEN': document
+                            .querySelector(
+                                'meta[name="csrf-token"]'
+                            )
+                            .getAttribute('content'),
 
                         'Accept': 'application/json'
                     }
@@ -684,73 +749,62 @@
 
             const formData = {
 
-                id_bayar:
-                    document.getElementById(
-                        'id_bayar_detail'
-                    ).value,
+                id_bayar: document.getElementById(
+                    'id_bayar_detail'
+                ).value,
 
-                id_item:
-                    document.getElementById(
-                        'id_item'
-                    ).value,
+                id_item: document.getElementById(
+                    'id_item'
+                ).value,
 
-                kwajiban_bayar:
-                    document.getElementById(
-                        'kwajiban_bayar'
-                    ).value,
+                kwajiban_bayar: document.getElementById(
+                    'kwajiban_bayar'
+                ).value,
 
-                jml_bayar:
-                    document.getElementById(
-                        'jml_bayar'
-                    ).value,
+                jml_bayar: document.getElementById(
+                    'jml_bayar'
+                ).value,
 
-                potongan:
-                    document.getElementById(
-                        'potongan'
-                    ).value,
+                potongan: document.getElementById(
+                    'potongan'
+                ).value,
 
-                id_cicilan:
-                    document.getElementById(
-                        'id_cicilan'
-                    ).value,
+                id_cicilan: document.getElementById(
+                    'id_cicilan'
+                ).value,
 
-                keterangan:
-                    document.getElementById(
-                        'keterangan'
-                    ).value
+                keterangan: document.getElementById(
+                    'keterangan'
+                ).value
             };
 
 
-            const url = id
-                ? `{{ url('det-bayar-calon-siswa') }}/${id}`
-                : `{{ route('det-bayar-calon-siswa.store') }}`;
+            const url = id ?
+                `{{ url('det-bayar-calon-siswa') }}/${id}` :
+                `{{ route('det-bayar-calon-siswa.store') }}`;
 
 
-            const method = id
-                ? 'PUT'
-                : 'POST';
+            const method = id ?
+                'PUT' :
+                'POST';
 
 
             const response = await fetch(
-                url,
-                {
+                url, {
 
                     method: method,
 
                     headers: {
 
-                        "Content-Type":
-                            "application/json",
+                        "Content-Type": "application/json",
 
-                        "Accept":
-                            "application/json",
+                        "Accept": "application/json",
 
-                        "X-CSRF-TOKEN":
-                            document
-                                .querySelector(
-                                    'meta[name="csrf-token"]'
-                                )
-                                .getAttribute('content')
+                        "X-CSRF-TOKEN": document
+                            .querySelector(
+                                'meta[name="csrf-token"]'
+                            )
+                            .getAttribute('content')
                     },
 
                     body: JSON.stringify(formData)
@@ -843,20 +897,17 @@
 
             const formData = {
 
-                tgl_bayar:
-                    document.getElementById(
-                        'tgl_bayar_history'
-                    ).value ?? '',
+                tgl_bayar: document.getElementById(
+                    'tgl_bayar_history'
+                ).value ?? '',
 
-                no_kwitansi:
-                    document.getElementById(
-                        'no_kwitansi_history'
-                    ).value ?? '',
+                no_kwitansi: document.getElementById(
+                    'no_kwitansi_history'
+                ).value ?? '',
 
-                keterangan:
-                    document.getElementById(
-                        'keterangan'
-                    ).value ?? ''
+                keterangan: document.getElementById(
+                    'keterangan'
+                ).value ?? ''
             };
 
 
@@ -888,18 +939,15 @@
 
                     headers: {
 
-                        'Content-Type':
-                            'application/json',
+                        'Content-Type': 'application/json',
 
-                        'Accept':
-                            'application/json',
+                        'Accept': 'application/json',
 
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector(
-                                    'meta[name="csrf-token"]'
-                                )
-                                .getAttribute('content')
+                        'X-CSRF-TOKEN': document
+                            .querySelector(
+                                'meta[name="csrf-token"]'
+                            )
+                            .getAttribute('content')
                     },
 
                     body: JSON.stringify(formData)
@@ -965,15 +1013,31 @@
 
     function openModalTambah() {
 
-    const modal = document.getElementById('modal-tambah-form');
+        const modal = document.getElementById('modal-tambah-form');
 
-    if (!modal) {
-        console.error('Modal modal-tambah-form tidak ditemukan');
-        return;
+        if (!modal) {
+            console.error('Modal modal-tambah-form tidak ditemukan');
+            return;
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-}
+    function lihatBuktiBayar(namaFile) {
 
+        if (!namaFile) {
+            return;
+        }
+
+        const url =
+            "{{ asset('storage/app/public') }}/" +
+            namaFile;
+
+        window.open(
+            url,
+            '_blank'
+        );
+
+    }
 </script>

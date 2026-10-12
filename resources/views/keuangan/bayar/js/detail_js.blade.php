@@ -59,7 +59,7 @@
                     {
                         title: "Total Bayar",
                         field: "tot_bayar",
-                       // hozAlign: "right",
+                        // hozAlign: "right",
                         formatter: function(cell) {
                             return new Intl.NumberFormat(
                                 'id-ID', {
@@ -88,7 +88,82 @@
                         title: "Keterangan",
                         field: "keterangan",
                         width: 250
+                    },
+                    {
+                    title: "Bukti Bayar",
+                    field: "bukti_bayar",
+                    width: 130,
+                    hozAlign: "center",
+                    headerHozAlign: "center",
+
+                    formatter: function(cell) {
+
+                        const bukti =
+                            cell.getValue();
+
+                            console.log('bukti', bukti);
+                            
+
+                        if (!bukti) {
+
+                            return `
+                                <span
+                                    class="text-xs text-slate-400"
+                                >
+                                    Tidak ada
+                                </span>
+                            `;
+
+                        }
+
+                        return `
+                            <button
+                                type="button"
+                                class="inline-flex
+                                       items-center
+                                       gap-1.5
+                                       px-3
+                                       py-1.5
+                                       rounded-lg
+                                       bg-[#02BC9C]
+                                       hover:bg-[#00aF8F]
+                                       text-white
+                                       text-xs
+                                       font-medium
+                                       transition-colors"
+                                onclick="lihatBuktiBayar('${bukti}')"
+                            >
+
+                                <svg
+                                    class="w-4 h-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"
+                                    />
+
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="2.5"
+                                    />
+
+                                </svg>
+
+                                Lihat
+
+                            </button>
+                        `;
+
                     }
+
+                }
                 ]
             }
         );
@@ -101,7 +176,7 @@
 
             document.getElementById('id_bayar_detail').value = data.id;
             showDetailBayar(data.id);
-                            selectedHistoryBayar = row.getData();
+            selectedHistoryBayar = row.getData();
 
 
             //editHistoryBayar(selectedHistoryBayar);
@@ -109,11 +184,11 @@
         });
     }
 
-    
+
 
     function editHistoryBayar() {
 
-    if (!selectedHistoryBayar) {
+        if (!selectedHistoryBayar) {
 
             Swal.fire({
                 icon: 'warning',
@@ -126,10 +201,10 @@
 
         console.log(selectedHistoryBayar.no_kwitansi);
 
-       document.getElementById('id_bayar_history').value =
-        selectedHistoryBayar.id;
+        document.getElementById('id_bayar_history').value =
+            selectedHistoryBayar.id;
 
-    // Jika tgl_bayar dari database format YYYY-MM-DD
+        // Jika tgl_bayar dari database format YYYY-MM-DD
         document.getElementById('tgl_bayar_history').value =
             selectedHistoryBayar.tgl_bayar ?? '';
 
@@ -150,72 +225,71 @@
 
     async function hapusHistoryBayar() {
 
-            if (!selectedHistoryBayar) {
+        if (!selectedHistoryBayar) {
 
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Peringatan',
-                    text: 'Pilih data terlebih dahulu'
-                });
-
-                return;
-            }
-
-            const konfirmasi = await Swal.fire({
+            Swal.fire({
                 icon: 'warning',
-                title: 'Konfirmasi Hapus',
-                text: 'Apakah Anda yakin ingin menghapus data ini?',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Batal'
+                title: 'Peringatan',
+                text: 'Pilih data terlebih dahulu'
             });
 
-            if (!konfirmasi.isConfirmed) {
-                return;
-            }
+            return;
+        }
 
-            try {
+        const konfirmasi = await Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi Hapus',
+            text: 'Apakah Anda yakin ingin menghapus data ini?',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+        });
 
-                const response = await fetch(
-                    `{{ url('bayar') }}/${selectedHistoryBayar.id}`,
-                    {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute('content')
-                        }
+        if (!konfirmasi.isConfirmed) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `{{ url('bayar') }}/${selectedHistoryBayar.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content')
                     }
-                );
-
-                const result = await response.json();
-
-                Swal.fire({
-                    icon: result.success ? 'success' : 'error',
-                    title: result.title,
-                    text: result.msg
-                });
-
-                if (result.success) {
-
-                    tableHistoryDetail.replaceData();
-
-                    document.getElementById('id_bayar_detail').value = '';
-
-                    document.getElementById('tableDetailBayar')
-                        ?.tabulator?.clearData?.();
                 }
+            );
 
-            } catch (error) {
+            const result = await response.json();
 
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message
-                });
+            Swal.fire({
+                icon: result.success ? 'success' : 'error',
+                title: result.title,
+                text: result.msg
+            });
 
+            if (result.success) {
+
+                tableHistoryDetail.replaceData();
+
+                document.getElementById('id_bayar_detail').value = '';
+
+                document.getElementById('tableDetailBayar')
+                    ?.tabulator?.clearData?.();
             }
+
+        } catch (error) {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message
+            });
+
+        }
     }
 
     async function setRegistrasi() {
@@ -251,8 +325,7 @@
         try {
 
             const response = await fetch(
-                "{{ route('det-bayar.set-regis') }}",
-                {
+                "{{ route('det-bayar.set-regis') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -299,12 +372,18 @@
 
     let selectedDetail = null;
 
-    function initTableDetailBayar() {
-        tableDetailBayar = new Tabulator("#tableDetailBayar", {
+   function initTableDetailBayar() {
+
+    tableDetailBayar = new Tabulator(
+        "#tableDetailBayar",
+        {
 
             layout: "fitDataStretch",
+
             height: "500px",
+
             selectableRows: 1,
+
             placeholder: "Belum ada data",
 
             columns: [
@@ -313,7 +392,8 @@
                     title: "No",
                     formatter: "rownum",
                     width: 60,
-                    hozAlign: "center"
+                    hozAlign: "center",
+                    headerHozAlign: "center"
                 },
 
                 {
@@ -325,59 +405,97 @@
                 {
                     title: "Kewajiban",
                     field: "kwajiban_bayar",
+                    minWidth: 160,
+                    hozAlign: "right",
+                    headerHozAlign: "right",
+
                     formatter: function(cell) {
+
                         return new Intl.NumberFormat(
-                            'id-ID', {
+                            'id-ID',
+                            {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0
                             }
-                        ).format(cell.getValue() || 0);
+                        ).format(
+                            cell.getValue() || 0
+                        );
+
                     }
                 },
 
                 {
                     title: "Potongan",
                     field: "potongan",
-                 //   hozAlign: "right",
+                    minWidth: 160,
+                    hozAlign: "right",
+                    headerHozAlign: "right",
+
                     formatter: function(cell) {
+
                         return new Intl.NumberFormat(
-                            'id-ID', {
+                            'id-ID',
+                            {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0
                             }
-                        ).format(cell.getValue() || 0);
+                        ).format(
+                            cell.getValue() || 0
+                        );
+
                     }
                 },
 
                 {
                     title: "Jumlah Bayar",
                     field: "jml_bayar",
-                 //   hozAlign: "right",
+                    minWidth: 200,
+                    hozAlign: "right",
+                    headerHozAlign: "right",
+
                     formatter: function(cell) {
+
                         return new Intl.NumberFormat(
-                            'id-ID', {
+                            'id-ID',
+                            {
                                 style: 'currency',
                                 currency: 'IDR',
                                 minimumFractionDigits: 0
                             }
-                        ).format(cell.getValue() || 0);
+                        ).format(
+                            cell.getValue() || 0
+                        );
+
                     }
-                }
+                },
+
+                /*
+                |--------------------------------------------------------------------------
+                | BUKTI BAYAR
+                |--------------------------------------------------------------------------
+                */
+
+                
 
             ]
-        });
 
-        tableDetailBayar.on("rowClick", function(e, row) {
+        }
+    );
 
-                selectedDetail = row.getData();
 
-            });
+    tableDetailBayar.on(
+        "rowClick",
+        function(e, row) {
 
-      
+            selectedDetail =
+                row.getData();
 
-    }
+        }
+    );
+
+}
 
     async function hapusData() {
 
@@ -408,8 +526,7 @@
         try {
 
             const response = await fetch(
-                `{{ url('det-bayar') }}/${selectedDetail.id}`,
-                {
+                `{{ url('det-bayar') }}/${selectedDetail.id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': document
@@ -460,20 +577,20 @@
 
     function editData() {
 
-    const selectedRows = tableDetailBayar.getSelectedData();
+        const selectedRows = tableDetailBayar.getSelectedData();
 
-    if (selectedRows.length === 0) {
+        if (selectedRows.length === 0) {
 
-        Swal.fire({
-            icon: 'warning',
-            title: 'Peringatan',
-            text: 'Pilih data terlebih dahulu'
-        });
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Pilih data terlebih dahulu'
+            });
 
-        return;
-    }
+            return;
+        }
 
-    const data = selectedRows[0];
+        const data = selectedRows[0];
 
         document.getElementById('id_detail').value = data.id;
         document.getElementById('id_bayar').value = data.id_bayar;
@@ -491,15 +608,29 @@
             data.id_cicilan ?? '';
 
         document.getElementById('keterangan').value =
-            data.keterangan ?? '';        
-        
+            data.keterangan ?? '';
+
         document.getElementById('id_item').value = String(data.id_item);
 
-        const modal = tailwind.Modal.getOrCreateInstance(
-            document.getElementById('modal-tambah-form')
-        );
+        // const modal = tailwind.Modal.getOrCreateInstance(
+        //     document.getElementById('modal-tambah-form')
+        // );
 
-        modal.show();
+        // modal.show();
+
+        const modal =
+            document.getElementById('modal-tambah-form');
+
+        if (!modal) {
+            return;
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        modal.setAttribute('aria-hidden', 'false');
+
+
     }
 
     async function saveItemBayar() {
@@ -515,17 +646,16 @@
                 id_cicilan: document.getElementById('id_cicilan').value,
                 keterangan: document.getElementById('keterangan').value
             };
-          //  console.log(formData);
+            //  console.log(formData);
 
-            const url = id
-                ? `{{ url('det-bayar') }}/${id}`
-                : `{{ route('det-bayar.store') }}`;
+            const url = id ?
+                `{{ url('det-bayar') }}/${id}` :
+                `{{ route('det-bayar.store') }}`;
 
-                    const method = id ? 'PUT' : 'POST';
-            
+            const method = id ? 'PUT' : 'POST';
+
             const response = await fetch(
-                url,
-                {
+                url, {
                     method: method,
                     headers: {
                         "Content-Type": "application/json",
@@ -536,32 +666,30 @@
                     body: JSON.stringify(formData)
                 }
             );
-//console.log(response.status);
+            //console.log(response.status);
             const result = await response.json();
 
             if (result.success) {
-             
-                 Swal.fire({
+
+                Swal.fire({
                     icon: "success",
                     title: result.title,
                     text: result.msg
                 });
 
-                const modal =
-                    tailwind.Modal.getInstance(
-                        document.getElementById('modal-tambah-form')
-                    );
 
-                modal.hide();
+            closeModalTambah();
+
+                
 
                 document.getElementById('form-item').reset();
 
                 // reload tabel
-               // tableHistoryDetail.replaceData();
+                // tableHistoryDetail.replaceData();
 
-      tableDetailBayar.setData(
-            "{{ url('bayar/detailBayar') }}/" + document.getElementById('id_bayar_detail').value
-        );
+                tableDetailBayar.setData(
+                    "{{ url('bayar/detailBayar') }}/" + document.getElementById('id_bayar_detail').value
+                );
 
             } else {
 
@@ -603,11 +731,10 @@
             };
 
             console.log(formData);
-            
+
 
             const response = await fetch(
-                `{{ url('bayar') }}/${id}`,
-                {
+                `{{ url('bayar') }}/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -629,13 +756,16 @@
                     text: result.msg
                 });
 
-                const modal = tailwind.Modal.getInstance(
-                    document.getElementById('modal-update-history-form')
-                );
+                const modal = document.getElementById('modal-tambah-form');
 
-                if (modal) {
-                    modal.hide();
+                if (!modal) {
+                    return;
                 }
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                        modal.setAttribute('aria-hidden', 'false');
+
 
                 // refresh tabel history
                 tableHistoryDetail.replaceData();
@@ -663,5 +793,62 @@
         }
     }
 
-       
+    function closeModalTambah() {
+
+        const modal = document.getElementById('modal-tambah-form');
+
+        if (!modal) {
+            return;
+        }
+
+        // Sembunyikan modal
+        modal.classList.add('hidden');
+
+        // Hapus flex agar tidak tetap tampil
+        modal.classList.remove('flex');
+
+        // Update accessibility
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openModalTambah() {
+
+    const modal = document.getElementById('modal-tambah-form');
+
+    if (!modal) {
+        return;
+    }
+
+    // Tampilkan modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    // Accessibility
+    modal.setAttribute('aria-hidden', 'false');
+
+   
+
+    // Reset detail
+    document.getElementById('id_detail').value = '';
+
+    // Fokus ke item
+    document.getElementById('id_item')?.focus();
+}
+
+function lihatBuktiBayar(namaFile) {
+
+    if (!namaFile) {
+        return;
+    }
+
+    const url =
+        "{{ asset('storage/app/public') }}/" +
+        namaFile;
+
+    window.open(
+        url,
+        '_blank'
+    );
+
+}
 </script>

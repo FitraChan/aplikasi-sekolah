@@ -605,139 +605,150 @@
             |--------------------------------------------------------------------------
             */
 
-            {
-                title: "Aksi",
+           {
+    title: "Aksi",
 
-                hozAlign: "center",
+    hozAlign: "center",
 
-                width: 180,
+    width: 180,
 
-                formatter: function(cell) {
+    formatter: function(cell) {
 
-                    let data = cell.getData();
+        let data = cell.getData();
 
-                    return `
+        console.log('data', data);
 
-                        <div class="flex items-center
-                                    justify-center gap-2">
+        let tombolDaftarUlang = '';
 
-                            <!-- EDIT -->
+        @if(isset($side) && $side === 'daftar-ulang')
 
-                            <a
-                                href="{{ url('calon-siswa/edit') }}/${data.id}"
-                                target="_blank"
-                                class="w-9 h-9
-                                       inline-flex
-                                       items-center
-                                       justify-center
-                                       rounded-lg
-                                       bg-amber-50
-                                       border border-amber-100
-                                       text-amber-600
-                                       hover:bg-amber-100
-                                       transition-colors"
-                                title="Edit">
+            if (data.status_daftar_id != 1) {
 
-                                <svg class="w-4 h-4"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round"
-                                     stroke-width="2"
-                                     viewBox="0 0 24 24">
+                tombolDaftarUlang = `
+                    <!-- DAFTAR ULANG -->
 
-                                    <path d="M12 20h9"></path>
+                    <button
+                        type="button"
+                        onclick='openDaftarUlang(${JSON.stringify(data)})'
+                        class="w-9 h-9
+                               inline-flex
+                               items-center
+                               justify-center
+                               rounded-lg
+                               bg-emerald-50
+                               border border-emerald-100
+                               text-emerald-600
+                               hover:bg-emerald-100
+                               transition-colors"
+                        title="Daftar Ulang">
 
-                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                        <svg class="w-4 h-4"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             stroke-width="2"
+                             viewBox="0 0 24 24">
 
-                                </svg>
+                            <path d="M20 6 9 17l-5-5"></path>
 
-                            </a>
+                        </svg>
 
-
-                            <!-- DELETE -->
-
-                            <button
-                                type="button"
-                                onclick="deleteData(${data.id})"
-                                class="w-9 h-9
-                                       inline-flex
-                                       items-center
-                                       justify-center
-                                       rounded-lg
-                                       bg-red-50
-                                       border border-red-100
-                                       text-red-600
-                                       hover:bg-red-100
-                                       transition-colors"
-                                title="Hapus">
-
-                                <svg class="w-4 h-4"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round"
-                                     stroke-width="2"
-                                     viewBox="0 0 24 24">
-
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-
-                                    <path d="M10 11v6"></path>
-
-                                    <path d="M14 11v6"></path>
-
-                                    <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
-
-                                </svg>
-
-                            </button>
-
-
-                            @if(isset($side) && $side === 'daftar-ulang')
-
-                                <!-- DAFTAR ULANG -->
-
-                                <button
-                                    type="button"
-                                    onclick='openDaftarUlang(${JSON.stringify(data)})'
-                                    class="w-9 h-9
-                                           inline-flex
-                                           items-center
-                                           justify-center
-                                           rounded-lg
-                                           bg-emerald-50
-                                           border border-emerald-100
-                                           text-emerald-600
-                                           hover:bg-emerald-100
-                                           transition-colors"
-                                    title="Daftar Ulang">
-
-                                    <svg class="w-4 h-4"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         stroke-width="2"
-                                         viewBox="0 0 24 24">
-
-                                        <path d="M20 6 9 17l-5-5"></path>
-
-                                    </svg>
-
-                                </button>
-
-                            @endif
-
-                        </div>
-
-                    `;
-
-                }
+                    </button>
+                `;
 
             }
 
+        @endif
+
+
+        return `
+
+            <div class="flex items-center
+                        justify-center gap-2">
+
+                <!-- EDIT -->
+
+                <a
+                    href="{{ url('calon-siswa/edit') }}/${data.id}"
+                    target="_blank"
+                    class="w-9 h-9
+                           inline-flex
+                           items-center
+                           justify-center
+                           rounded-lg
+                           bg-amber-50
+                           border border-amber-100
+                           text-amber-600
+                           hover:bg-amber-100
+                           transition-colors"
+                    title="Edit">
+
+                    <svg class="w-4 h-4"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         stroke-width="2"
+                         viewBox="0 0 24 24">
+
+                        <path d="M12 20h9"></path>
+
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+
+                    </svg>
+
+                </a>
+
+
+                <!-- DELETE -->
+
+                <button
+                    type="button"
+                    onclick="deleteData(${data.id})"
+                    class="w-9 h-9
+                           inline-flex
+                           items-center
+                           justify-center
+                           rounded-lg
+                           bg-red-50
+                           border border-red-100
+                           text-red-600
+                           hover:bg-red-100
+                           transition-colors"
+                    title="Hapus">
+
+                    <svg class="w-4 h-4"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         stroke-width="2"
+                         viewBox="0 0 24 24">
+
+                        <polyline points="3 6 5 6 21 6"></polyline>
+
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+
+                        <path d="M10 11v6"></path>
+
+                        <path d="M14 11v6"></path>
+
+                        <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+
+                    </svg>
+
+                </button>
+
+
+                ${tombolDaftarUlang}
+
+            </div>
+
+        `;
+
+    }
+}
         ]
 
     });

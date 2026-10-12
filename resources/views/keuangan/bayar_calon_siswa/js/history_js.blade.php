@@ -128,8 +128,8 @@
 
 
             document.getElementById(
-                'jurusan_siswa_detail'
-            ).value =
+                    'jurusan_siswa_detail'
+                ).value =
                 data.jurusan?.nama_jurusan ?? '';
 
 
@@ -155,8 +155,7 @@
     function initTableHistory() {
 
         tableDetail = new Tabulator(
-            "#tableHistoryBayar",
-            {
+            "#tableHistoryBayar", {
 
                 layout: "fitDataStretch",
 
@@ -184,7 +183,7 @@
 
                         let holder =
                             row.getElement()
-                               .querySelector(".detail-holder");
+                            .querySelector(".detail-holder");
 
 
                         if (holder) {
@@ -226,14 +225,12 @@
 
                         new Tabulator(tableDiv, {
 
-                            ajaxURL:
-                                "{{ url('/bayar-calon-siswa/detailBayar') }}/" +
+                            ajaxURL: "{{ url('/bayar-calon-siswa/detailBayar') }}/" +
                                 data.id,
 
                             layout: "fitColumns",
 
-                            placeholder:
-                                "Tidak ada detail pembayaran",
+                            placeholder: "Tidak ada detail pembayaran",
 
                             columns: [
 
@@ -249,8 +246,7 @@
                                     formatter: function(cell) {
 
                                         return new Intl.NumberFormat(
-                                            'id-ID',
-                                            {
+                                            'id-ID', {
                                                 style: 'currency',
                                                 currency: 'IDR',
                                                 minimumFractionDigits: 0
@@ -268,8 +264,7 @@
                                     formatter: function(cell) {
 
                                         return new Intl.NumberFormat(
-                                            'id-ID',
-                                            {
+                                            'id-ID', {
                                                 style: 'currency',
                                                 currency: 'IDR',
                                                 minimumFractionDigits: 0
@@ -287,8 +282,7 @@
                                     formatter: function(cell) {
 
                                         return new Intl.NumberFormat(
-                                            'id-ID',
-                                            {
+                                            'id-ID', {
                                                 style: 'currency',
                                                 currency: 'IDR',
                                                 minimumFractionDigits: 0
@@ -344,14 +338,14 @@
                                 new Date(value);
 
                             return String(
-                                date.getDate()
-                            ).padStart(2, '0') +
-                            "-" +
-                            String(
-                                date.getMonth() + 1
-                            ).padStart(2, '0') +
-                            "-" +
-                            date.getFullYear();
+                                    date.getDate()
+                                ).padStart(2, '0') +
+                                "-" +
+                                String(
+                                    date.getMonth() + 1
+                                ).padStart(2, '0') +
+                                "-" +
+                                date.getFullYear();
 
                         }
                     },
@@ -364,8 +358,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -384,8 +377,7 @@
                         formatter: function(cell) {
 
                             return new Intl.NumberFormat(
-                                'id-ID',
-                                {
+                                'id-ID', {
                                     style: 'currency',
                                     currency: 'IDR',
                                     minimumFractionDigits: 0
@@ -625,32 +617,27 @@
 
                     headers: {
 
-                        'Content-Type':
-                            'application/json',
+                        'Content-Type': 'application/json',
 
-                        'X-CSRF-TOKEN':
-                            document.querySelector(
-                                'meta[name="csrf-token"]'
-                            ).content
+                        'X-CSRF-TOKEN': document.querySelector(
+                            'meta[name="csrf-token"]'
+                        ).content
 
                     },
 
                     body: JSON.stringify({
 
-                        tgl_bayar:
-                            document.getElementById(
-                                'tgl_bayar'
-                            ).value,
+                        tgl_bayar: document.getElementById(
+                            'tgl_bayar'
+                        ).value,
 
-                        no_kwitansi:
-                            document.getElementById(
-                                'no_kwitansi'
-                            ).value,
+                        no_kwitansi: document.getElementById(
+                            'no_kwitansi'
+                        ).value,
 
-                        keterangan:
-                            document.getElementById(
-                                'keterangan'
-                            ).value
+                        keterangan: document.getElementById(
+                            'keterangan'
+                        ).value
 
                     })
 
@@ -663,9 +650,9 @@
 
             Swal.fire({
 
-                icon: result.success
-                    ? "success"
-                    : "error",
+                icon: result.success ?
+                    "success" :
+                    "error",
 
                 title: result.title,
 
@@ -694,8 +681,7 @@
 
                 title: "Error",
 
-                text:
-                    "Terjadi kesalahan saat menyimpan pembayaran"
+                text: "Terjadi kesalahan saat menyimpan pembayaran"
 
             });
 
@@ -722,12 +708,10 @@
                 'btn-save-cicilan'
             );
 
-
         const buttonText =
             document.getElementById(
                 'text-save-cicilan'
             );
-
 
         const originalText =
             buttonText.innerHTML;
@@ -741,80 +725,147 @@
 
         try {
 
+            /* =====================================================
+               FORM DATA
+            ===================================================== */
+
+            const formData =
+                new FormData();
+
+
+            /* =====================================================
+               DATA PEMBAYARAN
+            ===================================================== */
+
+            formData.append(
+                'id_bukti',
+                document.getElementById(
+                    'id_bukti'
+                )?.value ?? 0
+            );
+
+
+            formData.append(
+                'id_csiswa',
+                document.getElementById(
+                    'id_calon_siswa_cicilan'
+                ).value
+            );
+
+
+            formData.append(
+                'tgl_bayar',
+                document.getElementById(
+                    'tgl_bayar'
+                ).value
+            );
+
+
+            formData.append(
+                'no_kwitansi',
+                document.getElementById(
+                    'no_kwitansi'
+                ).value
+            );
+
+
+            formData.append(
+                'keterangan',
+                document.getElementById(
+                    'keterangan'
+                ).value
+            );
+
+
+            /* =====================================================
+               NOMINAL PEMBAYARAN
+            ===================================================== */
+
+            formData.append(
+                'jml_pendaftaran',
+                document.getElementById(
+                    'jml_pendaftaran'
+                ).value || 0
+            );
+
+
+            formData.append(
+                'jml_dpp',
+                document.getElementById(
+                    'jml_dpp'
+                ).value || 0
+            );
+
+
+            formData.append(
+                'jml_mos',
+                document.getElementById(
+                    'jml_mos'
+                ).value || 0
+            );
+
+
+            formData.append(
+                'jml_seragam',
+                document.getElementById(
+                    'jml_seragam'
+                ).value || 0
+            );
+
+
+            /* =====================================================
+               BUKTI BAYAR
+            ===================================================== */
+
+            const fileInput =
+                document.getElementById(
+                    'bukti_bayar_cicilan'
+                );
+
+
+            if (
+                fileInput &&
+                fileInput.files &&
+                fileInput.files.length > 0
+            ) {
+
+                formData.append(
+                    'bukti_bayar',
+                    fileInput.files[0]
+                );
+
+            }
+
+
+            /* =====================================================
+               REQUEST
+            ===================================================== */
+
             const response =
                 await fetch(
-                    '{{ route("bayar-calon-siswa.simpanCicilan") }}',
-                    {
+                    '{{ route("bayar-calon-siswa.simpanCicilan") }}', {
 
                         method: 'POST',
 
                         headers: {
 
-                            'Content-Type':
-                                'application/json',
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]'
+                            ).getAttribute('content'),
 
-                            'X-CSRF-TOKEN':
-                                document.querySelector(
-                                    'meta[name="csrf-token"]'
-                                ).getAttribute('content'),
-
-                            'Accept':
-                                'application/json'
+                            'Accept': 'application/json'
 
                         },
 
-                        body: JSON.stringify({
-
-                            id_bukti:
-                                document.getElementById(
-                                    'id_bukti'
-                                )?.value ?? 0,
-
-                            id_csiswa:
-                                document.getElementById(
-                                    'id_calon_siswa_cicilan'
-                                ).value,
-
-                            tgl_bayar:
-                                document.getElementById(
-                                    'tgl_bayar'
-                                ).value,
-
-                            no_kwitansi:
-                                document.getElementById(
-                                    'no_kwitansi'
-                                ).value,
-
-                            keterangan:
-                                document.getElementById(
-                                    'keterangan'
-                                ).value,
-
-                            jml_pendaftaran:
-                                document.getElementById(
-                                    'jml_pendaftaran'
-                                ).value || 0,
-
-                            jml_dpp:
-                                document.getElementById(
-                                    'jml_dpp'
-                                ).value || 0,
-
-                            jml_mos:
-                                document.getElementById(
-                                    'jml_mos'
-                                ).value || 0,
-
-                            jml_seragam:
-                                document.getElementById(
-                                    'jml_seragam'
-                                ).value || 0
-
-                        })
+                        body: formData
 
                     }
                 );
 
+
+            /* =====================================================
+               RESPONSE
+            ===================================================== */
 
             const result =
                 await response.json();
@@ -824,7 +875,7 @@
 
                 Swal.fire({
 
-                    icon: "success",
+                    icon: 'success',
 
                     title: result.title,
 
@@ -833,17 +884,55 @@
                 });
 
 
+                /* =================================================
+                   TUTUP MODAL
+                ================================================= */
+
                 closeModalCicilan();
 
 
+                /* =================================================
+                   REFRESH TABLE
+                ================================================= */
+
                 tableDetail.replaceData();
+                window.tableHistoryDetail.replaceData();
+
+
+
+                /* =================================================
+                   RESET FILE
+                ================================================= */
+
+                if (fileInput) {
+
+                    fileInput.value = '';
+
+                }
+
+
+                const namaFile =
+                    document.getElementById(
+                        'nama-file-bukti-cicilan'
+                    );
+
+
+                if (namaFile) {
+
+                    namaFile.textContent = '';
+
+                    namaFile.classList.add(
+                        'hidden'
+                    );
+
+                }
 
 
             } else {
 
                 Swal.fire({
 
-                    icon: "error",
+                    icon: 'error',
 
                     title: result.title,
 
@@ -856,17 +945,19 @@
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                'Error saveCicilan:',
+                error
+            );
 
 
             Swal.fire({
 
-                icon: "error",
+                icon: 'error',
 
-                title: "Error",
+                title: 'Error',
 
-                text:
-                    "Terjadi kesalahan saat menyimpan data"
+                text: 'Terjadi kesalahan saat menyimpan data'
 
             });
 
@@ -881,7 +972,6 @@
         }
 
     }
-
 
     /* =========================================================
        SAVE CICILAN BUKTI BAYAR
@@ -915,72 +1005,59 @@
 
             const response =
                 await fetch(
-                    '{{ route("bayar-calon-siswa.simpanCicilan") }}',
-                    {
+                    '{{ route("bayar-calon-siswa.simpanCicilan") }}', {
 
                         method: 'POST',
 
                         headers: {
 
-                            'Content-Type':
-                                'application/json',
+                            'Content-Type': 'application/json',
 
-                            'X-CSRF-TOKEN':
-                                document.querySelector(
-                                    'meta[name="csrf-token"]'
-                                ).getAttribute('content'),
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]'
+                            ).getAttribute('content'),
 
-                            'Accept':
-                                'application/json'
+                            'Accept': 'application/json'
 
                         },
 
                         body: JSON.stringify({
 
-                            id_bukti:
-                                document.getElementById(
-                                    'id_bukti'
-                                ).value,
+                            id_bukti: document.getElementById(
+                                'id_bukti'
+                            ).value,
 
-                            id_csiswa:
-                                document.getElementById(
-                                    'id_calon_siswa_cicilan'
-                                ).value,
+                            id_csiswa: document.getElementById(
+                                'id_calon_siswa_cicilan'
+                            ).value,
 
-                            tgl_bayar:
-                                document.getElementById(
-                                    'tgl_bayar'
-                                ).value,
+                            tgl_bayar: document.getElementById(
+                                'tgl_bayar'
+                            ).value,
 
-                            no_kwitansi:
-                                document.getElementById(
-                                    'no_kwitansi'
-                                ).value,
+                            no_kwitansi: document.getElementById(
+                                'no_kwitansi'
+                            ).value,
 
-                            keterangan:
-                                document.getElementById(
-                                    'keterangan'
-                                ).value,
+                            keterangan: document.getElementById(
+                                'keterangan'
+                            ).value,
 
-                            jml_pendaftaran:
-                                document.getElementById(
-                                    'jml_pendaftaran'
-                                ).value || 0,
+                            jml_pendaftaran: document.getElementById(
+                                'jml_pendaftaran'
+                            ).value || 0,
 
-                            jml_dpp:
-                                document.getElementById(
-                                    'jml_dpp'
-                                ).value || 0,
+                            jml_dpp: document.getElementById(
+                                'jml_dpp'
+                            ).value || 0,
 
-                            jml_mos:
-                                document.getElementById(
-                                    'jml_mos'
-                                ).value || 0,
+                            jml_mos: document.getElementById(
+                                'jml_mos'
+                            ).value || 0,
 
-                            jml_seragam:
-                                document.getElementById(
-                                    'jml_seragam'
-                                ).value || 0
+                            jml_seragam: document.getElementById(
+                                'jml_seragam'
+                            ).value || 0
 
                         })
 
@@ -1037,8 +1114,7 @@
 
                 title: "Error",
 
-                text:
-                    "Terjadi kesalahan saat menyimpan data"
+                text: "Terjadi kesalahan saat menyimpan data"
 
             });
 
@@ -1065,45 +1141,37 @@
 
             const response =
                 await fetch(
-                    "{{ route('bayar-calon-siswa.setDefBulan') }}",
-                    {
+                    "{{ route('bayar-calon-siswa.setDefBulan') }}", {
 
                         method: "POST",
 
                         headers: {
 
-                            "Content-Type":
-                                "application/json",
+                            "Content-Type": "application/json",
 
-                            "X-CSRF-TOKEN":
-                                "{{ csrf_token() }}",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
 
-                            "Accept":
-                                "application/json"
+                            "Accept": "application/json"
 
                         },
 
                         body: JSON.stringify({
 
-                            id_thn_ajaran:
-                                document.getElementById(
-                                    'id_thn_ajaran'
-                                ).value,
+                            id_thn_ajaran: document.getElementById(
+                                'id_thn_ajaran'
+                            ).value,
 
-                            id_jurusan:
-                                document.getElementById(
-                                    'id_jurusan'
-                                ).value,
+                            id_jurusan: document.getElementById(
+                                'id_jurusan'
+                            ).value,
 
-                            id_tahun:
-                                document.getElementById(
-                                    'id_tahun'
-                                ).value,
+                            id_tahun: document.getElementById(
+                                'id_tahun'
+                            ).value,
 
-                            id_bulan:
-                                document.getElementById(
-                                    'id_bulan'
-                                ).value
+                            id_bulan: document.getElementById(
+                                'id_bulan'
+                            ).value
 
                         })
 
@@ -1167,8 +1235,7 @@
 
                 title: "Error",
 
-                text:
-                    error.message
+                text: error.message
 
             });
 
@@ -1183,29 +1250,27 @@
 
     function applyFilter() {
 
+
+
+
         tableSiswa.setData(
-            "{{ route('bayar-calon-siswa.data') }}",
-            {
+            "{{ route('bayar-calon-siswa.data') }}", {
 
-                tahun:
-                    document.getElementById(
-                        'filter_tahun'
-                    ).value,
+                tahun: document.getElementById(
+                    'filter_tahun'
+                ).value,
 
-                jurusan:
-                    document.getElementById(
-                        'filter_jurusan'
-                    ).value,
+                jurusan: document.getElementById(
+                    'filter_jurusan'
+                ).value,
 
-                kelas:
-                    document.getElementById(
-                        'filter_kelas'
-                    ).value,
+                kelas: document.getElementById(
+                    'filter_kelas'
+                ).value,
 
-                keyword:
-                    document.getElementById(
-                        'filter_keyword'
-                    ).value
+                keyword: document.getElementById(
+                    'filter_keyword'
+                ).value
 
             }
         );
@@ -1268,5 +1333,4 @@
         );
 
     }
-
 </script>

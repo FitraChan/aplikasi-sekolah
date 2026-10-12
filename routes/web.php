@@ -36,15 +36,24 @@ use App\Http\Controllers\akademik\SoalController;
 use App\Http\Controllers\akademik\TahunAjaranController;
 
 use App\Http\Controllers\guru\PenilaianGuruController;
+
+use App\Http\Controllers\guru\MasterGuruController;
+
 use App\Http\Controllers\guru\JadwalController;
 use App\Http\Controllers\guru\UjianController;
 use App\Http\Controllers\guru\SoalGuruController;
+use App\Http\Controllers\guru\HasilWawancaraController;
+
+
+
 use App\Http\Controllers\akademik\PengumumanController;
 
 use App\Http\Controllers\pendaftaran\UjianCalonAdminController;
 use App\Http\Controllers\pendaftaran\UjianSoalCalonController;
 use App\Http\Controllers\pendaftaran\UjianCalonController as CalonSiswaUjianController;
 use App\Http\Controllers\pendaftaran\PengumumanCalonController;
+use App\Http\Controllers\pendaftaran\JadwalWawancaraController;
+use App\Http\Controllers\pendaftaran\HasilTestWawancaraController;
 
 use App\Http\Controllers\siswa\SiswaController;
 
@@ -83,6 +92,66 @@ Route::get('/cancelPembayaranIpaymu', [IpaymuController::class, 'cancel'])
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
+
+
+    Route::prefix('pendaftaran')->group(function () {
+    
+        Route::get(
+            '/hasil-wawancara',
+            [HasilTestWawancaraController::class, 'index']
+        )->name('hasilWawancara');
+
+
+        // Data untuk Tabulator
+        Route::get(
+            '/hasil-wawancara/data',
+            [HasilTestWawancaraController::class, 'data']
+        )->name('hasilWawancara.data');
+
+
+        // Detail hasil wawancara
+        Route::get(
+            '/hasil-wawancara/{id}',
+            [HasilTestWawancaraController::class, 'show']
+        )->name('hasilWawancara.show');
+
+    });
+
+    Route::get('/jadwal-wawancara', [JadwalWawancaraController::class, 'index'])
+        ->name('jadwal-wawancara.index');
+
+    Route::get('/jadwal-wawancara/data', [JadwalWawancaraController::class, 'data'])
+        ->name('jadwal-wawancara.data');  
+        
+    Route::get('/jadwal-wawancara/create', [JadwalWawancaraController::class, 'create'])
+        ->name('jadwal-wawancara.create'); 
+        
+    Route::get('/jadwal-wawancara/edit/{id}', [JadwalWawancaraController::class, 'edit'])
+        ->name('jadwal-wawancara.edit'); 
+
+    Route::put('/jadwal-wawancara/update/{id}', [JadwalWawancaraController::class, 'update'])
+        ->name('jadwal-wawancara.update'); 
+
+    Route::post('/jadwal-wawancara/store', [JadwalWawancaraController::class, 'store'])
+        ->name('jadwal-wawancara.store'); 
+
+    Route::delete('/jadwal-wawancara/delete/{id}', [JadwalWawancaraController::class, 'destroy'])
+        ->name('jadwal-wawancara.destroy'); 
+    
+        
+
+    Route::get('/masterGuru', [MasterGuruController::class, 'index'])
+        ->name('masterGuru.index');
+    Route::get('/masterGuru/data', [MasterGuruController::class, 'data'])
+        ->name('masterGuru.data');
+    Route::post('/masterGuru/store', [MasterGuruController::class, 'store'])
+        ->name('masterGuru.store');
+    Route::post('/masterGuru/update/{id}', [MasterGuruController::class, 'update'])
+        ->name('masterGuru.update');
+    Route::delete('/masterGuru/delete/{id}', [MasterGuruController::class, 'destroy'])
+        ->name('masterGuru.destroy');
+
+   
 
     Route::get('/tahunAjaran', [TahunAjaranController::class, 'index'])
         ->name('tahunAjaran.index');
@@ -832,8 +901,41 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
 
 Route::middleware(['auth', 'role:guru'])->group(function () {
 
+      Route::get(
+        '/guru/jadwal-wawancara/wawancara/{id}',
+        [HasilWawancaraController::class, 'create']
+    )->name('hasilWawancara.create');
+
+    Route::post(
+        '/guru/hasil-wawancara',
+        [HasilWawancaraController::class, 'store']
+    )->name('hasilWawancara.store');
+
+    Route::get(
+        '/guru/hasil-wawancara/{id}',
+        [HasilWawancaraController::class, 'show']
+    )->name('hasilWawancara.show');
+
+    Route::delete(
+        '/guru/hasil-wawancara/{id}',
+        [HasilWawancaraController::class, 'destroy']
+    )->name('hasilWawancara.destroy');
+
+
+    Route::get(
+    '/guru/jadwal-wawancara',
+    [JadwalWawancaraController::class, 'jadwalGuru']
+    )->name('jadwalWawancaraGuru');
+
+    Route::get(
+        '/guru/jadwal-wawancara/data',
+        [JadwalWawancaraController::class, 'dataJadwalGuru']
+    )->name('jadwalGuru.data');    
+
     Route::get('/dashboard', [Home::class, 'index'])
         ->name('dashboard');
+         Route::get('/masterGuru/profile', [MasterGuruController::class, 'profile'])
+        ->name('masterGuru.profile');
 
     Route::get(
         '/pbm',

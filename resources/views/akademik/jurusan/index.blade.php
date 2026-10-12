@@ -9,13 +9,73 @@
 <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-w-0">
 
     {{-- Header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    {{-- Header --}}
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-        <div>
-            <div class="flex items-center gap-2 mb-2">
-                <a href="javascript:history.back()"
-                   class="inline-flex items-center gap-2 text-sm font-medium text-[#02BC9C] hover:text-[#02a387] transition-colors">
+    {{-- Judul --}}
+    <div>
+        <div class="flex items-center gap-2 mb-2">
+            <a href="javascript:history.back()"
+               class="inline-flex items-center gap-2 text-sm font-medium text-[#02BC9C] hover:text-[#02a387] transition-colors">
 
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-4 h-4"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 19l-7-7 7-7"/>
+                </svg>
+
+                Kembali
+            </a>
+        </div>
+
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+            Jurusan
+        </h1>
+
+        <p class="text-sm text-slate-500 mt-1">
+            Kelola daftar program keahlian dan kuota pendaftaran untuk Angkatan
+            <span id="label-tahun">{{ $tahun }}</span>
+        </p>
+    </div>
+
+
+    {{-- Filter dan Tombol --}}
+    <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+
+        {{-- Dropdown Tahun Ajaran --}}
+        <div class="w-full sm:w-52">
+
+            <label for="filter_tahun"
+                   class="block text-xs font-semibold text-slate-600 mb-1.5">
+                Angkatan
+            </label>
+
+            <div class="relative">
+
+                <select
+                    id="filter_tahun"
+                    class="w-full appearance-none rounded-lg border border-slate-300
+                           bg-white px-3 py-2.5 pr-10 text-sm text-slate-700
+                           outline-none transition
+                           focus:border-[#02BC9C]
+                           focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                    @foreach ($tahun_list as $row)
+                        <option
+                            value="{{ $row->thn_ajaran }}"
+                            {{ $row->thn_ajaran == $tahun ? 'selected' : '' }}>
+                            {{ $row->thn_ajaran }}
+                        </option>
+                    @endforeach
+
+                </select>
+
+                <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="w-4 h-4"
                          fill="none"
@@ -24,29 +84,24 @@
                          stroke-width="2">
                         <path stroke-linecap="round"
                               stroke-linejoin="round"
-                              d="M15 19l-7-7 7-7"/>
+                              d="m19 9-7 7-7-7"/>
                     </svg>
+                </div>
 
-                    Kembali
-                </a>
             </div>
 
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
-                Jurusan
-            </h1>
-
-            <p class="text-sm text-slate-500 mt-1">
-                Kelola daftar program keahlian dan kuota pendaftaran untuk Tahun Ajaran {{ $tahun }}
-            </p>
         </div>
 
+
+        {{-- Tombol Tambah Jurusan --}}
         <button type="button"
                 onclick="openModalJurusan('add')"
                 class="inline-flex items-center justify-center gap-2
                        bg-[#00bfa5] hover:bg-[#00a892]
                        text-white font-semibold
                        px-4 py-2.5 rounded-lg
-                       shadow-sm hover:shadow transition-all">
+                       shadow-sm hover:shadow transition-all
+                       whitespace-nowrap">
 
             <svg xmlns="http://www.w3.org/2000/svg"
                  class="w-5 h-5"
@@ -63,6 +118,10 @@
         </button>
 
     </div>
+
+</div>
+
+    
 
 
     {{-- Table Card --}}
@@ -305,6 +364,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ajaxURL: "{{ route('jurusan.data') }}",
 
+        // Kirim tahun ajaran ke controller
+        ajaxURLGenerator: function (url, config, params) {
+
+            const filterTahun = document.getElementById('filter_tahun');
+
+            const tahun = filterTahun
+                ? filterTahun.value
+                : "{{ $tahun }}";
+
+            return url + "?tahun=" + encodeURIComponent(tahun);
+        },
+
+        // Jika controller mengembalikan { tahun: ..., data: [...] }
+        ajaxResponse: function (url, params, response) {
+            return response.data ?? response;
+        },
+
         layout: "fitColumns",
 
         height: "500px",
@@ -339,57 +415,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 width: 130
             },
 
-           {
-    title: "Pendaftar / Kuota",
-    field: "pendaftar",
-    hozAlign: "center",
-    width: 180,
+            {
+                title: "Pendaftar / Kuota",
+                field: "pendaftar",
+                hozAlign: "center",
+                width: 180,
 
-    formatter: function(cell) {
+                formatter: function (cell) {
 
-        let data = cell.getData();
+                    const data = cell.getData();
 
-        let pendaftar = Number(data.pendaftar || 0);
+                    const pendaftar = Number(data.pendaftar || 0);
+                    const target = Number(data.jumlah_siswa || 0);
 
-        let target = Number(data.jumlah_siswa || 0);
+                    const progress = Math.min(
+                        100,
+                        Math.max(0, Number(data.progress || 0))
+                    );
 
-        let progress = Number(data.progress || 0);
+                    return `
+                        <div class="inline-flex flex-col items-center">
 
-        return `
-            <div class="inline-flex flex-col items-center">
+                            <div class="w-20 bg-slate-100 h-1.5 rounded-full overflow-hidden mb-1.5">
+                                <div
+                                    class="bg-blue-600 h-full rounded-full"
+                                    style="width: ${progress}%;">
+                                </div>
+                            </div>
 
-                <!-- PROGRESS BAR -->
-                <div
-                    class="w-20
-                           bg-slate-100
-                           h-1.5
-                           rounded-full
-                           overflow-hidden
-                           mb-1.5">
+                            <span class="text-[11px] font-bold text-blue-600">
+                                ${pendaftar} / ${target}
+                            </span>
 
-                    <div
-                        class="bg-blue-600
-                               h-full
-                               rounded-full"
-                        style="width: ${progress}%;">
-                    </div>
-
-                </div>
-
-                <!-- ANGKA -->
-                <span
-                    class="text-[11px]
-                           font-bold
-                           text-blue-600">
-
-                    ${pendaftar} / ${target}
-
-                </span>
-
-            </div>
-        `;
-    }
-},
+                        </div>
+                    `;
+                }
+            },
 
             {
                 title: "Aksi",
@@ -398,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 formatter: function (cell) {
 
-                    let data = cell.getData();
+                    const data = cell.getData();
 
                     return `
                         <div class="flex items-center justify-center gap-2">
@@ -406,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <button
                                 type="button"
                                 title="Edit"
-                                onclick='editJurusan(${JSON.stringify(data)})'
+                                onclick='editJurusan(${JSON.stringify(data).replace(/'/g, "&#39;")})'
                                 class="w-9 h-9 rounded-lg
                                        flex items-center justify-center
                                        bg-amber-50 text-amber-600
@@ -420,24 +481,20 @@ document.addEventListener('DOMContentLoaded', function () {
                                      viewBox="0 0 24 24"
                                      stroke="currentColor"
                                      stroke-width="2">
-
                                     <path stroke-linecap="round"
                                           stroke-linejoin="round"
                                           d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5"/>
-
                                     <path stroke-linecap="round"
                                           stroke-linejoin="round"
                                           d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-
                                 </svg>
 
                             </button>
 
-
                             <button
                                 type="button"
                                 title="Hapus"
-                                onclick="deleteJurusan(${data.id})"
+                                onclick="deleteJurusan(${Number(data.id)})"
                                 class="w-9 h-9 rounded-lg
                                        flex items-center justify-center
                                        bg-red-50 text-red-600
@@ -451,23 +508,18 @@ document.addEventListener('DOMContentLoaded', function () {
                                      viewBox="0 0 24 24"
                                      stroke="currentColor"
                                      stroke-width="2">
-
                                     <path stroke-linecap="round"
                                           stroke-linejoin="round"
                                           d="M3 6h18"/>
-
                                     <path stroke-linecap="round"
                                           stroke-linejoin="round"
                                           d="M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2"/>
-
                                     <path stroke-linecap="round"
                                           stroke-linejoin="round"
                                           d="M19 6l-1 14a1 1 0 01-1 1H7a1 1 0 01-1-1L5 6"/>
-
                                     <path stroke-linecap="round"
                                           stroke-linejoin="round"
                                           d="M10 11v6M14 11v6"/>
-
                                 </svg>
 
                             </button>
@@ -481,8 +533,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
-});
 
+    // Filter tahun ajaran
+    const filterTahun = document.getElementById('filter_tahun');
+
+    if (filterTahun) {
+
+        filterTahun.addEventListener('change', function () {
+
+            const tahun = this.value;
+
+            // Perbarui label tahun pada header
+            const labelTahun = document.getElementById('label-tahun');
+
+            if (labelTahun) {
+                labelTahun.textContent = tahun;
+            }
+
+            // Muat ulang data dengan tahun yang dipilih
+            tableJurusan.setData();
+        });
+
+    }
+
+});
 
 /*
 |--------------------------------------------------------------------------

@@ -1,37 +1,286 @@
-<div id="modal-edit-user" class="modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="font-medium text-base mr-auto">Edit Data User</h2>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="edit_user_id">
-                <div class="mb-4">
-                    <label class="form-label">Nama Lengkap</label>
-                    <input type="text" id="edit_user_name" class="form-control" placeholder="Nama lengkap user">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="edit_user_email" class="form-control" placeholder="user@email.com">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">Password Baru (Opsional)</label>
-                    <input type="password" id="edit_user_password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah">
-                </div>
-                <div class="mb-4">
-                    <label class="form-label">Pilih Role</label>
-                    <select id="edit_user_role" class="form-select">
-                        <option value="">-- Pilih Role --</option>
-                        @foreach ($roles as $role)
-                            <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Batal</button>
-                <button type="button" onclick="updateUser()" class="btn btn-primary w-24">Update</button>
-            </div>
+<div
+    id="modal-edit-user"
+    class="hidden fixed inset-0 z-[9999]
+           items-center justify-center
+           bg-slate-900/50
+           p-4"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div
+        class="w-full max-w-lg
+               bg-white
+               rounded-xl
+               shadow-xl
+               overflow-hidden"
+    >
+
+        {{-- =====================================================
+            HEADER
+        ====================================================== --}}
+        <div class="flex items-center justify-between
+                    px-6 py-4
+                    border-b border-slate-200">
+
+            <h2 class="text-lg font-semibold text-slate-800">
+                Edit Data User
+            </h2>
+
+            <button
+                type="button"
+                onclick="closeModalEditUser()"
+                class="inline-flex items-center justify-center
+                       w-8 h-8
+                       rounded-lg
+                       text-slate-400
+                       hover:text-slate-600
+                       hover:bg-slate-100
+                       transition-colors"
+                aria-label="Tutup"
+            >
+                <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
+
         </div>
+
+
+        {{-- =====================================================
+            BODY
+        ====================================================== --}}
+        <div class="px-6 py-5">
+
+            <input
+                type="hidden"
+                id="edit_user_id"
+            >
+
+
+            {{-- Nama --}}
+            <div class="mb-5">
+
+                <label
+                    for="edit_user_name"
+                    class="block mb-2
+                           text-sm font-medium
+                           text-slate-700"
+                >
+                    Nama Lengkap
+                </label>
+
+                <input
+                    type="text"
+                    id="edit_user_name"
+                    placeholder="Nama lengkap user"
+                    class="w-full
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           px-3 py-2.5
+                           text-sm text-slate-700
+                           placeholder:text-slate-400
+                           outline-none
+                           transition
+                           focus:border-[#02BC9C]
+                           focus:ring-2
+                           focus:ring-[#02BC9C]/20"
+                >
+
+            </div>
+
+
+            {{-- Email --}}
+            <div class="mb-5">
+
+                <label
+                    for="edit_user_email"
+                    class="block mb-2
+                           text-sm font-medium
+                           text-slate-700"
+                >
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="edit_user_email"
+                    placeholder="user@email.com"
+                    class="w-full
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           px-3 py-2.5
+                           text-sm text-slate-700
+                           placeholder:text-slate-400
+                           outline-none
+                           transition
+                           focus:border-[#02BC9C]
+                           focus:ring-2
+                           focus:ring-[#02BC9C]/20"
+                >
+
+            </div>
+
+
+            {{-- Password --}}
+            <div class="mb-5">
+
+                <label
+                    for="edit_user_password"
+                    class="block mb-2
+                           text-sm font-medium
+                           text-slate-700"
+                >
+                    Password Baru
+                    <span class="text-slate-400 font-normal">
+                        (Opsional)
+                    </span>
+                </label>
+
+                <input
+                    type="password"
+                    id="edit_user_password"
+                    placeholder="Kosongkan jika tidak ingin mengubah"
+                    class="w-full
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           px-3 py-2.5
+                           text-sm text-slate-700
+                           placeholder:text-slate-400
+                           outline-none
+                           transition
+                           focus:border-[#02BC9C]
+                           focus:ring-2
+                           focus:ring-[#02BC9C]/20"
+                >
+
+            </div>
+
+
+            {{-- Role --}}
+            <div>
+
+                <label
+                    for="edit_user_role"
+                    class="block mb-2
+                           text-sm font-medium
+                           text-slate-700"
+                >
+                    Pilih Role
+                </label>
+
+                <select
+                    id="edit_user_role"
+                    class="w-full
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           px-3 py-2.5
+                           text-sm text-slate-700
+                           outline-none
+                           transition
+                           focus:border-[#02BC9C]
+                           focus:ring-2
+                           focus:ring-[#02BC9C]/20"
+                >
+                    <option value="">
+                        -- Pilih Role --
+                    </option>
+
+                    @foreach ($roles as $role)
+
+                        <option value="{{ $role->name }}">
+                            {{ ucfirst($role->name) }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        {{-- =====================================================
+            FOOTER
+        ====================================================== --}}
+        <div
+            class="flex flex-col-reverse
+                   sm:flex-row sm:justify-end
+                   gap-2
+                   px-6 py-4
+                   bg-slate-50
+                   border-t border-slate-200"
+        >
+
+            {{-- Batal --}}
+            <button
+                type="button"
+                onclick="closeModalEditUser()"
+                class="inline-flex items-center justify-center
+                       px-4 py-2.5
+                       rounded-lg
+                       border border-slate-300
+                       bg-white
+                       text-sm font-medium
+                       text-slate-700
+                       hover:bg-slate-100
+                       transition-colors"
+            >
+                Batal
+            </button>
+
+
+            {{-- Update --}}
+            <button
+                type="button"
+                onclick="updateUser()"
+                class="inline-flex items-center justify-center
+                       gap-2
+                       px-4 py-2.5
+                       rounded-lg
+                       bg-[#02BC9C]
+                       hover:bg-[#00B686]
+                       text-white
+                       text-sm font-medium
+                       shadow-sm
+                       transition-colors"
+            >
+
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M5 12l4 4L19 6"
+                    />
+                </svg>
+
+                Update
+
+            </button>
+
+        </div>
+
     </div>
+
 </div>

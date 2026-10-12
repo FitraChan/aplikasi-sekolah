@@ -414,11 +414,9 @@
 
             <div class="p-6">
 
-                <div class="overflow-x-auto">
-
-                    <div id="table-konfig"></div>
-
-                </div>
+              <div class="w-full overflow-x-auto">
+    <div id="table-konfig"></div>
+</div>
 
             </div>
 
@@ -1307,170 +1305,136 @@
     /* ============================================================= */
 
 
-    let tableKonfig = new Tabulator(
-        "#table-konfig", {
+    let tableKonfig = new Tabulator("#table-konfig", {
 
-            ajaxURL: "{{ route('konfig.data') }}",
+    ajaxURL: "{{ route('konfig.data') }}",
 
-            layout: "fitColumns",
+    layout: "fitDataTable",
 
-            pagination: true,
+    pagination: true,
 
-            paginationSize: 10,
+    paginationSize: 10,
 
-            placeholder: "Belum ada konfigurasi.",
+    placeholder: "Belum ada konfigurasi.",
 
-            columns: [
+    columns: [
 
-                {
+        {
+            title: "No",
+            formatter: "rownum",
+            hozAlign: "center",
+            width: 55,
+            minWidth: 55
+        },
 
-                    title: "No",
+        {
+            title: "Thn Aktif",
+            field: "id_tahun",
+            hozAlign: "center",
+            width: 120,
+            minWidth: 120
+        },
 
-                    formatter: "rownum",
+        {
+            title: "Semester",
+            field: "smt",
+            hozAlign: "center",
+            width: 130,
+            minWidth: 130,
 
-                    hozAlign: "center",
+            formatter: function(cell) {
 
-                    width: 55
+                return Number(cell.getValue()) === 1
 
-                },
+                    ? `
+                        <span class="inline-flex
+                                     px-2.5 py-1
+                                     rounded-full
+                                     bg-blue-50
+                                     border border-blue-100
+                                     text-blue-700
+                                     text-xs
+                                     font-semibold">
+                            Ganjil
+                        </span>
+                    `
 
+                    : `
+                        <span class="inline-flex
+                                     px-2.5 py-1
+                                     rounded-full
+                                     bg-violet-50
+                                     border border-violet-100
+                                     text-violet-700
+                                     text-xs
+                                     font-semibold">
+                            Genap
+                        </span>
+                    `;
+            }
+        },
 
-                {
+        {
+            title: "Tahun PPDB",
+            field: "id_thn_ppdb",
+            hozAlign: "center",
+            width: 150,
+            minWidth: 150
+        },
 
-                    title: "ID Tahun",
+        {
+            title: "Aksi",
+            width: 100,
+            minWidth: 100,
+            hozAlign: "center",
+            headerSort: false,
 
-                    field: "id_tahun",
+            formatter: function(cell) {
 
-                    hozAlign: "center",
+                const data = cell.getData();
 
-                    width: 90
+                return `
+                    <div class="flex items-center justify-center">
 
-                },
+                        <button
+                            type="button"
+                            onclick='editKonfig(${JSON.stringify(data)})'
+                            class="w-9 h-9
+                                   inline-flex
+                                   items-center
+                                   justify-center
+                                   rounded-lg
+                                   bg-amber-50
+                                   border border-amber-100
+                                   text-amber-600
+                                   hover:bg-amber-100
+                                   transition-colors"
+                            title="Edit">
 
+                            <svg class="w-4 h-4"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 stroke-width="2"
+                                 viewBox="0 0 24 24">
 
-                {
+                                <path d="M12 20h9"></path>
 
-                    title: "Semester",
+                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
 
-                    field: "smt",
+                            </svg>
 
-                    hozAlign: "center",
+                        </button>
 
-                    formatter: function(cell) {
-
-                        return Number(
-                                cell.getValue()
-                            ) === 1
-
-                            ?
-                            `
-                                <span class="inline-flex
-                                             px-2.5 py-1
-                                             rounded-full
-                                             bg-blue-50
-                                             border border-blue-100
-                                             text-blue-700
-                                             text-xs
-                                             font-semibold">
-                                    Ganjil
-                                </span>
-                              `
-
-                            :
-                            `
-                                <span class="inline-flex
-                                             px-2.5 py-1
-                                             rounded-full
-                                             bg-violet-50
-                                             border border-violet-100
-                                             text-violet-700
-                                             text-xs
-                                             font-semibold">
-                                    Genap
-                                </span>
-                              `;
-
-                    }
-
-                },
-
-
-                {
-
-                    title: "ID Tahun PPDB",
-
-                    field: "id_thn_ppdb",
-
-                    hozAlign: "center"
-
-                },
-
-
-                {
-
-                    title: "Aksi",
-
-                    width: 90,
-
-                    hozAlign: "center",
-
-                    headerSort: false,
-
-                    formatter: function(cell) {
-
-                        const data =
-                            cell.getData();
-
-
-                        return `
-
-                            <div class="flex
-                                        items-center
-                                        justify-center">
-
-                                <button
-                                    type="button"
-                                    onclick='editKonfig(${JSON.stringify(data)})'
-                                    class="w-9 h-9
-                                           inline-flex
-                                           items-center
-                                           justify-center
-                                           rounded-lg
-                                           bg-amber-50
-                                           border border-amber-100
-                                           text-amber-600
-                                           hover:bg-amber-100
-                                           transition-colors"
-                                    title="Edit">
-
-                                    <svg class="w-4 h-4"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         stroke-width="2"
-                                         viewBox="0 0 24 24">
-
-                                        <path d="M12 20h9"></path>
-
-                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
-
-                                    </svg>
-
-                                </button>
-
-                            </div>
-
-                        `;
-
-                    }
-
-                }
-
-            ]
-
+                    </div>
+                `;
+            }
         }
-    );
+
+    ]
+
+});
 
 
     /*

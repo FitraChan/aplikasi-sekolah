@@ -25,95 +25,71 @@ class JurusanController extends Controller
 
     public function index()
     {
+          $tahun = TahunAjaran::whereBetween('id', [
+                $this->tahun - 3,
+                $this->tahun
+            ])
+            ->orderBy('id', 'desc')
+            ->get();
 
         $thn = TahunAjaran::where('id', $this->tahun)->first();
         return view('akademik.jurusan.index', [
             'tahun' =>  $thn->thn_ajaran,
+            'tahun_list' => $tahun,
             'side' => 'jurusan'
         ]);
     }
 
-    // public function data()
-    // {
-
-    //     $tahun = $this->tahun;
-    //     $data =  $data = Jurusan::withCount([
-    //         'siswa as pendaftar_count' => function ($query) use ($tahun) {
-    //             $query->where('id_thn_ajaran', $tahun);
-    //         }
-    //     ])
-    //         ->orderBy('nama_jurusan')
-    //         ->get()
-    //         ->map(function ($item) {
-
-    //             $target = (int) $item->jumlah_siswa;
-    //             $pendaftar = (int) $item->calon_siswas_count;
-
-    //             $persentase = $target > 0
-    //                 ? round(($pendaftar / $target) * 100)
-    //                 : 0;
-
-    //             // Maksimal progress 100%
-    //             $progress = min($persentase, 100);
-
-    //             return [
-    //                 'id' => $item->id,
-    //                 'nama_jurusan' => $item->nama_jurusan,
-    //                 'singkatan' => $item->singkatan,
-
-    //                 // Target / kuota
-    //                 'jumlah_siswa' => $target,
-
-    //                 // Jumlah calon siswa
-    //                 'pendaftar' => $pendaftar,
-
-    //                 // Persentase
-    //                 'persentase' => $persentase,
-    //                 'progress' => $progress,
-    //             ];
-    //         });
-
-    //     return response()->json($data);
-    // }
-
-    public function data()
+    
+    public function data(Request $request)
     {
-        $tahun = $this->tahun;
+        // Default tahun ajaran
+        $tahunDefault = $this->tahun;
+
+        // Jika tahun dipilih, gunakan tahun dari pencarian
+        $tahun = $request->input('tahun', $tahunDefault);
 
         $data = Jurusan::query()
             ->leftJoin('tb_siswa as siswa', function ($join) use ($tahun) {
-
                 $join->on('siswa.id_jurusan', '=', 'tb_jurusan.id')
                     ->where('siswa.id_thn_ajaran', $tahun);
-
             })
-        ->selectRaw('(tb_jurusan.id) as id')
-        ->selectRaw('MAX(tb_jurusan.nama_jurusan) as nama_jurusan')
-        ->selectRaw('MAX(tb_jurusan.singkatan) as singkatan')
-        ->selectRaw('MAX(tb_jurusan.jumlah_siswa) as jumlah_siswa')
+            ->selectRaw('tb_jurusan.id as id')
+            ->selectRaw('MAX(tb_jurusan.nama_jurusan) as nama_jurusan')
+            ->selectRaw('MAX(tb_jurusan.singkatan) as singkatan')
+            ->selectRaw('MAX(tb_jurusan.jumlah_siswa) as jumlah_siswa')
             ->selectRaw('COUNT(siswa.id) as pendaftar')
             ->selectRaw('
-                ROUND(
-                    COUNT(siswa.id) * 100.0 / tb_jurusan.jumlah_siswa
+                COALESCE(
+                    ROUND(
+                        COUNT(siswa.id) * 100.0 /
+                        NULLIF(MAX(tb_jurusan.jumlah_siswa), 0)
+                    ),
+                    0
                 ) as persentase
             ')
             ->selectRaw('
-                    LEAST(
+                LEAST(
+                    COALESCE(
                         ROUND(
-                            COUNT(siswa.id) * 100.0 / tb_jurusan.jumlah_siswa
+                            COUNT(siswa.id) * 100.0 /
+                            NULLIF(MAX(tb_jurusan.jumlah_siswa), 0)
                         ),
-                        100
-                    ) as progress
-                ')
+                        0
+                    ),
+                    100
+                ) as progress
+            ')
             ->groupBy(
                 'tb_jurusan.id',
-                
-                'tb_jurusan.jumlah_siswa'
+                'tb_jurusan.jumlah_siswa',
+                'tb_jurusan.nama_jurusan'
             )
             ->orderBy('tb_jurusan.nama_jurusan')
             ->get();
 
-        return response()->json($data);
+        return response()->json($data
+        );
     }
 
     public function store(Request $request)

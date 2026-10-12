@@ -128,6 +128,121 @@
 
                 </div>
 
+                <div class="md:col-span-12">
+
+                    <label
+                        for="bukti_bayar_cicilan"
+                        class="block text-sm font-medium
+                               text-slate-700 mb-1.5"
+                    >
+                        Bukti Bayar
+                    </label>
+
+                    <div
+                        class="relative
+                               rounded-lg
+                               border-2 border-dashed
+                               border-slate-300
+                               bg-slate-50
+                               hover:border-[#02BC9C]
+                               hover:bg-[#02BC9C]/5
+                               transition-colors"
+                    >
+
+                        <input
+                            type="file"
+                            id="bukti_bayar_cicilan"
+                            name="bukti_bayar"
+                            accept="image/jpeg,image/png,image/jpg,application/pdf"
+                            class="absolute inset-0
+                                   w-full h-full
+                                   opacity-0
+                                   cursor-pointer"
+                            onchange="previewBuktiBayarCicilan(this)"
+                        >
+
+                        <div
+                            class="flex flex-col
+                                   items-center
+                                   justify-center
+                                   px-6 py-6
+                                   text-center"
+                        >
+
+                            <!-- ICON UPLOAD -->
+
+                            <div
+                                class="flex items-center justify-center
+                                       w-12 h-12
+                                       rounded-full
+                                       bg-[#02BC9C]/10
+                                       text-[#02BC9C]
+                                       mb-3"
+                            >
+
+                                <svg
+                                    class="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24"
+                                >
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M12 16V4"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M8 8l4-4 4 4"
+                                    />
+
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"
+                                    />
+
+                                </svg>
+
+                            </div>
+
+
+                            <!-- TEXT -->
+
+                            <p class="text-sm font-medium text-slate-700">
+                                Klik untuk upload bukti bayar
+                            </p>
+
+                            <p class="mt-1 text-xs text-slate-500">
+                                JPG, JPEG, PNG atau PDF
+                            </p>
+
+
+                            <!-- NAMA FILE -->
+
+                            <p
+                                id="nama-file-bukti-cicilan"
+                                class="hidden mt-2
+                                       text-sm font-medium
+                                       text-[#02BC9C]"
+                            ></p>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-1.5 text-xs text-slate-500">
+                        Maksimal ukuran file 2 MB.
+                    </p>
+
+                </div>
+
+                
+
                 {{-- Pendaftaran --}}
                 <div class="col-span-12 sm:col-span-6 md:col-span-3">
 
@@ -304,3 +419,18 @@
 
     </div>
 </div>
+
+<script>
+    function previewBuktiBayarCicilan(input) {
+        const file = input.files[0];
+        const namaFileElement = document.getElementById('nama-file-bukti-cicilan');
+
+        if (file) {
+            namaFileElement.textContent = file.name;
+            namaFileElement.classList.remove('hidden');
+        } else {
+            namaFileElement.textContent = '';
+            namaFileElement.classList.add('hidden');
+        }
+    }
+</script>

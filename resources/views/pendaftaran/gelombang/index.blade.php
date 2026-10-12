@@ -1363,6 +1363,7 @@
 
     function editGelombang(data) {
 
+   
         const modal =
             document.getElementById(
                 'modal-edit-gelombang'
@@ -1445,6 +1446,13 @@
 
 
 
+         document.getElementById(
+                'edit_kuota'
+            ).value =
+            data.kuota ?? '';    
+
+
+
 
 
         /*
@@ -1498,228 +1506,133 @@
     |--------------------------------------------------------------------------
     */
 
-    function saveData() {
-
-        /*
-         * Cek apakah edit
-         */
-
-        const editIdElement =
-            document.getElementById(
-                'edit_id'
-            );
-
-
-        const id =
-            editIdElement ?
-            editIdElement.value :
-            '';
-
-
-        const isEdit =
-            id !== '';
-
-
-        /*
-         * Prefix
-         */
-
-        const prefix =
-            isEdit ?
-            'edit_' :
-            'add_';
-
-
-        /*
-         * URL
-         */
-
-        const url =
-            isEdit
-
-            ?
-            "{{ url('gelombang/update') }}/" + id
-
-            :
-            "{{ url('gelombang/store') }}";
-
-
-        /*
-         * Ambil value
-         */
-
-        const data = {
-
-            id_tahun: document.getElementById(
-                prefix + 'id_tahun'
-            ).value,
-
-
-            nama_gelombang: document.getElementById(
-                prefix + 'nama_gelombang'
-            ).value,
-
-
-            awal: document.getElementById(
-                prefix + 'awal'
-            ).value,
-
-
-            akhir: document.getElementById(
-                prefix + 'akhir'
-            ).value,
-
-
-            is_current: document.getElementById(
-                prefix + 'is_current'
-            ).value,
-
-
-
-
-        };
-
-
-        /*
-         * Validasi sederhana
-         */
-
-        if (!data.id_tahun) {
-
-            alert(
-                'Tahun wajib diisi.'
-            );
-
-            return;
-
-        }
-
-
-        if (!data.nama_gelombang) {
-
-            alert(
-                'Nama gelombang wajib diisi.'
-            );
-
-            return;
-
-        }
-
-
-        if (!data.awal) {
-
-            alert(
-                'Tanggal awal wajib diisi.'
-            );
-
-            return;
-
-        }
-
-
-        if (!data.akhir) {
-
-            alert(
-                'Tanggal akhir wajib diisi.'
-            );
-
-            return;
-
-        }
-
-
-        /*
-         * Kirim
-         */
-
-        fetch(url, {
-
-                method: 'POST',
-
-                headers: {
-
-                    'Content-Type': 'application/json',
-
-                    'Accept': 'application/json',
-
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-
-                },
-
-                body: JSON.stringify(data)
-
-            })
-
-            .then(async function(response) {
-
-                const result =
-                    await response.json();
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        result.message ||
-                        'Gagal menyimpan data.'
-                    );
-
-                }
-
-
-                return result;
-
-            })
-
-            .then(function(result) {
-
-                /*
-                 * Tutup modal
-                 */
-
-                closeModal();
-
-
-                /*
-                 * Reload card
-                 */
-
-                loadGelombang();
-
-
-                /*
-                 * Reset edit ID
-                 */
-
-                if (editIdElement) {
-
-                    editIdElement.value = '';
-
-                }
-
-
-                /*
-                 * Pesan
-                 */
-
-                console.log(
-                    result.message ||
-                    'Data berhasil disimpan.'
-                );
-
-            })
-
-            .catch(function(error) {
-
-                console.error(error);
-
-                alert(
-                    error.message ||
-                    'Terjadi kesalahan saat menyimpan data.'
-                );
-
-            });
-
+   function saveData() {
+
+    // Cek apakah edit
+    const editIdElement = document.getElementById('edit_id');
+
+    const id = editIdElement ? editIdElement.value : '';
+    const isEdit = id !== '';
+
+    // Prefix form
+    const prefix = isEdit ? 'edit_' : 'add_';
+
+    // URL
+    const url = isEdit
+        ? "{{ url('gelombang/update') }}/" + id
+        : "{{ url('gelombang/store') }}";
+
+    // Ambil data form
+    const data = {
+        id_tahun: document.getElementById(prefix + 'id_tahun').value,
+        nama_gelombang: document.getElementById(prefix + 'nama_gelombang').value.trim(),
+        awal: document.getElementById(prefix + 'awal').value,
+        akhir: document.getElementById(prefix + 'akhir').value,
+        is_current: document.getElementById(prefix + 'is_current').value,
+
+        // Kuota pendaftar
+        kuota: document.getElementById(prefix + 'kuota').value
+    };
+
+    // Validasi tahun
+    if (!data.id_tahun) {
+        alert('Tahun wajib diisi.');
+        return;
     }
+
+    // Validasi nama gelombang
+    if (!data.nama_gelombang) {
+        alert('Nama gelombang wajib diisi.');
+        return;
+    }
+
+    // Validasi tanggal awal
+    if (!data.awal) {
+        alert('Tanggal awal wajib diisi.');
+        return;
+    }
+
+    // Validasi tanggal akhir
+    if (!data.akhir) {
+        alert('Tanggal akhir wajib diisi.');
+        return;
+    }
+
+    // Validasi rentang tanggal
+    if (data.akhir < data.awal) {
+        alert('Tanggal akhir tidak boleh sebelum tanggal awal.');
+        return;
+    }
+
+    // Validasi kuota
+    if (data.kuota === '' || data.kuota === null) {
+        alert('Kuota wajib diisi.');
+        return;
+    }
+
+    const kuota = Number(data.kuota);
+
+    if (!Number.isInteger(kuota) || kuota < 0) {
+        alert('Kuota harus berupa bilangan bulat minimal 0.');
+        return;
+    }
+
+    // Pastikan kuota dikirim sebagai angka
+    data.kuota = kuota;
+
+    // Kirim data ke Laravel
+    fetch(url, {
+        method: 'POST',
+
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+
+        body: JSON.stringify(data)
+
+    })
+    .then(async function (response) {
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                result.message || 'Gagal menyimpan data.'
+            );
+        }
+
+        return result;
+
+    })
+    .then(function (result) {
+
+        // Tutup modal
+        closeModal();
+
+        // Muat ulang data gelombang
+        loadGelombang();
+
+        // Reset ID edit
+        if (editIdElement) {
+            editIdElement.value = '';
+        }
+
+        alert(result.message || 'Data gelombang berhasil disimpan.');
+
+    })
+    .catch(function (error) {
+
+        console.error(error);
+
+        alert(
+            error.message || 'Terjadi kesalahan saat menyimpan data.'
+        );
+
+    });
+
+}
 
 
 

@@ -8,28 +8,39 @@ use App\Models\TahunAjaran;
 use App\Models\ItemBayar;
 use Illuminate\Support\Facades\DB;
 use App\Models\Jurusan;
+use App\Models\Konfig;
 use App\Models\DetTempBayar;
 use App\Models\Gelombang;
 use App\Models\Siswa;
 use App\Models\LogModel;
-
-
-
-
-
-
-
 use Illuminate\Http\Request;
 
 class TemplateBayarController extends Controller
 {
+     var $tahun, $smt;
+  
+    public function __construct()
+    {
+        $konfig = Konfig::first();
+        $this->tahun = $konfig->id_thn_ppdb;
+        $this->smt = $konfig->smt;
+
+      
+    }   
 
     public function index()
     {
+        $tahunSekarang = $this->tahun;
+
         $side = 'template-bayar';
-        $tahun = TahunAjaran::orderBy('id', 'desc')->get();
+        $tahun =  TahunAjaran::whereBetween('id', [
+                        $tahunSekarang - 3,
+                        $tahunSekarang
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->get();
         $jurusan = Jurusan::orderBy('nama_jurusan')->get();
-        $gelombang = Gelombang::orderBy('idx')->get();
+        $gelombang = Gelombang::orderBy('idx')->where('is_current', 1)->get();
         $itemBayar = ItemBayar::orderBy('id', 'desc')->get();
 
 
@@ -45,41 +56,41 @@ class TemplateBayarController extends Controller
         );
     }
     public function data(Request $request)
-{
-    $query = TemplateBayar::query()
-        ->with([
-            'tahunAjaran',
-            'gelombang',
-            'jurusan',
-        ]);
+    {
+        $query = TemplateBayar::query()
+            ->with([
+                'tahunAjaran',
+                'gelombang',
+                'jurusan',
+            ]);
 
-    if ($request->filled('id_thn_ajaran')) {
-        $query->where(
-            'id_tahun',
-            $request->id_thn_ajaran
-        );
+        if ($request->filled('id_thn_ajaran')) {
+            $query->where(
+                'id_tahun',
+                $request->id_thn_ajaran
+            );
+        }
+
+        if ($request->filled('id_gelombang')) {
+            $query->where(
+                'id_gelombang',
+                $request->id_gelombang
+            );
+        }
+
+        if ($request->filled('id_jurusan')) {
+            $query->where(
+                'id_jurusan',
+                $request->id_jurusan
+            );
+        }
+
+        $data = $query
+            ->latest()
+            ->get();
+
+        return response()->json($data);
     }
-
-    if ($request->filled('id_gelombang')) {
-        $query->where(
-            'id_gelombang',
-            $request->id_gelombang
-        );
-    }
-
-    if ($request->filled('id_jurusan')) {
-        $query->where(
-            'id_jurusan',
-            $request->id_jurusan
-        );
-    }
-
-    $data = $query
-        ->latest()
-        ->get();
-
-    return response()->json($data);
-}
 
     public function detail($idTemplate)
     {
@@ -421,7 +432,7 @@ class TemplateBayarController extends Controller
                 'aksi'      => 'delete',
                 'user'      => auth()->id(),
                 'ip'        => request()->ip(),
-                'keterangan'=> json_encode($templateData),
+                'keterangan' => json_encode($templateData),
                 'serial'    => url('hapus/' . $id),
             ]);
         });

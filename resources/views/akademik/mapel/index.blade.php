@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: "SMT 1",
                 field: "smt1",
                 hozAlign: "center",
-                width: 80
+                width: 100
             },
 
 
@@ -669,7 +669,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: "SMT 2",
                 field: "smt2",
                 hozAlign: "center",
-                width: 80
+                width: 100
             },
 
 
@@ -677,31 +677,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: "SMT 3",
                 field: "smt3",
                 hozAlign: "center",
-                width: 80
+                width: 100
             },
-
-
             {
                 title: "SMT 4",
                 field: "smt4",
                 hozAlign: "center",
-                width: 80
+                width: 100
             },
-
-
             {
                 title: "SMT 5",
                 field: "smt5",
                 hozAlign: "center",
-                width: 80
+                width: 100
             },
-
 
             {
                 title: "SMT 6",
                 field: "smt6",
                 hozAlign: "center",
-                width: 80
+                width: 100
             },
 
 

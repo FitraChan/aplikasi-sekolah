@@ -20,6 +20,7 @@ class Gelombang extends Model
         'akhir',
         'is_current',
         'idx',
+         'kuota',
     ];
 
     protected $casts = [

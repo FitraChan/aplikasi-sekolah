@@ -26,6 +26,195 @@
             Data Mapel
         </a>
     </div>
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+
+        {{-- Tahun Ajaran --}}
+        <div>
+            <label
+                for="filter_tahun"
+                class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Tahun Ajaran
+            </label>
+
+            <select
+                id="filter_tahun_detail"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                <option value="">
+                    Semua Tahun Ajaran
+                </option>
+
+                @foreach($tahun as $item)
+                <option value="{{ $item->id }}">
+                    {{ $item->thn_ajaran }}
+                </option>
+                @endforeach
+
+            </select>
+        </div>
+
+
+        {{-- Jurusan --}}
+        <div>
+            <label
+                for="filter_jurusan"
+                class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Jurusan
+            </label>
+
+            <select
+                id="filter_jurusan_detail"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                <option value="">
+                    Semua Jurusan
+                </option>
+
+                @foreach($jurusan as $item)
+                <option value="{{ $item->id }}">
+                    {{ $item->nama_jurusan }}
+                </option>
+                @endforeach
+
+            </select>
+        </div>
+
+
+        {{-- Kelas --}}
+        <div>
+            <label
+                for="filter_kelas"
+                class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Kelas
+            </label>
+
+            <select
+                id="filter_kelas_detail"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                <option value="">
+                    Semua Kelas
+                </option>
+
+                @foreach($kelas as $item)
+                <option value="{{ $item->idx }}">
+                    {{ $item->nama_kelas }}
+                </option>
+                @endforeach
+
+            </select>
+        </div>
+
+
+        {{-- Semester --}}
+        <div>
+            <label
+                for="filter_semester"
+                class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Semester
+            </label>
+
+            <select
+                id="filter_semester_detail"
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                <option value="">
+                    Semua Semester
+                </option>
+
+                <option value="1">
+                    Ganjil
+                </option>
+
+                <option value="0">
+                    Genap
+                </option>
+
+            </select>
+        </div>
+
+        <div>
+    <label
+        for="filter_nama_pelajaran_detail"
+        class="mb-1.5 block text-xs font-semibold text-slate-600">
+        Nama Pelajaran
+    </label>
+
+    <input
+        type="text"
+        id="filter_nama_pelajaran_detail"
+        placeholder="Cari nama pelajaran..."
+        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+</div>
+
+
+        {{-- Tombol Cari --}}
+        <div class="flex items-end">
+            <button
+                type="button"
+                onclick="loadDetailData()"
+                class="w-full inline-flex items-center justify-center gap-2
+                   rounded-xl
+                   bg-[#02BC9C]
+                   px-4 py-2.5
+                   text-sm font-semibold text-white
+                   shadow-sm
+                   hover:bg-[#00AF8F]
+                   transition">
+
+                <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+
+                </svg>
+
+                Cari
+            </button>
+        </div>
+
+
+        {{-- Tombol Reset --}}
+        <div class="flex items-end">
+            <button
+                type="button"
+                onclick="resetFilterJadwal()"
+                class="w-full inline-flex items-center justify-center gap-2
+                   rounded-xl
+                   border border-slate-300
+                   bg-white
+                   px-4 py-2.5
+                   text-sm font-semibold text-slate-700
+                   hover:bg-slate-50
+                   transition">
+
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4 4v5h5M20 20v-5h-5M5.5 9A7.5 7.5 0 0118 6.5M18.5 15A7.5 7.5 0 016 17.5" />
+
+                </svg>
+
+                Reset Filter
+            </button>
+        </div>
+
+    </div>
     <!-- Schedule Management Container Card -->
     <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col" data-purpose="schedule-card-container">
         <div class="flex flex-1 min-h-[460px]">
@@ -163,67 +352,141 @@
 
             async function loadDetailData() {
 
-                const idTahun = document.getElementById('filter_angkatan')?.value || '';
-                const idKelas = document.getElementById('filter_kelas')?.value || '';
-                const idJurusan = document.getElementById('filter_jurusan')?.value || '';
-                const smt = document.getElementById('filter_smt')?.value || '';
-                const mapel = document.getElementById('filter_mapel')?.value || '';
+                const idTahun =
+                    document.getElementById('filter_tahun_detail')?.value || '';
+
+                const idKelas =
+                    document.getElementById('filter_kelas_detail')?.value || '';
+
+                const idJurusan =
+                    document.getElementById('filter_jurusan_detail')?.value || '';
+
+                const semester =
+                    document.getElementById('filter_semester_detail')?.value ?? '';
+
+                const namaPelajaran =
+                    document.getElementById('filter_nama_pelajaran_detail')?.value.trim() || '';
+
 
                 console.log({
                     id_tahun: idTahun,
                     id_kelas: idKelas,
                     id_jurusan: idJurusan,
-                    smt: smt,
-                    mapel: mapel
+                    semester: semester,
+                    nama_pelajaran: namaPelajaran
                 });
 
-                const params = new URLSearchParams();
+
+                const params =
+                    new URLSearchParams();
+
 
                 if (idTahun) {
-                    params.append('id_tahun', idTahun);
+
+                    params.append(
+                        'id_tahun',
+                        idTahun
+                    );
+
                 }
+
 
                 if (idKelas) {
-                    params.append('id_kelas', idKelas);
+
+                    params.append(
+                        'id_kelas',
+                        idKelas
+                    );
+
                 }
+
 
                 if (idJurusan) {
-                    params.append('id_jurusan', idJurusan);
+
+                    params.append(
+                        'id_jurusan',
+                        idJurusan
+                    );
+
                 }
 
-                if (smt) {
-                    params.append('smt', smt);
+
+                /*
+                 * Semester Genap = 0
+                 * Jadi jangan menggunakan:
+                 *
+                 * if (semester)
+                 *
+                 * karena nilai 0 akan dianggap false.
+                 */
+
+                if (semester !== '') {
+
+                    params.append(
+                        'semester',
+                        semester
+                    );
+
                 }
 
-                if (mapel) {
-                    params.append('mapel', mapel);
+
+                /*
+                 * Filter nama pelajaran
+                 */
+
+                if (namaPelajaran !== '') {
+
+                    params.append(
+                        'nama_pelajaran',
+                        namaPelajaran
+                    );
+
                 }
+
 
                 try {
 
-                    const response = await fetch(
-                        `{{ route('detail-jadwal.data') }}?${params.toString()}`, {
-                            headers: {
-                                'Accept': 'application/json'
+                    const response =
+                        await fetch(
+                            `{{ route('detail-jadwal.data') }}?${params.toString()}`, {
+                                headers: {
+                                    'Accept': 'application/json'
+                                }
                             }
-                        }
-                    );
+                        );
+
 
                     if (!response.ok) {
-                        throw new Error('Gagal mengambil data jadwal');
+
+                        throw new Error(
+                            'Gagal mengambil data jadwal'
+                        );
+
                     }
 
-                    const data = await response.json();
 
-                    //console.log('Data jadwal:', data);
+                    const data =
+                        await response.json();
+
+
+                    console.log(
+                        'Data jadwal:',
+                        data
+                    );
+
 
                     renderSchedule(data);
 
+
                 } catch (error) {
 
-                    console.error(error);
+                    console.error(
+                        'Gagal load jadwal:',
+                        error
+                    );
 
                 }
+
             }
 
 
@@ -391,8 +654,6 @@
 
 
             function renderSchedule(data) {
-
-                console.log('dataHari', data);
 
 
                 Object.values(hariMap).forEach(day => {
@@ -565,13 +826,13 @@
 
 
                 openMapelModal('edit', {
-                   
+
                     idHari: slot.dataset.idHari,
-                   
+
                 });
             }
 
-          
+
 
             async function reloadSchedule() {
 
@@ -586,7 +847,7 @@
                     );
 
                     const result = await response.json();
-                               
+
                     renderSchedule(result);
 
                 } catch (error) {

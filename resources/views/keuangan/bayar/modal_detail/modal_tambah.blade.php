@@ -1,144 +1,402 @@
-<div id="modal-tambah-form" class="modal" tabindex="-1">
+<div
+    id="modal-tambah-form"
+    class="hidden fixed inset-0 z-[9999]
+           items-center justify-center
+           bg-slate-900/50
+           p-4"
+    tabindex="-1"
+>
 
-    <div class="modal-dialog modal-lg">
+    <div
+        class="w-full max-w-2xl
+               bg-white
+               rounded-xl
+               shadow-xl
+               overflow-hidden"
+    >
 
-        <div class="modal-content">
+        <form id="form-item"  enctype="multipart/form-data">
 
-            <form id="form-item">
+            <!-- =====================================================
+                 INPUT HIDDEN
+            ====================================================== -->
 
-                <input type="hidden" id="id_bayar" name="id_bayar">
-                <input type="hidden" id="id_detail" name="id_detail">
+            <input
+                type="hidden"
+                id="id_bayar"
+                name="id_bayar"
+            >
 
-                <div class="modal-header">
-                    <h2 class="font-medium text-base">
-                        Item Pembayaran
-                    </h2>
-                </div>
+            <input
+                type="hidden"
+                id="id_detail"
+                name="id_detail"
+            >
 
-                <div class="modal-body">
 
-                    <div class="grid grid-cols-12 gap-4">
+            <!-- =====================================================
+                 HEADER
+            ====================================================== -->
 
-                        <!-- Item Bayar -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                Item Pembayaran
-                            </label>
-                             <select
-                                id="id_item"
-                                name="id_item"
-                                class="form-control">
+            <div
+                class="flex items-center justify-between
+                       px-6 py-4
+                       border-b border-slate-200"
+            >
 
-                                <option value="">Pilih Item Pembayaran</option>
-                                @foreach ($itemBayar as $item)
-                                    <option value="{{ $item->id }}">
-                                        {{ $item->nama_item }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                <h2 class="text-lg font-semibold text-slate-800">
+                    Item Pembayaran
+                </h2>
 
-                        <!-- Kewajiban -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="form-label">
-                                Kewajiban Bayar
-                            </label>
 
-                            <input
-                                type="number"
-                                id="kwajiban_bayar"
-                                name="kwajiban_bayar"
-                                class="form-control"
-                                placeholder="Jumlah">
-                        </div>
+                <!-- TOMBOL CLOSE -->
 
-                        <!-- Jumlah Bayar -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="form-label">
-                                Jumlah Bayar
-                            </label>
+                <button
+                    type="button"
+                    onclick="closeModalTambah()"
+                    class="inline-flex items-center justify-center
+                           w-8 h-8
+                           rounded-lg
+                           text-slate-400
+                           hover:text-slate-600
+                           hover:bg-slate-100
+                           transition-colors"
+                    aria-label="Tutup"
+                >
 
-                            <input
-                                type="number"
-                                id="jml_bayar"
-                                name="jml_bayar"
-                                class="form-control"
-                                placeholder="Jumlah">
-                        </div>
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                    >
 
-                        <!-- Potongan -->
-                        <div class="col-span-12 md:col-span-4">
-                            <label class="form-label">
-                                Potongan
-                            </label>
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 6l12 12M6 18L18 6"
+                        />
 
-                            <input
-                                type="number"
-                                id="potongan"
-                                name="potongan"
-                                class="form-control"
-                                placeholder="Potongan">
-                        </div>
+                    </svg>
 
-                        <!-- Cicilan -->
-                        <div class="col-span-12 md:col-span-3">
-                            <label class="form-label">
-                                Cicilan Ke
-                            </label>
+                </button>
 
-                            <input
-                                type="number"
-                                id="id_cicilan"
-                                name="id_cicilan"
-                                class="form-control"
-                                placeholder="Cicilan">
-                        </div>
+            </div>
 
-                        <!-- Keterangan -->
-                        <div class="col-span-12 md:col-span-9">
-                            <label class="form-label">
-                                Keterangan
-                            </label>
 
-                            <input
-                                type="text"
-                                id="keterangan"
-                                name="keterangan"
-                                class="form-control"
-                                placeholder="Masukkan keterangan">
-                        </div>
+            <!-- =====================================================
+                 BODY
+            ====================================================== -->
+
+            <div class="px-6 py-5">
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+
+
+                    <!-- ITEM PEMBAYARAN -->
+
+                    <div class="md:col-span-12">
+
+                        <label
+                            for="id_item"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Item Pembayaran
+                        </label>
+
+                        <select
+                            id="id_item"
+                            name="id_item"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                            <option value="">
+                                Pilih Item Pembayaran
+                            </option>
+
+                            @foreach ($itemBayar as $item)
+
+                                <option value="{{ $item->id }}">
+                                    {{ $item->nama_item }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
 
                     </div>
 
+
+                    <!-- KEWAJIBAN BAYAR -->
+
+                    <div class="md:col-span-4">
+
+                        <label
+                            for="kwajiban_bayar"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Kewajiban Bayar
+                        </label>
+
+                        <input
+                            type="number"
+                            id="kwajiban_bayar"
+                            name="kwajiban_bayar"
+                            placeholder="Jumlah"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+
+                    <!-- JUMLAH BAYAR -->
+
+                    <div class="md:col-span-4">
+
+                        <label
+                            for="jml_bayar"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Jumlah Bayar
+                        </label>
+
+                        <input
+                            type="number"
+                            id="jml_bayar"
+                            name="jml_bayar"
+                            placeholder="Jumlah"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+
+                    <!-- POTONGAN -->
+
+                    <div class="md:col-span-4">
+
+                        <label
+                            for="potongan"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Potongan
+                        </label>
+
+                        <input
+                            type="number"
+                            id="potongan"
+                            name="potongan"
+                            placeholder="Potongan"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+
+                    <!-- CICILAN -->
+
+                    <div class="md:col-span-3">
+
+                        <label
+                            for="id_cicilan"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Cicilan Ke
+                        </label>
+
+                        <input
+                            type="number"
+                            id="id_cicilan"
+                            name="id_cicilan"
+                            placeholder="Cicilan"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+
+                    <!-- KETERANGAN -->
+
+                    <div class="md:col-span-9">
+
+                        <label
+                            for="keterangan"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Keterangan
+                        </label>
+
+                        <input
+                            type="text"
+                            id="keterangan"
+                            name="keterangan"
+                            placeholder="Masukkan keterangan"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+                    <!-- BUKTI BAYAR -->
+
+
+
                 </div>
 
-                <div class="modal-footer">
+            </div>
 
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-tw-dismiss="modal">
 
-                        Batal
+            <!-- =====================================================
+                 FOOTER
+            ====================================================== -->
 
-                    </button>
+            <div
+                class="flex flex-col-reverse sm:flex-row
+                       sm:justify-end
+                       gap-2
+                       px-6 py-4
+                       bg-slate-50
+                       border-t border-slate-200"
+            >
 
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        onclick="saveItemBayar()">
+                <!-- BATAL -->
 
-                        <i data-lucide="save" class="w-4 h-4 mr-1"></i>
-                        Simpan
+                <button
+                    type="button"
+                    onclick="closeModalTambah()"
+                    class="inline-flex items-center justify-center
+                           px-4 py-2.5
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           text-sm font-medium
+                           text-slate-700
+                           hover:bg-slate-100
+                           transition-colors"
+                >
+                    Batal
+                </button>
 
-                    </button>
 
-                </div>
+                <!-- SIMPAN -->
 
-            </form>
+                <button
+                    type="button"
+                    onclick="saveItemBayar()"
+                    class="inline-flex items-center justify-center
+                           gap-2
+                           px-4 py-2.5
+                           rounded-lg
+                           bg-[#02BC9C]
+                           hover:bg-[#00B686]
+                           text-white
+                           text-sm font-medium
+                           shadow-sm
+                           transition-colors"
+                >
 
-        </div>
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                    >
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
+                        />
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17 21v-8H7v8M7 3v5h8"
+                        />
+
+                    </svg>
+
+                    Simpan
+
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
 
 </div>
+

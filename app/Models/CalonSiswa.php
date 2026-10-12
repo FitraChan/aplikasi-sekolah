@@ -90,4 +90,14 @@ class CalonSiswa extends Model
             'id_calon_siswa'
         );
     }
+
+    
+    public function jadwalWawancara()
+    {
+        return $this->hasOne(
+            JadwalWawancara::class,
+            'id_calon_siswa',
+            'id'
+        );
+    }
 }

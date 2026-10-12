@@ -26,6 +26,7 @@ class BayarCalonSiswa extends Model
         'total_kwajiban',
         'no_daftar',
         'nipd',
+        'bukti_bayar',
     ];
 
     protected $casts = [

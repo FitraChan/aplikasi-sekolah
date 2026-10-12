@@ -114,7 +114,7 @@
                 <div>
                     <label for="filter-tahun"
                            class="block text-sm font-medium text-slate-700 mb-1.5">
-                        Tahun Ajaran
+                        Angkatan
                     </label>
 
                     <select id="filter-tahun"
@@ -125,7 +125,7 @@
                                    transition">
 
                         <option value="">
-                            Semua Tahun Ajaran
+                            Semua Angkatan
                         </option>
 
                         @foreach ($tahunAjaran as $tahun)
@@ -375,22 +375,11 @@
             },
 
 
+
+
             {
                 title: "Kelas",
-                field: "nama_kelas",
-                width: 180,
-
-                formatter: function(cell) {
-
-                    return cell.getValue() ?? "-";
-
-                }
-            },
-
-
-            {
-                title: "Tahun Ajaran",
-                field: "tahun_ajaran",
+                field: "kelas",
                 width: 160,
 
                 formatter: function(cell) {

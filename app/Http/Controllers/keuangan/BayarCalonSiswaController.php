@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\URL;
 use App\Models\DetTempBayar;
 use App\Models\Kelas;
 use App\Models\LogModel;
+use App\Models\Konfig;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\KartuUjianMail;
 use App\Models\BuktiBayarCalon;
@@ -32,10 +34,27 @@ use Illuminate\Support\Facades\Log;
 
 class BayarCalonSiswaController extends Controller
 {
+    var $tahun, $smt;
+  
+    public function __construct()
+    {
+        $konfig = Konfig::first();
+        $this->tahun = $konfig->id_thn_ppdb;
+        $this->smt = $konfig->smt;
+
+      
+    }  
     public function index()
     {
+        $tahunSekarang = $this->tahun;
+
         $side = 'bayar-calon-siswa';
-        $tahun = TahunAjaran::orderBy('id', 'desc')->get();
+        $tahun =  TahunAjaran::whereBetween('id', [
+                        $tahunSekarang - 3,
+                        $tahunSekarang
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->get();
         $jurusan = Jurusan::orderBy('nama_jurusan')->get();
         $gelombang = Gelombang::orderBy('nama_gelombang')->get();
         $itemBayar = ItemBayar::orderBy('nama_item')->get();
@@ -179,7 +198,7 @@ class BayarCalonSiswaController extends Controller
 
         if ($request->filled('kelas')) {
             $query->whereHas('kelas', function ($q) use ($request) {
-                $q->where('nama_kelas', 'like', '%' . $request->kelas . '%');
+                $q->where('id_kelas', 'like', '%' . $request->kelas . '%');
             });
         }
 
@@ -243,6 +262,7 @@ class BayarCalonSiswaController extends Controller
                     'total_kwajiban'  => $row->total_kwajiban,
                     'keterangan'    => $row->keterangan,
                     'no_kwitansi'   => $row->no_kwitansi,
+                    'bukti_bayar'   => $row->bukti_bayar,
                 ];
             });
     }
@@ -498,6 +518,29 @@ class BayarCalonSiswaController extends Controller
         DB::beginTransaction();
 
         try {
+
+
+         $namaBuktiBayar = null;
+
+        if ($request->hasFile('bukti_bayar')) {
+
+            $file = $request->file('bukti_bayar');
+
+            $namaBuktiBayar =
+                'bukti_cicilan_' .
+                date('YmdHis') .
+                '_' .
+                uniqid() .
+                '.' .
+                $file->getClientOriginalExtension();          
+
+             $file->storeAs(
+                    'uploads/pembayaran',
+                    $namaBuktiBayar,
+                    'public'
+                );
+
+        }
                
 
             $bayar = BayarCalonSiswa::create([
@@ -508,6 +551,7 @@ class BayarCalonSiswaController extends Controller
                 'tgl_bayar'   => date('Y-m-d', strtotime($request->tgl_bayar ?? now())),
                 'id_kasir'    => auth()->user()->id,
                 'keterangan'  => $request->keterangan,
+                'bukti_bayar' =>  'uploads/pembayaran/' .$namaBuktiBayar,
             ]);
 
             if($request->id_bukti != 0){
@@ -583,12 +627,7 @@ class BayarCalonSiswaController extends Controller
                                 );
                             }
                     }
-
-
-                    //  if($item['id_item'] == 2){
-
-                    //     CalonSiswa::where('no_daftar', $request->id_csiswa)->update(['status_daftar' => 1]);  
-                    // }
+                  
       
                 }
             }

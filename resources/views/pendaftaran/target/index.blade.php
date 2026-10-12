@@ -416,65 +416,7 @@ let table = new Tabulator("#table-target", {
         },
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | SISA TARGET
-        |--------------------------------------------------------------------------
-        */
-
-        {
-            title: "Sisa Target",
-
-            hozAlign: "right",
-
-            minWidth: 120,
-
-            formatter: function(cell) {
-
-                let data = cell.getData();
-
-
-                let target =
-                    parseFloat(data.target) || 0;
-
-
-                let pencapaian =
-                    parseFloat(data.pencapaian) || 0;
-
-
-                let sisa =
-                    target - pencapaian;
-
-
-                if (sisa <= 0) {
-
-                    return `
-
-                        <span class="font-semibold text-emerald-600">
-
-                            0
-
-                        </span>
-
-                    `;
-
-                }
-
-
-                return `
-
-                    <span class="font-semibold text-slate-700">
-
-                        ${formatAngka(sisa)}
-
-                    </span>
-
-                `;
-
-            }
-
-        },
-
+       
 
         /*
         |--------------------------------------------------------------------------

@@ -93,4 +93,13 @@ class Gtk extends Model
             'id'
         );
     }
+
+    public function jadwalWawancara()
+    {
+        return $this->hasMany(
+            JadwalWawancara::class,
+            'id_gtk',
+            'id'
+        );
+    }
 }

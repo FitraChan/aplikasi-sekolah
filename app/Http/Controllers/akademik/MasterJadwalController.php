@@ -34,7 +34,7 @@ class MasterJadwalController extends Controller
     public function index()
     {
 
-           $tahunSekarang = $this->tahun;
+        $tahunSekarang = $this->tahun;
 
         return view('akademik.master_jadwal.index', [
             'side'  => 'master-jadwal',
@@ -183,9 +183,9 @@ class MasterJadwalController extends Controller
             });
         }
 
-        if ($request->filled('mapel')) {
+        if ($request->filled('nama_pelajaran')) {
             $query->whereHas('jadwal.mapel', function ($q) use ($request) {
-                $q->where('nama_mapel', 'like', '%' . $request->mapel . '%');
+                $q->where('nama_mapel', 'like', '%' . $request->nama_pelajaran . '%');
             });
         }
 

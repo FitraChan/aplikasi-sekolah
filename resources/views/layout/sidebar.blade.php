@@ -1,41 +1,31 @@
 <!-- Mobile Drawer Backdrop -->
 <div id="sidebar-backdrop"
-    class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 hidden transition-opacity lg:hidden"
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden"
     aria-hidden="true">
 </div>
 
 
 <!-- SIDEBAR -->
 <aside id="main-sidebar"
-    class="fixed inset-y-0 left-0 z-50 w-[260px] lg:w-64
-              bg-white border-r border-gray-200
-              flex flex-col justify-between
-              py-6 px-4
-              transform -translate-x-full lg:translate-x-0
-              transition-transform duration-300 ease-in-out
-              shadow-xl lg:shadow-none
-              lg:sticky lg:top-0 lg:h-screen">
-
-    <!-- ========================= -->
+    class="fixed lg:static inset-y-0 left-0 z-50
+           w-72 lg:w-64 h-screen
+           flex flex-col shrink-0
+           bg-white border-r border-slate-200
+           overflow-hidden
+           transform -translate-x-full lg:translate-x-0
+           transition-transform duration-300 ease-in-out"> <!-- ========================= -->
     <!-- TOP -->
     <!-- ========================= -->
-    <div class="space-y-8">
-
+    <div class="flex flex-col flex-1 min-h-0">
         <!-- BRAND -->
-        <div class="flex items-center justify-between px-2">
-
+        <div class="shrink-0 px-2 pt-4 pb-6">
             <div class="flex items-center gap-3">
 
                 <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
 
-                    <svg class="w-6 h-6 text-[#00b074]"
-                        fill="currentColor"
-                        viewBox="0 0 24 24">
-
-                        <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18C5 19.94 8.13 22 12 22C15.87 22 19 19.94 19 17.18V13.18L12 17L5 13.18Z">
-                        </path>
-
-                    </svg>
+                    <img src="{{ asset('public/images/Favicon_MOBIS_WARNA.png') }}"
+                        alt="Logo"
+                        class="w-8 h-8 object-contain">
 
                 </div>
 
@@ -81,8 +71,8 @@
         <!-- ========================= -->
         <!-- NAVIGATION -->
         <!-- ========================= -->
-        <nav aria-label="Menu Utama" class="space-y-1.5">
-
+        <nav aria-label="Menu Utama"
+            class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain px-2 pb-4 space-y-1.5 sidebar-scroll">
 
             {{-- ========================================= --}}
             {{-- ROLE CALON --}}
@@ -201,7 +191,7 @@
             @if(Auth::user()->hasRole('admin'))
 
             @php
-                $side = $side ?? '';
+            $side = $side ?? '';
             @endphp
 
             <!-- DASHBOARD -->
@@ -247,7 +237,7 @@
 
                 </svg>
 
-             <span class="flex-1 text-left text-[16px] font-semibold">Management Role</span>
+                <span class="flex-1 text-left text-[16px] font-semibold">Management Role</span>
 
             </a>
 
@@ -269,7 +259,9 @@
             'ujian-calon-siswa',
             'bukti',
             'template-bayar-pendaftaran',
-            
+            'jadwal-wawancara',
+            'hasil-wawancara',
+
             ]);
             @endphp
 
@@ -294,7 +286,7 @@
 
                     </svg>
 
-                   <span class="flex-1 text-left text-[16px] font-semibold">
+                    <span class="flex-1 text-left text-[16px] font-semibold">
                         Pendaftaran
                     </span>
 
@@ -360,41 +352,7 @@
                         </svg>
                         <span>Calon Siswa</span>
                     </a>
-
-                    {{-- Set Kelas --}}
-                    <a href="{{ route('set-kelas.index') }}"
-                        class="sidebar-submenu {{ $side == 'set-kelas' ? 'sidebar-submenu-active' : '' }}">
-                        <svg class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                            <path d="M8 8h8"></path>
-                            <path d="M8 12h8"></path>
-                            <path d="M8 16h5"></path>
-                        </svg>
-                        <span>Set Kelas</span>
-                    </a>
-
-                    {{-- Rekap Kelas --}}
-                    <a href="{{ url('rekapKelas') }}"
-                        class="sidebar-submenu {{ $side == 'rekap_kelas' ? 'sidebar-submenu-active' : '' }}">
-                        <svg class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path d="M4 4h16v16H4z"></path>
-                            <path d="M8 9h8"></path>
-                            <path d="M8 13h8"></path>
-                            <path d="M8 17h5"></path>
-                        </svg>
-                        <span>Rekap Kelas</span>
-                    </a>
-
-                    
-
+                                   
                     {{-- Kuota Siswa --}}
                     <a href="{{ url('target') }}"
                         class="sidebar-submenu {{ $side == 'target' ? 'sidebar-submenu-active' : '' }}">
@@ -441,40 +399,106 @@
                     </a>
 
 
-                      {{-- Ujian Calon Siswa --}}
-                   <a href="{{ route('listBuktiPembayaran') }}"
-                        class="sidebar-submenu {{ $side == 'bukti' ? 'sidebar-submenu-active' : '' }}">
+                    {{-- Ujian Calon Siswa --}}
+                   {{-- BUKTI PEMBAYARAN --}}
+<a href="{{ route('listBuktiPembayaran') }}"
+    class="sidebar-submenu {{ $side == 'bukti' ? 'sidebar-submenu-active' : '' }}">
 
-                        <svg class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                            <path d="M3 10h18"></path>
-                            <path d="M7 15h3"></path>
-                            <path d="M14 15h3"></path>
-                        </svg>
+    <svg class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24">
 
-                        <span>Bukti Pembayaran</span>
-                    </a>
+        {{-- Credit Card --}}
+        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+        <path d="M3 10h18"></path>
+        <path d="M7 15h3"></path>
 
-                    <a href="{{ route('templatePendaftaran.index') }}"
-                        class="sidebar-submenu {{ $side == 'template-bayar-pendaftaran' ? 'sidebar-submenu-active' : '' }}">
+    </svg>
 
-                        <svg class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                            <path d="M3 10h18"></path>
-                            <path d="M7 15h3"></path>
-                            <path d="M14 15h3"></path>
-                        </svg>
+    <span>Bukti Pembayaran</span>
+</a>
 
-                        <span>Template Pembayaran</span>
-                    </a>
+
+{{-- TEMPLATE PEMBAYARAN --}}
+<a href="{{ route('templatePendaftaran.index') }}"
+    class="sidebar-submenu {{ $side == 'template-bayar-pendaftaran' ? 'sidebar-submenu-active' : '' }}">
+
+    <svg class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24">
+
+        {{-- Document --}}
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="8" y1="13" x2="16" y2="13"></line>
+        <line x1="8" y1="17" x2="13" y2="17"></line>
+
+    </svg>
+
+    <span>Template Pembayaran</span>
+</a>
+
+
+{{-- JADWAL WAWANCARA --}}
+<a href="{{ route('jadwal-wawancara.index') }}"
+    class="sidebar-submenu {{ $side == 'jadwal-wawancara' ? 'sidebar-submenu-active' : '' }}">
+
+    <svg class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24">
+
+        {{-- Calendar --}}
+        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+
+        {{-- Calendar date --}}
+        <path d="M8 14h.01"></path>
+        <path d="M12 14h.01"></path>
+        <path d="M16 14h.01"></path>
+        <path d="M8 18h.01"></path>
+        <path d="M12 18h.01"></path>
+
+    </svg>
+
+    <span>Jadwal Wawancara</span>
+</a>
+
+
+{{-- HASIL WAWANCARA --}}
+<a href="{{ route('hasilWawancara') }}"
+    class="sidebar-submenu {{ $side == 'hasil-wawancara' ? 'sidebar-submenu-active' : '' }}">
+
+    <svg class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24">
+
+        {{-- Clipboard --}}
+        <rect x="5" y="4" width="14" height="18" rx="2"></rect>
+
+        {{-- Clipboard top --}}
+        <path d="M9 4V2h6v2"></path>
+
+        {{-- Checklist --}}
+        <polyline points="8 10 9.5 11.5 12 9"></polyline>
+        <line x1="13" y1="10" x2="16" y2="10"></line>
+
+        <polyline points="8 15 9.5 16.5 12 14"></polyline>
+        <line x1="13" y1="15" x2="16" y2="15"></line>
+
+    </svg>
+
+    <span>Hasil Wawancara</span>
+</a>
 
                 </div>
 
@@ -560,7 +584,7 @@
                     </a>
 
 
-                    {{-- Calon Siswa --}}
+
                     <a href="{{ route('daftarCalonSiswa') }}"
                         class="sidebar-submenu flex items-center gap-2
                {{ $side == 'daftar-ulang' ? 'sidebar-submenu-active' : '' }}">
@@ -883,7 +907,7 @@
 
                     </svg>
 
-                   <span class="flex-1 text-left text-[16px] font-semibold">
+                    <span class="flex-1 text-left text-[16px] font-semibold">
                         Akademik
                     </span>
 
@@ -1129,6 +1153,38 @@
 
             </div>
 
+
+
+             @php 
+                    $guruActive = in_array($side, [ 'master-guru', ]); 
+            @endphp 
+            <div> 
+                {{-- Menu Guru --}}
+                <button type="button" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors font-medium text-sm" onclick="toggleSidebarSubmenu('submenu-guru')">
+                    {{-- Icon Guru --}}
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+
+                        <circle cx="9" cy="8" r="3"></circle>
+                        <path d="M3 20c0-3 2.5-5 6-5s6 2 6 5"></path>
+                        <path d="M16 11h5"></path>
+                        <path d="M18.5 8.5v5"></path>
+                    </svg>
+                    <span class="flex-1 text-left text-[16px] font-semibold"> Guru </span> 
+                    {{-- Arrow --}} 
+                    <svg id="icon-guru" class="w-4 h-4 transition-transform {{ $guruActive ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg> </button> {{-- Submenu Guru --}}
+                <div id="submenu-guru" class="pl-4 mt-1 space-y-1 {{ $guruActive ? '' : 'hidden' }}"> {{-- Master Guru --}} 
+                    <a href="{{ route('masterGuru.index') }}" class="sidebar-submenu flex items-center gap-2 {{ $side == 'master-guru' ? 'sidebar-submenu-active' : '' }}"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 3.5a4 4 0 010 7.5" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21v-2a4 4 0 00-3-3.87" />
+                        </svg> <span>Master Guru</span>
+                    </a>
+                </div>
+            </div>
             @endif
 
 
@@ -1209,6 +1265,8 @@
                 </div>
 
             </div>
+
+           
 
             @endif
 
@@ -1322,6 +1380,9 @@
 
 <!-- SIDEBAR SCRIPT -->
 <script>
+    /* =====================================================
+       SIDEBAR SUBMENU
+    ===================================================== */
     function toggleSidebarSubmenu(id) {
 
         const submenu = document.getElementById(id);
@@ -1340,4 +1401,125 @@
             icon.classList.toggle('rotate-180');
         }
     }
+
+
+    /* =====================================================
+       MOBILE SIDEBAR DRAWER
+    ===================================================== */
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const sidebar = document.getElementById('main-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const closeBtn = document.getElementById('close-sidebar-btn');
+
+        if (!sidebar) {
+            return;
+        }
+
+        /* -----------------------------------------------
+           OPEN SIDEBAR
+        ------------------------------------------------ */
+        window.openSidebar = function () {
+
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+
+            if (backdrop) {
+                backdrop.classList.remove('hidden');
+            }
+
+            document.body.classList.add('overflow-hidden');
+        };
+
+
+        /* -----------------------------------------------
+           CLOSE SIDEBAR
+        ------------------------------------------------ */
+        window.closeSidebar = function () {
+
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+
+            if (backdrop) {
+                backdrop.classList.add('hidden');
+            }
+
+            document.body.classList.remove('overflow-hidden');
+        };
+
+
+        /* -----------------------------------------------
+           TOMBOL X
+        ------------------------------------------------ */
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                closeSidebar();
+            });
+        }
+
+
+        /* -----------------------------------------------
+           KLIK BACKDROP
+        ------------------------------------------------ */
+        if (backdrop) {
+            backdrop.addEventListener('click', function () {
+                closeSidebar();
+            });
+        }
+
+
+        /* -----------------------------------------------
+           ESC UNTUK MENUTUP
+        ------------------------------------------------ */
+        document.addEventListener('keydown', function (event) {
+
+            if (event.key === 'Escape') {
+                closeSidebar();
+            }
+        });
+
+
+        /* -----------------------------------------------
+           KLIK MENU -> TUTUP DI MOBILE
+        ------------------------------------------------ */
+        sidebar.querySelectorAll('a').forEach(function (link) {
+
+            link.addEventListener('click', function () {
+
+                if (window.innerWidth < 1024) {
+                    closeSidebar();
+                }
+            });
+        });
+
+
+        /* -----------------------------------------------
+           RESIZE DESKTOP / MOBILE
+        ------------------------------------------------ */
+        window.addEventListener('resize', function () {
+
+            if (window.innerWidth >= 1024) {
+
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+
+                if (backdrop) {
+                    backdrop.classList.add('hidden');
+                }
+
+                document.body.classList.remove('overflow-hidden');
+
+            } else {
+
+                /*
+                 * Pada mobile sidebar default tertutup.
+                 * Jangan menutup jika sedang terbuka.
+                 */
+                if (!sidebar.classList.contains('translate-x-0')) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            }
+        });
+
+    });
 </script>

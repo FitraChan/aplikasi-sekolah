@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Pendaftaran;
 
 use App\Http\Controllers\Controller;
 use App\Models\Gelombang;
+use App\Models\Konfig;
+
 use Illuminate\Http\Request;
 use App\Models\LogModel;
 
@@ -11,52 +13,63 @@ use App\Models\LogModel;
 
 class GelombangController extends Controller
 {
-    public function index()
+
+
+    var $tahun, $smt;
+
+    public function __construct()
     {
-        return view('pendaftaran.gelombang.index',[ 'side'  => 'gelombang']);
+        $konfig = Konfig::first();
+        $this->tahun = $konfig->id_thn_ppdb;
+        $this->smt = $konfig->smt;
     }
 
- public function data()
-{
-    $data = Gelombang::withCount([
-        // Semua pendaftar
-        'calonSiswas',
+    public function index()
+    {
+        return view('pendaftaran.gelombang.index', ['side'  => 'gelombang']);
+    }
 
-        // Pendaftar yang sudah terverifikasi
-        'calonSiswas as terverifikasi_count' => function ($query) {
-            $query->where('status_daftar', 0);
-        },
-    ])
-    ->orderBy('id_tahun', 'desc')
-    ->get()
-    ->map(function ($item) {
-
-        return [
-
-            'id' => $item->id,
-
-            'nama_gelombang' => $item->nama_gelombang,
-
-            'id_tahun' => $item->id_tahun,
-
-            'awal' => $item->awal,
-
-            'akhir' => $item->akhir,
-
-            'is_current' => $item->is_current,
-
-            'idx' => $item->idx,
-
+    public function data()
+    {
+        $data = Gelombang::withCount([
             // Semua pendaftar
-            'pendaftar' => $item->calon_siswas_count,
+            'calonSiswas',
+            // Pendaftar yang sudah terverifikasi
+            'calonSiswas as terverifikasi_count' => function ($query) {
+                $query->where('status_daftar', 0);
+            },
+        ])
+            ->where('id_tahun', $this->tahun)
+            ->orderBy('id_tahun', 'desc')
+            ->get()
+            ->map(function ($item) {
 
-            // status_daftar = 0
-            'terverifikasi' => $item->terverifikasi_count,
-        ];
-    });
+                return [
 
-    return response()->json($data);
-}
+                    'id' => $item->id,
+
+                    'nama_gelombang' => $item->nama_gelombang,
+
+                    'id_tahun' => $item->id_tahun,
+
+                    'awal' => $item->awal,
+
+                    'akhir' => $item->akhir,
+
+                    'is_current' => $item->is_current,
+
+                    'idx' => $item->idx,
+                    'kuota' => $item->kuota,
+                    // Semua pendaftar
+                    'pendaftar' => $item->calon_siswas_count,
+
+                    // status_daftar = 0
+                    'terverifikasi' => $item->terverifikasi_count,
+                ];
+            });
+
+        return response()->json($data);
+    }
 
     public function store(Request $request)
     {
@@ -67,6 +80,7 @@ class GelombangController extends Controller
             'akhir' => $request->akhir,
             'is_current' => $request->is_current,
             'idx' => $request->idx,
+            'kuota' => $request->kuota,
         ]);
         LogModel::create([
             'tanggal' => now(),
@@ -94,6 +108,7 @@ class GelombangController extends Controller
             'akhir' => $request->akhir,
             'is_current' => $request->is_current,
             'idx' => $request->idx,
+            'kuota' => $request->kuota,
         ]);
 
         LogModel::create([

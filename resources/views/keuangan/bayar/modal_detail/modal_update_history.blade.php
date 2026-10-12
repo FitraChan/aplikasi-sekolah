@@ -1,95 +1,282 @@
-<div id="modal-update-history-form" class="modal" tabindex="-1">
+<div
+    id="modal-update-history-form"
+    class="hidden fixed inset-0 z-[9999]
+           items-center justify-center
+           bg-slate-900/50
+           p-4"
+    tabindex="-1"
+>
 
-    <div class="modal-dialog">
+    <div
+        class="w-full max-w-lg
+               bg-white
+               rounded-xl
+               shadow-xl
+               overflow-hidden"
+    >
 
-        <div class="modal-content">
+        <form id="form-bayar">
 
-            <form id="form-bayar">
+            <!-- =====================================================
+                 INPUT HIDDEN
+            ====================================================== -->
 
-                <input type="hidden" id="id_bayar_history" name="id_bayar">
-                <input type="hidden" id="id_siswa" name="id_siswa">
+            <input
+                type="hidden"
+                id="id_bayar_history"
+                name="id_bayar"
+            >
 
-                <div class="modal-header">
-                    <h2 class="font-medium text-base">
-                        Data Pembayaran
-                    </h2>
-                </div>
+            <input
+                type="hidden"
+                id="id_siswa"
+                name="id_siswa"
+            >
 
-                <div class="modal-body">
 
-                    <div class="grid grid-cols-12 gap-4">
+            <!-- =====================================================
+                 HEADER
+            ====================================================== -->
 
-                        <!-- Tanggal Bayar -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                Tanggal Bayar
-                            </label>
+            <div
+                class="flex items-center justify-between
+                       px-6 py-4
+                       border-b border-slate-200"
+            >
 
-                            <input
-                                type="date"
-                                id="tgl_bayar_history"
-                                name="tgl_bayar"
-                                class="form-control">
-                        </div>
+                <h2 class="text-lg font-semibold text-slate-800">
+                    Data Pembayaran
+                </h2>
 
-                        <!-- No Kwitansi -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                No Kwitansi
-                            </label>
 
-                            <input
-                                type="text"
-                                id="no_kwitansi_history"
-                                name="no_kwitansi"
-                                class="form-control"
-                                placeholder="Masukkan nomor kwitansi">
-                        </div>
+                <!-- TOMBOL CLOSE -->
 
-                        <!-- Keterangan -->
-                        <div class="col-span-12">
-                            <label class="form-label">
-                                Keterangan
-                            </label>
+                <button
+                    type="button"
+                    onclick="closeModalUpdateHistory()"
+                    class="inline-flex items-center justify-center
+                           w-8 h-8
+                           rounded-lg
+                           text-slate-400
+                           hover:text-slate-600
+                           hover:bg-slate-100
+                           transition-colors"
+                    aria-label="Tutup"
+                >
 
-                            <textarea
-                                id="keterangan"
-                                name="keterangan"
-                                rows="3"
-                                class="form-control"
-                                placeholder="Masukkan keterangan"></textarea>
-                        </div>
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                    >
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M6 6l12 12M6 18L18 6"
+                        />
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            <!-- =====================================================
+                 BODY
+            ====================================================== -->
+
+            <div class="px-6 py-5">
+
+                <div class="space-y-5">
+
+
+                    <!-- TANGGAL BAYAR -->
+
+                    <div>
+
+                        <label
+                            for="tgl_bayar_history"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Tanggal Bayar
+                        </label>
+
+                        <input
+                            type="date"
+                            id="tgl_bayar_history"
+                            name="tgl_bayar"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+
+                    <!-- NO KWITANSI -->
+
+                    <div>
+
+                        <label
+                            for="no_kwitansi_history"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            No Kwitansi
+                        </label>
+
+                        <input
+                            type="text"
+                            id="no_kwitansi_history"
+                            name="no_kwitansi"
+                            placeholder="Masukkan nomor kwitansi"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        >
+
+                    </div>
+
+
+                    <!-- KETERANGAN -->
+
+                    <div>
+
+                        <label
+                            for="keterangan"
+                            class="block text-sm font-medium
+                                   text-slate-700 mb-1.5"
+                        >
+                            Keterangan
+                        </label>
+
+                        <textarea
+                            id="keterangan"
+                            name="keterangan"
+                            rows="3"
+                            placeholder="Masukkan keterangan"
+                            class="w-full
+                                   rounded-lg
+                                   border border-slate-300
+                                   bg-white
+                                   px-3 py-2.5
+                                   text-sm text-slate-700
+                                   placeholder:text-slate-400
+                                   outline-none
+                                   resize-none
+                                   transition
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2
+                                   focus:ring-[#02BC9C]/20"
+                        ></textarea>
 
                     </div>
 
                 </div>
 
-                <div class="modal-footer">
+            </div>
 
-                    <button
-                        type="button"
-                        class="btn btn-outline-secondary"
-                        data-tw-dismiss="modal">
 
-                        Batal
+            <!-- =====================================================
+                 FOOTER
+            ====================================================== -->
 
-                    </button>
+            <div
+                class="flex flex-col-reverse sm:flex-row
+                       sm:justify-end
+                       gap-2
+                       px-6 py-4
+                       bg-slate-50
+                       border-t border-slate-200"
+            >
 
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                        onclick="saveHistoryBayar()">
+                <!-- BATAL -->
 
-                        <i data-lucide="save" class="w-4 h-4 mr-1"></i>
-                        Simpan
+                <button
+                    type="button"
+                    onclick="closeModalUpdateHistory()"
+                    class="inline-flex items-center justify-center
+                           px-4 py-2.5
+                           rounded-lg
+                           border border-slate-300
+                           bg-white
+                           text-sm font-medium
+                           text-slate-700
+                           hover:bg-slate-100
+                           transition-colors"
+                >
+                    Batal
+                </button>
 
-                    </button>
 
-                </div>
+                <!-- SIMPAN -->
 
-            </form>
+                <button
+                    type="button"
+                    onclick="saveHistoryBayar()"
+                    class="inline-flex items-center justify-center
+                           gap-2
+                           px-4 py-2.5
+                           rounded-lg
+                           bg-[#02BC9C]
+                           hover:bg-[#00B686]
+                           text-white
+                           text-sm font-medium
+                           shadow-sm
+                           transition-colors"
+                >
 
-        </div>
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                    >
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
+                        />
+
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M17 21v-8H7v8M7 3v5h8"
+                        />
+
+                    </svg>
+
+                    Simpan
+
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
 

@@ -45,7 +45,7 @@
             TAMBAH TEMPLATE
         ====================================================== --}}
         <a href=""
-           class="inline-flex items-center justify-center gap-2
+            class="inline-flex items-center justify-center gap-2
                   px-5 py-2.5
                   bg-[#02BC9C]
                   hover:bg-[#02a387]
@@ -58,14 +58,14 @@
                   shadow-emerald-500/20">
 
             <svg class="w-4 h-4"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 viewBox="0 0 24 24">
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24">
 
                 <path d="M12 4v16M4 12h16"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"/>
+                    stroke-linecap="round"
+                    stroke-linejoin="round" />
 
             </svg>
 
@@ -90,75 +90,75 @@
         ====================================================== --}}
         @forelse ($data ?? [] as $idGelombang => $itemsByItem)
 
-            @php
+        @php
 
-                /*
-                |--------------------------------------------------------------------------
-                | Ambil detail pertama
-                |--------------------------------------------------------------------------
-                */
+        /*
+        |--------------------------------------------------------------------------
+        | Ambil detail pertama
+        |--------------------------------------------------------------------------
+        */
 
-                $firstItemGroup = $itemsByItem->first();
+        $firstItemGroup = $itemsByItem->first();
 
-                $first = $firstItemGroup
-                    ? $firstItemGroup->first()
-                    : null;
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | DATA GELOMBANG
-                |--------------------------------------------------------------------------
-                */
-
-                $namaGelombang =
-                    $first['nama_gelombang'] ?? '-';
-
-                $idTahun =
-                    $first['id_tahun'] ?? '-';
+        $first = $firstItemGroup
+        ? $firstItemGroup->first()
+        : null;
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | STATUS
-                |--------------------------------------------------------------------------
-                */
+        /*
+        |--------------------------------------------------------------------------
+        | DATA GELOMBANG
+        |--------------------------------------------------------------------------
+        */
 
-                $aktif = true;
+        $namaGelombang =
+        $first['nama_gelombang'] ?? '-';
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | JUMLAH JENIS ITEM
-                |--------------------------------------------------------------------------
-                */
-
-                $jumlahItem =
-                    $itemsByItem->count();
+        $idTahun =
+        $first['id_tahun'] ?? '-';
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | TOTAL SEMUA PEMBAYARAN
-                |--------------------------------------------------------------------------
-                */
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS
+        |--------------------------------------------------------------------------
+        */
 
-       $total = $itemsByItem->sum(function ($itemDetails) {
-
-                $itemFirst = $itemDetails->first();
-
-                return (float) (
-                    $itemFirst['jml_bayar'] ?? 0
-                );
-            });
-
-            @endphp
+        $aktif = true;
 
 
-            {{-- =================================================
+        /*
+        |--------------------------------------------------------------------------
+        | JUMLAH JENIS ITEM
+        |--------------------------------------------------------------------------
+        */
+
+        $jumlahItem =
+        $itemsByItem->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL SEMUA PEMBAYARAN
+        |--------------------------------------------------------------------------
+        */
+
+        $total = $itemsByItem->sum(function ($itemDetails) {
+
+        $itemFirst = $itemDetails->first();
+
+        return (float) (
+        $itemFirst['jml_bayar'] ?? 0
+        );
+        });
+
+        @endphp
+
+
+        {{-- =================================================
                 CARD GELOMBANG
             ================================================== --}}
-            <div class="bg-white
+        <div class="bg-white
                         rounded-xl
                         border border-slate-200
                         shadow-sm
@@ -167,40 +167,40 @@
                         min-w-0">
 
 
-                {{-- =================================================
+            {{-- =================================================
                     CARD HEADER
                 ================================================== --}}
-                <div>
+            <div>
 
-                    <div class="flex items-start justify-between gap-4">
+                <div class="flex items-start justify-between gap-4">
 
-                        <div class="min-w-0">
+                    <div class="min-w-0">
 
-                            <h3 class="text-xl font-bold
+                        <h3 class="text-xl font-bold
                                        text-slate-800
                                        leading-snug">
 
-                                Biaya Pendidikan Tahun Ajaran
+                            Biaya Pendidikan Tahun Ajaran
 
-                            </h3>
+                        </h3>
 
-                            <h3 class="text-xl font-bold
+                        <h3 class="text-xl font-bold
                                        text-slate-800
                                        leading-snug">
 
-                                {{ $tahunAjaran->thn_ajaran ?? '-' }}
+                            {{ $tahunAjaran->thn_ajaran ?? '-' }}
 
-                            </h3>
+                        </h3>
 
-                        </div>
+                    </div>
 
 
-                        {{-- =================================================
+                    {{-- =================================================
                             STATUS
                         ================================================== --}}
-                        @if ($aktif)
+                    @if ($aktif)
 
-                            <span class="inline-flex items-center
+                    <span class="inline-flex items-center
                                          px-3 py-1
                                          rounded-full
                                          text-xs
@@ -209,13 +209,13 @@
                                          text-white
                                          shrink-0">
 
-                                AKTIF
+                        AKTIF
 
-                            </span>
+                    </span>
 
-                        @else
+                    @else
 
-                            <span class="inline-flex items-center
+                    <span class="inline-flex items-center
                                          px-3 py-1
                                          rounded-full
                                          text-xs
@@ -224,25 +224,25 @@
                                          text-white
                                          shrink-0">
 
-                                TIDAK AKTIF
+                        TIDAK AKTIF
 
-                            </span>
+                    </span>
 
-                        @endif
+                    @endif
 
-                    </div>
+                </div>
 
 
-                    {{-- =================================================
+                {{-- =================================================
                         GELOMBANG
                     ================================================== --}}
-                    <div class="mt-5 mb-4">
+                <div class="mt-5 mb-4">
 
-                        <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3">
 
-                            <div>
+                        <div>
 
-                                <span class="block
+                            <span class="block
                                              text-[10px]
                                              font-bold
                                              text-slate-400
@@ -250,11 +250,11 @@
                                              tracking-wider
                                              mb-1">
 
-                                    GELOMBANG
+                                GELOMBANG
 
-                                </span>
+                            </span>
 
-                                <span class="inline-flex items-center
+                            <span class="inline-flex items-center
                                              px-3 py-1.5
                                              rounded-lg
                                              bg-teal-50
@@ -263,19 +263,19 @@
                                              text-sm
                                              font-bold">
 
-                                    {{ $namaGelombang }}
+                                {{ $namaGelombang }}
 
-                                </span>
+                            </span>
 
-                            </div>
+                        </div>
 
 
-                            {{-- =================================================
+                        {{-- =================================================
                                 JUMLAH ITEM
                             ================================================== --}}
-                            <div class="text-right">
+                        <div class="text-right">
 
-                                <span class="block
+                            <span class="block
                                              text-[10px]
                                              font-bold
                                              text-slate-400
@@ -283,97 +283,97 @@
                                              tracking-wider
                                              mb-1">
 
-                                    ITEM
+                                ITEM
 
-                                </span>
+                            </span>
 
-                                <span class="text-sm
+                            <span class="text-sm
                                              font-bold
                                              text-slate-600">
 
-                                    {{ $jumlahItem }} item
+                                {{ $jumlahItem }} item
 
-                                </span>
-
-                            </div>
+                            </span>
 
                         </div>
 
                     </div>
 
+                </div>
 
-                    {{-- =================================================
+
+                {{-- =================================================
                         LEVEL 2
                         ITEM PEMBAYARAN
                     ================================================== --}}
-                    <div class="space-y-3">
+                <div class="space-y-3">
 
-                        @foreach ($itemsByItem as $idItem => $itemDetails)
+                    @foreach ($itemsByItem as $idItem => $itemDetails)
 
-                            @php
+                    @php
 
-                                /*
-                                |--------------------------------------------------------------------------
-                                | DETAIL PERTAMA ITEM
-                                |--------------------------------------------------------------------------
-                                */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DETAIL PERTAMA ITEM
+                    |--------------------------------------------------------------------------
+                    */
 
-                                $itemFirst =
-                                    $itemDetails->first();
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | DATA ITEM
-                                |--------------------------------------------------------------------------
-                                */
-
-                                $namaItem =
-                                    $itemFirst['nama_item'] ?? '-';
-
-                                $kategori =
-                                    $itemFirst['kategori'] ?? '-';
-
-                                $periode =
-                                    $itemFirst['periode'] ?? '-';
+                    $itemFirst =
+                    $itemDetails->first();
 
 
-                                /*
-                                |--------------------------------------------------------------------------
-                                | KETERANGAN
-                                |--------------------------------------------------------------------------
-                                */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DATA ITEM
+                    |--------------------------------------------------------------------------
+                    */
 
-                                $keterangan =
-                                    $itemDetails
-                                        ->pluck('ket_bayar')
-                                        ->filter()
-                                        ->unique()
-                                        ->implode(', ');
+                    $namaItem =
+                    $itemFirst['nama_item'] ?? '-';
 
+                    $kategori =
+                    $itemFirst['kategori'] ?? '-';
 
-                                /*
-                                |--------------------------------------------------------------------------
-                                | TOTAL ITEM
-                                |--------------------------------------------------------------------------
-                                */
-
-                                $jumlahItemBayar =
-                                    $itemDetails->sum(function ($item) {
-
-                                        return (float) (
-                                            $item['jml_bayar'] ?? 0
-                                        );
-
-                                    });
-
-                            @endphp
+                    $periode =
+                    $itemFirst['periode'] ?? '-';
 
 
-                            {{-- =================================================
+                    /*
+                    |--------------------------------------------------------------------------
+                    | KETERANGAN
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $keterangan =
+                    $itemDetails
+                    ->pluck('ket_bayar')
+                    ->filter()
+                    ->unique()
+                    ->implode(', ');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | TOTAL ITEM
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $jumlahItemBayar =
+                    $itemDetails->sum(function ($item) {
+
+                    return (float) (
+                    $item['jml_bayar'] ?? 0
+                    );
+
+                    });
+
+                    @endphp
+
+
+                    {{-- =================================================
                                 ITEM PEMBAYARAN
                             ================================================== --}}
-                            <div class="grid grid-cols-12
+                    <div class="grid grid-cols-12
                                         items-center
                                         bg-slate-50
                                         border border-slate-100
@@ -382,92 +382,106 @@
                                         gap-3">
 
 
-                                {{-- =================================================
+                        {{-- =================================================
                                     ICON + NAMA ITEM
                                 ================================================== --}}
-                                <div class="col-span-12
+                        <div class="col-span-12
                                             sm:col-span-5
                                             flex items-center
                                             gap-3
                                             min-w-0">
 
-                                    <div class="w-10 h-10
-                                                rounded-lg
-                                                bg-teal-50
-                                                border border-teal-100
-                                                text-[#02BC9C]
-                                                flex items-center
-                                                justify-center
-                                                shrink-0">
 
-                                        <svg class="w-5 h-5"
-                                             fill="none"
-                                             stroke="currentColor"
-                                             stroke-width="2"
-                                             viewBox="0 0 24 24">
+                            <?php if ($namaItem == 'DPP') { ?>
+                                <div class="w-10 h-10 rounded-xl bg-[#f3e8ff] text-[#9333ea] flex items-center justify-center shrink-0">
 
-                                            <path stroke-linecap="round"
-                                                  stroke-linejoin="round"
-                                                  d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                            <?php } else if ($namaItem == 'Seragam') { ?>
 
-                                            <path stroke-linecap="round"
-                                                  stroke-linejoin="round"
-                                                  d="M8 7h8M8 11h8M8 15h5"/>
+                                <div class="w-10 h-10 rounded-xl bg-[#ccfbf1] text-[#02BC9C] flex items-center justify-center shrink-0">
 
-                                        </svg>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.5a2 2 0 001.24 1.55L6 11.5V20a2 2 0 002 2h8a2 2 0 002-2v-8.5l1.9-0.76a2 2 0 001.24-1.55l.58-3.5a2 2 0 00-1.34-2.23z"></path>
+                                    </svg>
 
-                                    </div>
+                                </div>
+                            <?php } else { ?>
+
+                                <div class="w-10 h-10 rounded-xl bg-[#dbeafe] text-[#2563eb] flex items-center justify-center shrink-0">
+
+                                    <svg class="w-5 h-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24">
+
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1-2 1z" />
+
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M8 7h8M8 11h8M8 15h5" />
+
+                                    </svg>
+
+                                </div>
+                            <?php } ?>
 
 
-                                    <div class="min-w-0">
 
-                                        <span class="block
+                            <div class="min-w-0">
+
+                                <span class="block
                                                      text-sm
                                                      font-bold
                                                      text-slate-800
                                                      truncate">
 
-                                            {{ $namaItem }}
+                                    {{ $namaItem }}
 
-                                        </span>
+                                </span>
 
 
-                                        <span class="block
+                                <span class="block
                                                      text-xs
                                                      text-slate-500
                                                      mt-0.5
                                                      truncate">
 
-                                            {{ $kategori }}
+                                    {{ $kategori }}
 
-                                        </span>
+                                </span>
 
 
-                                        @if ($keterangan)
+                                @if ($keterangan)
 
-                                            <span class="block
+                                <span class="block
                                                          text-xs
                                                          text-slate-400
                                                          mt-0.5
                                                          truncate">
 
-                                                {{ $keterangan }}
+                                    {{ $keterangan }}
 
-                                            </span>
+                                </span>
 
-                                        @endif
+                                @endif
 
-                                    </div>
+                            </div>
 
-                                </div>
+                        </div>
 
 
-                                {{-- =================================================
+                        {{-- =================================================
                                     JUMLAH
                                 ================================================== --}}
-                                <div class="col-span-6 sm:col-span-4">
+                        <div class="col-span-6 sm:col-span-4">
 
-                                    <span class="block
+                            <span class="block
                                                  text-[10px]
                                                  font-bold
                                                  text-slate-400
@@ -475,32 +489,32 @@
                                                  tracking-wider
                                                  mb-0.5">
 
-                                        JUMLAH
+                                JUMLAH
 
-                                    </span>
+                            </span>
 
-                                    <span class="text-sm
+                            <span class="text-sm
                                                  font-bold
                                                  text-slate-800">
 
-                                        Rp {{ number_format(
+                                Rp {{ number_format(
                                             $itemFirst['jml_bayar'],
                                             0,
                                             ',',
                                             '.'
                                         ) }}
 
-                                    </span>
+                            </span>
 
-                                </div>
+                        </div>
 
 
-                                {{-- =================================================
+                        {{-- =================================================
                                     PERIODE
                                 ================================================== --}}
-                                <div class="col-span-6 sm:col-span-3">
+                        <div class="col-span-6 sm:col-span-3">
 
-                                    <span class="block
+                            <span class="block
                                                  text-[10px]
                                                  font-bold
                                                  text-slate-400
@@ -508,33 +522,33 @@
                                                  tracking-wider
                                                  mb-0.5">
 
-                                        PERIODE
+                                PERIODE
 
-                                    </span>
+                            </span>
 
-                                    <span class="text-xs
+                            <span class="text-xs
                                                  font-semibold
                                                  text-slate-600">
 
-                                        {{ $periode ?: '-' }}
+                                {{ $periode ?: '-' }}
 
-                                    </span>
+                            </span>
 
-                                </div>
-
-                            </div>
-
-                        @endforeach
+                        </div>
 
                     </div>
 
+                    @endforeach
+
                 </div>
 
+            </div>
 
-                {{-- =================================================
+
+            {{-- =================================================
                     CARD FOOTER
                 ================================================== --}}
-                <div class="border-t
+            <div class="border-t
                             border-dashed
                             border-slate-300
                             pt-5
@@ -546,12 +560,12 @@
                             gap-4">
 
 
-                    {{-- =================================================
+                {{-- =================================================
                         TOTAL
                     ================================================== --}}
-                    <div>
+                <div>
 
-                        <span class="text-[10px]
+                    <span class="text-[10px]
                                      sm:text-[11px]
                                      text-slate-400
                                      block
@@ -560,35 +574,35 @@
                                      tracking-wider
                                      mb-0.5">
 
-                            TOTAL BIAYA
+                        TOTAL BIAYA
 
-                        </span>
+                    </span>
 
-                        <span class="text-2xl
+                    <span class="text-2xl
                                      font-extrabold
                                      text-[#02BC9C]">
 
-                            Rp {{ number_format(
+                        Rp {{ number_format(
                                 $total,
                                 0,
                                 ',',
                                 '.'
                             ) }}
 
-                        </span>
+                    </span>
 
-                    </div>
+                </div>
 
 
-                    {{-- =================================================
+                {{-- =================================================
                         ACTION
                     ================================================== --}}
-                    <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2">
 
 
-                        {{-- EDIT --}}
-                        <a href=""
-                           class="inline-flex
+                    {{-- EDIT --}}
+                    <a href=""
+                        class="inline-flex
                                   items-center
                                   justify-center
                                   gap-1.5
@@ -604,29 +618,29 @@
                                   transition
                                   shadow-sm">
 
-                            <svg class="w-4 h-4"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="2"
-                                 viewBox="0 0 24 24">
+                        <svg class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
 
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M11 5h2M5 19l1.5-6L16 3.5a2.12 2.12 0 013 3L9.5 17.5 5 19z"/>
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M11 5h2M5 19l1.5-6L16 3.5a2.12 2.12 0 013 3L9.5 17.5 5 19z" />
 
-                            </svg>
+                        </svg>
 
-                            <span>
-                                Edit
-                            </span>
+                        <span>
+                            Edit
+                        </span>
 
-                        </a>
+                    </a>
 
 
-                        {{-- HAPUS --}}
-                        <button type="button"
-                                onclick=""
-                                class="inline-flex
+                    {{-- HAPUS --}}
+                    <button type="button"
+                        onclick=""
+                        class="inline-flex
                                        items-center
                                        justify-center
                                        gap-1.5
@@ -643,47 +657,47 @@
                                        shadow-sm
                                        cursor-pointer">
 
-                            <svg class="w-4 h-4 shrink-0"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="2"
-                                 viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
 
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M6 6l12 12M18 6L6 18"/>
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M6 6l12 12M18 6L6 18" />
 
-                            </svg>
+                        </svg>
 
-                            <span>
-                                Hapus
-                            </span>
+                        <span>
+                            Hapus
+                        </span>
 
-                        </button>
-
-                    </div>
+                    </button>
 
                 </div>
 
             </div>
 
+        </div>
+
 
         @empty
 
 
-            {{-- =================================================
+        {{-- =================================================
                 EMPTY STATE
             ================================================== --}}
-            <div class="lg:col-span-2">
+        <div class="lg:col-span-2">
 
-                <div class="bg-white
+            <div class="bg-white
                             rounded-xl
                             border border-slate-200
                             shadow-sm
                             p-10
                             text-center">
 
-                    <div class="w-12 h-12
+                <div class="w-12 h-12
                                 mx-auto
                                 rounded-xl
                                 bg-teal-50
@@ -692,44 +706,44 @@
                                 flex items-center
                                 justify-center">
 
-                        <svg class="w-6 h-6"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2"
-                             viewBox="0 0 24 24">
+                    <svg class="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        viewBox="0 0 24 24">
 
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M9 12h6M9 16h6M5 20V5a2 2 0 012-2h7l5 5v12a2 2 0 01-2 2H7a2 2 0 01-2-2z"/>
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 12h6M9 16h6M5 20V5a2 2 0 012-2h7l5 5v12a2 2 0 01-2 2H7a2 2 0 01-2-2z" />
 
-                        </svg>
+                    </svg>
 
-                    </div>
+                </div>
 
 
-                    <h3 class="mt-4
+                <h3 class="mt-4
                                text-sm
                                font-bold
                                text-slate-800">
 
-                        Belum Ada Data
+                    Belum Ada Data
 
-                    </h3>
+                </h3>
 
 
-                    <p class="mt-1
+                <p class="mt-1
                               text-sm
                               text-slate-500">
 
-                        Belum terdapat struktur biaya pembayaran.
+                    Belum terdapat struktur biaya pembayaran.
 
-                    </p>
+                </p>
 
 
-                    <div class="mt-5">
+                <div class="mt-5">
 
-                        <a href=""
-                           class="inline-flex
+                    <a href=""
+                        class="inline-flex
                                   items-center
                                   gap-2
                                   px-4
@@ -742,27 +756,27 @@
                                   rounded-lg
                                   transition">
 
-                            <svg class="w-4 h-4"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="2"
-                                 viewBox="0 0 24 24">
+                        <svg class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
 
-                                <path d="M12 4v16M4 12h16"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"/>
+                            <path d="M12 4v16M4 12h16"
+                                stroke-linecap="round"
+                                stroke-linejoin="round" />
 
-                            </svg>
+                        </svg>
 
-                            Tambah Template
+                        Tambah Template
 
-                        </a>
-
-                    </div>
+                    </a>
 
                 </div>
 
             </div>
+
+        </div>
 
         @endforelse
 
@@ -777,12 +791,11 @@
 @push('scripts')
 
 <script>
-
     async function hapusTemplate(id) {
 
         if (!confirm(
-            'Apakah Anda yakin ingin menghapus template ini?'
-        )) {
+                'Apakah Anda yakin ingin menghapus template ini?'
+            )) {
             return;
         }
 
@@ -790,18 +803,16 @@
         try {
 
             const response = await fetch(
-                `/template-pembayaran/${id}`,
-                {
+                `/template-pembayaran/${id}`, {
                     method: 'DELETE',
 
                     headers: {
 
-                        'X-CSRF-TOKEN':
-                            document
-                                .querySelector(
-                                    'meta[name="csrf-token"]'
-                                )
-                                .getAttribute('content'),
+                        'X-CSRF-TOKEN': document
+                            .querySelector(
+                                'meta[name="csrf-token"]'
+                            )
+                            .getAttribute('content'),
 
                         'Accept': 'application/json'
 
@@ -844,7 +855,6 @@
         }
 
     }
-
 </script>
 
 @endpush
