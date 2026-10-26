@@ -68,7 +68,7 @@
                         <div class="w-full">
 
                             <select
-                                id="filter_tahun_detail"
+                                id="filter_tahun_detail_modal"
                                 class="w-full h-11 px-3
                                rounded-xl
                                border border-slate-200
@@ -99,7 +99,7 @@
                         <div class="w-full">
 
                             <select
-                                id="filter_jurusan_detail"
+                                id="filter_jurusan_detail_modal"
                                 class="w-full h-11 px-3
                                rounded-xl
                                border border-slate-200
@@ -130,7 +130,7 @@
                         <div class="w-full">
 
                             <select
-                                id="filter_kelas_detail"
+                                id="filter_kelas_detail_modal"
                                 class="w-full h-11 px-3
                                rounded-xl
                                border border-slate-200
@@ -161,7 +161,7 @@
                         <div class="w-full">
 
                             <select
-                                id="filter_semester_detail"
+                                id="filter_semester_detail_modal"
                                 class="w-full h-11 px-3
                                rounded-xl
                                border border-slate-200
@@ -193,7 +193,7 @@
 
                             <input
                                 type="text"
-                                id="filter_mapel_detail"
+                                id="filter_mapel_detail_modal"
                                 class="w-full h-11 px-4
                                rounded-xl
                                border border-slate-200
@@ -317,19 +317,19 @@
 
 
 <script>
-    const jamOptions = @json(
-        $jam->mapWithKeys(function($item) {
+   const jamOptions = {
+    "": "Pilih Jam",
+    ...@json(
+        $jam->mapWithKeys(function ($item) {
             return [
                 $item->id =>
-                'Jam Ke-'.$item->jam_ke.
-                ' ('.
-                $item->jam_awal.
-                ' - '.
-                $item->jam_akhir.
-                ')'
+                    'Jam Ke-' . $item->jam_ke .
+                    ' (' . $item->jam_awal .
+                    ' - ' . $item->jam_akhir . ')'
             ];
         })
-    );
+    )
+};
 
     let changedRowsDetail = [];
 
@@ -338,22 +338,46 @@
        TABULATOR
     ============================================================= */
 
-    let tableDetail = new Tabulator(
-        "#table-detail-jadwal", {
 
-            ajaxURL: "{{ route('detail-jadwal.data') }}",
+              
+    
 
-            ajaxParams: {},
+  let tableDetail;
 
-            selectableRows: 1,
+window.tampilkanTableDetail = function() {
 
-            layout: "fitDataStretch",
+   tableDetail = null;
+    const idHari = window.currentEditingSlot?.idHari ?? null;
 
-            pagination: true,
+    console.log('ID HARI UNTUK TABEL:', idHari);
 
-            paginationSize: 20,
+    if (!idHari) {
+        console.log('ID Hari belum tersedia');
+        return;
+    }
 
-            columns: [
+    if (tableDetail) {
+        tableDetail.setData(
+            "{{ route('detail-jadwal.data') }}",
+            { id_hari: idHari }
+        );
+        return;
+    }
+
+    tableDetail = new Tabulator("#table-detail-jadwal", {
+        ajaxURL: "{{ route('detail-jadwal.data') }}",
+
+        ajaxParams: {
+            id_hari: idHari
+        },
+
+        selectableRows: 1,
+        layout: "fitDataStretch",
+        pagination: true,
+        paginationSize: 20,
+
+        // Pertahankan konfigurasi columns milik Anda di sini.
+         columns: [
 
                 {
                     title: "No",
@@ -407,9 +431,7 @@
                     title: "Guru",
                     field: "id_gtk",
                     width: 250,
-
                     editor: "list",
-
                     editorParams: {
 
                         values: guruOptions,
@@ -471,15 +493,10 @@
 
             ]
 
-        }
-    );
+    });
 
 
-    /* =============================================================
-       TRACK PERUBAHAN
-    ============================================================= */
-
-    tableDetail.on(
+     tableDetail.on(
         "cellEdited",
         function(cell) {
 
@@ -505,6 +522,182 @@
 
         }
     );
+};
+   
+let tableDetailFull = null;
+window.tampilkanTableDetailFull = function() {
+   
+ tableDetailFull = null;
+    if (tableDetailFull) {
+        tableDetailFull.setData(
+            "{{ route('detail-jadwal.data') }}",
+           
+        );
+        return;
+    }
+
+    tableDetailFull = new Tabulator("#table-detail-jadwal", {
+        ajaxURL: "{{ route('detail-jadwal.data') }}",
+
+       
+        selectableRows: 1,
+        layout: "fitDataStretch",
+        pagination: true,
+        paginationSize: 20,
+
+        // Pertahankan konfigurasi columns milik Anda di sini.
+         columns: [
+
+                {
+                    title: "No",
+                    width: 70,
+                    hozAlign: "center",
+
+                    formatter: function(cell) {
+
+                        let row = cell.getRow();
+                        let table = row.getTable();
+
+                        let page = table.getPage();
+                        let size = table.getPageSize();
+
+                        return ((page - 1) * size) +
+                            row.getPosition(true);
+                    }
+                },
+
+
+                {
+                    title: "Tahun",
+                    field: "tahun_ajaran",
+                    width: 150
+                },
+
+
+                {
+                    title: "Semester",
+                    field: "semester",
+                    width: 100,
+                    hozAlign: "center"
+                },
+
+
+                {
+                    title: "Kelas",
+                    field: "nama_kelas",
+                    width: 180
+                },
+
+
+                {
+                    title: "Mapel",
+                    field: "nama_mapel",
+                    width: 250
+                },
+
+
+                {
+                    title: "Guru",
+                    field: "id_gtk",
+                    width: 250,
+                    editor: "list",
+                    editorParams: {
+
+                        values: guruOptions,
+
+                        autocomplete: true,
+
+                        listOnEmpty: true,
+
+                        freetext: false
+                    },
+
+                    formatter: function(cell) {
+
+                        return guruOptions[
+                            cell.getValue()
+                        ] ?? "-";
+                    }
+                },
+
+
+                {
+                    title: "Jam Pelajaran",
+                    field: "id_jam",
+                    width: 300,
+
+                    editor: "list",
+
+                    editorParams: {
+
+                        values: jamOptions,
+
+                        autocomplete: true,
+
+                        listOnEmpty: true
+                    },
+
+                    formatter: function(cell) {
+
+                        return jamOptions[
+                            cell.getValue()
+                        ] ?? "-";
+                    }
+                },
+
+
+                {
+                    title: "Waktu",
+                    width: 150,
+
+                    formatter: function(cell) {
+
+                        let row = cell.getData();
+
+                        return (row.jam_awal ?? '') +
+                            ' - ' +
+                            (row.jam_akhir ?? '');
+                    }
+                }
+
+            ]
+
+    });
+
+
+     tableDetailFull.on(
+        "cellEdited",
+        function(cell) {
+
+            let data = cell.getRow().getData();
+
+            let idx = changedRowsDetail.findIndex(
+                x => x.id == data.id
+            );
+
+            if (idx === -1) {
+
+                changedRowsDetail.push({
+                    ...data
+                });
+
+            } else {
+
+                changedRowsDetail[idx] = {
+                    ...data
+                };
+
+            }
+
+        }
+    );
+};
+
+    /* =============================================================
+       TRACK PERUBAHAN
+    ============================================================= */
+
+   
 
 
     /* =============================================================
@@ -513,26 +706,30 @@
 
     function loadDetailDataPelajaran() {
 
+    console.log('loadDetailDataPelajaran dipanggil', document.getElementById(
+                'filter_mapel_detail_modal'
+            ).value);
+
         let params = {
 
             id_tahun: document.getElementById(
-                'filter_tahun_detail'
+                'filter_tahun_detail_modal'
             ).value,
 
             id_jurusan: document.getElementById(
-                'filter_jurusan_detail'
+                'filter_jurusan_detail_modal'
             ).value,
 
             id_kelas: document.getElementById(
-                'filter_kelas_detail'
+                'filter_kelas_detail_modal'
             ).value,
 
             smt: document.getElementById(
-                'filter_semester_detail'
+                'filter_semester_detail_modal'
             ).value,
 
-            mapel: document.getElementById(
-                'filter_mapel_detail'
+            nama_pelajaran: document.getElementById(
+                'filter_mapel_detail_modal'
             ).value
 
         };
@@ -541,12 +738,27 @@
             'Filter:',
             params
         );
-
+if(tableDetail) {
         tableDetail.setData(
             "{{ route('detail-jadwal.data') }}",
             params
         );
+
+}
+
+if(tableDetailFull) {
+
+         tableDetailFull.setData(
+            "{{ route('detail-jadwal.data') }}",
+            params
+        );
+
+}
     }
+
+   
+
+    
 
     async function saveDetailJadwal() {
         if (changedRowsDetail.length === 0) {
@@ -569,7 +781,8 @@
 
             ...row,
 
-            id_hari: row.id_hari ?? idHari
+            id_hari: row.id_hari ?? idHari,
+            id_jam: row.id_jam ?? 0
 
         }));
 
@@ -628,8 +841,14 @@
 
             await reloadSchedule();
 
+if(tableDetail) {
+            tableDetail.replaceData();
+}
 
-            await tableDetail.replaceData();
+if(tableDetailFull) {
+    tableDetailFull.replaceData();
+}
+            // await tableDetail.replaceData();
 
             closeMapelModal();
 

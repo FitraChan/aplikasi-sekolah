@@ -135,18 +135,18 @@
         </div>
 
         <div>
-    <label
-        for="filter_nama_pelajaran_detail"
-        class="mb-1.5 block text-xs font-semibold text-slate-600">
-        Nama Pelajaran
-    </label>
+            <label
+                for="filter_nama_pelajaran_detail"
+                class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Nama Pelajaran
+            </label>
 
-    <input
-        type="text"
-        id="filter_nama_pelajaran_detail"
-        placeholder="Cari nama pelajaran..."
-        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
-</div>
+            <input
+                type="text"
+                id="filter_nama_pelajaran_detail"
+                placeholder="Cari nama pelajaran..."
+                class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+        </div>
 
 
         {{-- Tombol Cari --}}
@@ -508,6 +508,7 @@
                         data-id-gtk="${item.id_gtk}"
                         data-id-mapel="${item.id_mapel}"
                         data-id-jam="${item.id_jam}"
+                        data-id-angkatan="${item.angkatan}"
 
                     >
 
@@ -732,6 +733,9 @@
                     setSelectValue(mapelSelect, data.id);
                     setSelectValue(pengajarSelect, data.idGtk);
 
+                    window.tampilkanTableDetail();
+
+
                 } else {
 
                     const activeDayContainer =
@@ -750,7 +754,10 @@
                         idHari: idHari
                     };
 
+                    window.tampilkanTableDetailFull();
+
                 }
+
 
                 modal.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden');
@@ -920,16 +927,69 @@
                 }
             }
 
-            function deleteSlot(btn) {
-                if (confirm('Apakah Anda yakin ingin menghapus jam pelajaran ini?')) {
-                    const slot = btn.closest('.p-6');
-                    if (slot) {
-                        slot.style.transition = 'all 0.2s ease-out';
-                        slot.style.opacity = '0';
-                        slot.style.transform = 'scale(0.98)';
-                        setTimeout(() => slot.remove(), 200);
-                    }
-                }
+            async function deleteSlot(btn) {
+    if (!confirm('Apakah Anda yakin ingin menghapus jam pelajaran ini?')) {
+        return;
+    }
+
+    const slot = btn.closest('.p-6');
+
+    if (!slot) {
+        alert('Slot jadwal tidak ditemukan.');
+        return;
+    }
+
+    const id = slot.dataset.id;
+    const idpenjadwalan = slot.dataset.idpenjadwalan;
+
+    if (!id || !idpenjadwalan) {
+        alert('ID jadwal tidak ditemukan.');
+        console.error({ id, idpenjadwalan });
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            "{{ route('detail-jadwal.destroy') }}",
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector(
+                        'meta[name="csrf-token"]'
+                    ).content
+                },
+                body: JSON.stringify({
+                    id: id,
+                    idpenjadwalan: idpenjadwalan
+                })
             }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.msg || result.message || 'Gagal menghapus jadwal.'
+            );
+        }
+
+        // Animasi setelah server berhasil
+        slot.style.transition = 'all 0.2s ease-out';
+        slot.style.opacity = '0';
+        slot.style.transform = 'scale(0.98)';
+
+        setTimeout(() => {
+            slot.remove();
+        }, 200);
+
+        console.log(result.msg);
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Terjadi kesalahan saat menghapus jadwal.');
+    }
+}
         </script>
 </main>

@@ -297,9 +297,12 @@
 
 
 <script>
-    const guruOptions = @json(
+   const guruOptions = {
+    "": "Pilih Guru",
+    ...@json(
         $guru->pluck('nama_gtk', 'id')
-    );
+    )
+};
 
     let changedRows = [];
 
@@ -529,10 +532,10 @@
 
     function loadData() {
 
-         const angkatan = document.getElementById('filter_angkatan').value;
+         const angkatan = document.getElementById('filter_mapel').value;
 
-         console.log(angkatan);
-         
+      
+         console.log('loadData dipanggil', angkatan);
 
         table.setData(
             "{{ route('master-jadwal.data') }}",

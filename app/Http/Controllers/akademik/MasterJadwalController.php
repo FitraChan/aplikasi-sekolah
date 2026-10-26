@@ -49,7 +49,6 @@ class MasterJadwalController extends Controller
             'kelas' => Kelas::orderBy('nama_kelas')->get(),
             'mapel' => Mapel::orderBy('nama_mapel')->get(),
             'guru'  => Gtk::orderBy('nama_gtk')->get(),
-            //'tahun_sekarang' => $tahunSekarang
             
         'mapel_2' => PenjadwalanHari::with([
                         'jam',
@@ -61,16 +60,12 @@ class MasterJadwalController extends Controller
                 'tb_penjadwalan_hari.id as id',
                 'tb_penjadwalan_hari.idpenjadwalan as idpenjadwalan',
                 'tb_penjadwalan_hari.id_hari',
-                'tb_penjadwalan_hari.id_jam',  
-                            
-                
+                'tb_penjadwalan_hari.id_jam',                                              
             ])->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan')             
               ->whereBetween('tb_master_jadwal.id_tahun', [
                     $tahunSekarang - 3,
                     $tahunSekarang - 1
                 ])->get(),
-
-
         ]);
     }
 
@@ -165,6 +160,18 @@ class MasterJadwalController extends Controller
             $tahunSekarang - 1
         ]);
 
+     
+
+        if ($request->id_hari) {
+            $query->where(function ($q) use ($request) {
+                $q->where('id_hari', $request->id_hari)
+                ->orWhereNull('id_hari');
+            });
+        }
+      
+
+         
+
         if ($request->filled('id_tahun')) {
             $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('id_tahun', $request->id_tahun);
@@ -222,6 +229,9 @@ class MasterJadwalController extends Controller
                     'id'              => $item->id,
                     'idpenjadwalan'   => $item->idpenjadwalan,
                     'id_hari'         => $item->id_hari,
+
+                     'id_kelas'         => $item->jadwal?->id_kelas ?? '',
+
 
                     'hari'            => $hari[$item->id_hari] ?? '',
 
@@ -341,6 +351,24 @@ class MasterJadwalController extends Controller
             'keterangan'  => json_encode($jadwal),
             'serial'      => url('master-jadwal/delete/' . $id)
         ]);
+
+        return response()->json([
+            'success' => true,
+            'msg'     => 'Data berhasil dihapus'
+        ]);
+    }
+    public function destroyDetail(Request $request)
+    {
+        PenjadwalanHari::where('id', $request->id)
+                    ->update([
+                        'id_hari' => null,
+                        'id_jam'  => null,
+                    ]);    
+                    
+                MasterJadwal::where('id', $request->idpenjadwalan)
+                    ->update([
+                        'id_gtk' => null
+                    ]);
 
         return response()->json([
             'success' => true,
@@ -501,8 +529,9 @@ class MasterJadwalController extends Controller
                 $bentrok = PenjadwalanHari::where('id', '!=', $row['id'])
                     ->where('id_hari', $row['id_hari'])
                     ->where('id_jam', $row['id_jam'])
-                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt) {
-                        $q->where('id_gtk', $penjadwalan->jadwal->id_gtk);
+                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt,$row) {
+                        $q->where('id_gtk', $row['id_gtk']);
+                      //  $q->where('id_kelas', $row['id_kelas']);
                         $q->where('semester', $smt);
                     })
                     ->exists();
@@ -513,6 +542,27 @@ class MasterJadwalController extends Controller
                     return response()->json([
                         'success' => false,
                         'msg' => 'Guru sudah memiliki jadwal pada hari dan jam tersebut.'
+                    ], 422);
+                }
+
+                 $bentrokKelas = PenjadwalanHari::where('id', '!=', $row['id'])
+                    ->where('id_hari', $row['id_hari'])
+                    ->where('id_jam', $row['id_jam'])
+                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt,$row) {
+                    
+                        $q->where('id_kelas', $row['id_kelas']);
+                          $q->where('angkatan', $row['angkatan']);
+                        $q->where('semester', $smt);
+                    })
+                    ->exists();
+
+
+                     if ($bentrokKelas) {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'success' => false,
+                        'msg' => 'Kelas sudah memiliki jadwal pada hari dan jam tersebut.'
                     ], 422);
                 }
 

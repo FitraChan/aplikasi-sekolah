@@ -76,7 +76,7 @@ Jadwal Guru
                                 </td>
 
                                 <td>
-                                    {{ $row->jadwal->kelas->kelas }}
+                                    {{ $row->jadwal->nkelas }}
                                     {{ $row->jadwal->kelas->nama_kelas }}
                                 </td>
 

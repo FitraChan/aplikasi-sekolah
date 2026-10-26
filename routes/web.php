@@ -447,6 +447,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         [MasterJadwalController::class, 'inisialisasi']
     )->name('master-jadwal.inisialisasi');
 
+
+
+     Route::post(
+        '/detail-jadwal/destroy',
+        [MasterJadwalController::class, 'destroyDetail']
+    )->name('detail-jadwal.destroy');
+
     Route::post(
         '/master-jadwal/isi-nilai',
         [MasterJadwalController::class, 'isiNilai']
