@@ -42,9 +42,13 @@ class AuthController extends Controller
 {
     $credentials = $request->only('email', 'password');
 
+    
+
     if (Auth::attempt($credentials)) {
 
         $user = Auth::user();
+                  //dd($user->getRoleNames());
+
 
         if ($user->hasRole('admin')) {
             return redirect('/admin');
@@ -55,19 +59,33 @@ class AuthController extends Controller
         }
 
         if ($user->hasRole('Akademik')) {
-            return redirect()->route('admin');
+            return redirect()->route('master-jadwal.index');
+
+        
         }
 
         if ($user->hasRole('guru')) {
             return redirect()->route('jadwalGuru.index');
         }
 
+        if ($user->hasRole('Pendaftaran')) {
+            return redirect()->route('gelombang.index');
+        }
+
+         if ($user->hasRole('keuangan')) {
+            return redirect()->route('bayar.index');
+            //return "masuk keuangan";
+        }
+
+
         Auth::logout();
 
-        return back()->with('error', 'Role tidak diizinkan');
+        return back()->withErrors('error', 'Role tidak diizinkan');
     }
 
-    return back()->with('error', 'Email atau password salah');
+    return back() ->withErrors([
+            'email' => 'Email atau password yang Anda masukkan salah.',
+        ]);
 }
 
     public function Logout()

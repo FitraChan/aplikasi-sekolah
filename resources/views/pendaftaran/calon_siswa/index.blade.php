@@ -18,17 +18,17 @@
             <div class="flex items-center gap-2 mb-2">
 
                 <a href="javascript:history.back()"
-                   class="inline-flex items-center gap-2 text-sm font-medium
+                    class="inline-flex items-center gap-2 text-sm font-medium
                           text-[#02BC9C] hover:text-[#02a387]
                           transition-colors">
 
                     <svg class="w-4 h-4"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         stroke-width="2.2"
-                         viewBox="0 0 24 24">
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2.2"
+                        viewBox="0 0 24 24">
 
                         <line x1="19" x2="5" y1="12" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
@@ -55,8 +55,8 @@
 
         <!-- TAMBAH -->
 
-        <a href="{{ route('calon-siswa.create') }}"
-           class="inline-flex items-center justify-center gap-2
+        <a href="{{ route('createCalonSiswa') }}"
+            class="inline-flex items-center justify-center gap-2
                   px-4 py-2.5
                   bg-[#00bfa5] hover:bg-[#00a892]
                   text-white text-sm font-semibold
@@ -64,12 +64,12 @@
                   transition-colors">
 
             <svg class="w-4 h-4"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 stroke-width="2.2"
-                 viewBox="0 0 24 24">
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.2"
+                viewBox="0 0 24 24">
 
                 <line x1="12" x2="12" y1="5" y2="19"></line>
                 <line x1="5" x2="19" y1="12" y2="12"></line>
@@ -108,12 +108,12 @@
                         text-teal-600">
 
                 <svg class="w-5 h-5"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     stroke-width="2"
-                     viewBox="0 0 24 24">
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24">
 
                     <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path>
 
@@ -164,17 +164,17 @@
                                     text-slate-400">
 
                             <svg class="w-4 h-4"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-linecap="round"
-                                 stroke-linejoin="round"
-                                 stroke-width="2"
-                                 viewBox="0 0 24 24">
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                viewBox="0 0 24 24">
 
                                 <circle cx="11" cy="11" r="8"></circle>
 
                                 <line x1="21" y1="21"
-                                      x2="16.65" y2="16.65"></line>
+                                    x2="16.65" y2="16.65"></line>
 
                             </svg>
 
@@ -225,9 +225,9 @@
 
                         @foreach ($tahunAjaran as $tahun)
 
-                            <option value="{{ $tahun->id }}">
-                                {{ $tahun->thn_ajaran }}
-                            </option>
+                        <option value="{{ $tahun->id }}">
+                            {{ $tahun->thn_ajaran }}
+                        </option>
 
                         @endforeach
 
@@ -263,9 +263,9 @@
 
                         @foreach ($jurusan as $item)
 
-                            <option value="{{ $item->id }}">
-                                {{ $item->nama_jurusan }}
-                            </option>
+                        <option value="{{ $item->id }}">
+                            {{ $item->nama_jurusan }}
+                        </option>
 
                         @endforeach
 
@@ -301,9 +301,9 @@
 
                         @foreach ($gelombang as $item)
 
-                            <option value="{{ $item->id }}">
-                                {{ $item->nama_gelombang }}
-                            </option>
+                        <option value="{{ $item->id }}">
+                            {{ $item->nama_gelombang }}
+                        </option>
 
                         @endforeach
 
@@ -329,17 +329,17 @@
                                transition-colors">
 
                         <svg class="w-4 h-4"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-linecap="round"
-                             stroke-linejoin="round"
-                             stroke-width="2"
-                             viewBox="0 0 24 24">
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
 
                             <circle cx="11" cy="11" r="8"></circle>
 
                             <line x1="21" y1="21"
-                                  x2="16.65" y2="16.65"></line>
+                                x2="16.65" y2="16.65"></line>
 
                         </svg>
 
@@ -377,12 +377,12 @@
                             text-teal-600">
 
                     <svg class="w-5 h-5"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         stroke-width="2"
-                         viewBox="0 0 24 24">
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24">
 
                         <path d="M3 6h18"></path>
                         <path d="M3 12h18"></path>
@@ -435,7 +435,6 @@
 
 
 <script>
-
     /*
     |--------------------------------------------------------------------------
     | TABULATOR
@@ -453,6 +452,7 @@
         pagination: true,
 
         paginationSize: 10,
+        paginationSizeSelector: [10, 20, 50, 100],
 
         placeholder: "Belum ada data calon siswa.",
 
@@ -466,10 +466,24 @@
 
             {
                 title: "No",
-                formatter: "rownum",
+                width: 70,
                 hozAlign: "center",
-                width: 70
+                headerHozAlign: "center",
+                headerSort: false,
+
+                formatter: function(cell) {
+
+                    let row = cell.getRow();
+                    let table = row.getTable();
+
+                    let page = table.getPage();
+                    let size = table.getPageSize();
+
+                    return ((page - 1) * size) +
+                        row.getPosition(true);
+                }
             },
+
 
 
             /*
@@ -572,6 +586,12 @@
                 minWidth: 150
             },
 
+            {
+                title: "Email",
+                field: "email",
+                minWidth: 150
+            },
+
 
             /*
             |--------------------------------------------------------------------------
@@ -605,26 +625,26 @@
             |--------------------------------------------------------------------------
             */
 
-           {
-    title: "Aksi",
+            {
+                title: "Aksi",
 
-    hozAlign: "center",
+                hozAlign: "center",
 
-    width: 180,
+                width: 180,
 
-    formatter: function(cell) {
+                formatter: function(cell) {
 
-        let data = cell.getData();
+                    let data = cell.getData();
 
-        console.log('data', data);
+                    console.log('data', data);
 
-        let tombolDaftarUlang = '';
+                    let tombolDaftarUlang = '';
 
-        @if(isset($side) && $side === 'daftar-ulang')
+                    @if(isset($side) && $side === 'daftar-ulang')
 
-            if (data.status_daftar_id != 1) {
+                    if (data.status_daftar_id != 1) {
 
-                tombolDaftarUlang = `
+                        tombolDaftarUlang = `
                     <!-- DAFTAR ULANG -->
 
                     <button
@@ -657,12 +677,12 @@
                     </button>
                 `;
 
-            }
+                    }
 
-        @endif
+                    @endif
 
 
-        return `
+                    return `
 
             <div class="flex items-center
                         justify-center gap-2">
@@ -747,8 +767,8 @@
 
         `;
 
-    }
-}
+                }
+            }
         ]
 
     });
@@ -760,7 +780,7 @@
     |--------------------------------------------------------------------------
     */
 
-   
+
 
 
     /*
@@ -883,11 +903,9 @@
 
                     headers: {
 
-                        'Accept':
-                            'application/json',
+                        'Accept': 'application/json',
 
-                        'X-Requested-With':
-                            'XMLHttpRequest'
+                        'X-Requested-With': 'XMLHttpRequest'
 
                     }
 
@@ -988,88 +1006,81 @@
     function saveData(type) {
 
         let prefix =
-            type == 'add'
-                ? 'add_'
-                : 'edit_';
+            type == 'add' ?
+            'add_' :
+            'edit_';
 
 
         let id =
-            type == 'edit'
-                ? document.getElementById(
-                    'edit_id'
-                ).value
-                : '';
+            type == 'edit' ?
+            document.getElementById(
+                'edit_id'
+            ).value :
+            '';
 
 
         let url =
             type == 'edit'
 
-                ? "{{ url('calon-siswa/update') }}/" + id
+            ?
+            "{{ url('calon-siswa/update') }}/" + id
 
-                : "{{ url('calon-siswa/store') }}";
+            :
+            "{{ url('calon-siswa/store') }}";
 
 
         fetch(url, {
 
-            method: 'POST',
+                method: 'POST',
 
-            headers: {
+                headers: {
 
-                'Content-Type':
-                    'application/json',
+                    'Content-Type': 'application/json',
 
-                'Accept':
-                    'application/json',
+                    'Accept': 'application/json',
 
-                'X-CSRF-TOKEN':
-                    '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
 
-            },
+                },
 
 
-            body: JSON.stringify({
+                body: JSON.stringify({
 
-                nama_lengkap:
-                    document.getElementById(
+                    nama_lengkap: document.getElementById(
                         prefix + 'nama_lengkap'
                     ).value,
 
-                jk:
-                    document.getElementById(
+                    jk: document.getElementById(
                         prefix + 'jk'
                     ).value,
 
-                nisn:
-                    document.getElementById(
+                    nisn: document.getElementById(
                         prefix + 'nisn'
                     ).value,
 
-                no_hp:
-                    document.getElementById(
+                    no_hp: document.getElementById(
                         prefix + 'no_hp'
                     ).value,
 
-                id_jurusan:
-                    document.getElementById(
+                    id_jurusan: document.getElementById(
                         prefix + 'id_jurusan'
                     ).value,
 
-                id_gelombang:
-                    document.getElementById(
+                    id_gelombang: document.getElementById(
                         prefix + 'id_gelombang'
                     ).value
 
+                })
+
             })
 
-        })
+            .then(res => res.json())
 
-        .then(res => res.json())
+            .then(res => {
 
-        .then(res => {
+                table.replaceData();
 
-            table.replaceData();
-
-        });
+            });
 
     }
 
@@ -1095,30 +1106,29 @@
 
         fetch(
 
-            "{{ url('calon-siswa/delete') }}/" + id,
+                "{{ url('calon-siswa/delete') }}/" + id,
 
-            {
+                {
 
-                method: 'DELETE',
+                    method: 'DELETE',
 
-                headers: {
+                    headers: {
 
-                    'X-CSRF-TOKEN':
-                        '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+
+                    }
 
                 }
 
-            }
+            )
 
-        )
+            .then(res => res.json())
 
-        .then(res => res.json())
+            .then(res => {
 
-        .then(res => {
+                table.replaceData();
 
-            table.replaceData();
-
-        });
+            });
 
     }
 
@@ -1196,11 +1206,9 @@
 
                         headers: {
 
-                            "X-CSRF-TOKEN":
-                                "{{ csrf_token() }}",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
 
-                            "Accept":
-                                "application/json"
+                            "Accept": "application/json"
 
                         },
 
@@ -1285,29 +1293,25 @@
         .getElementById("btn-cari")
         .addEventListener(
             "click",
-            function () {
+            function() {
 
                 const params = {
 
-                    search:
-                        document.getElementById(
-                            "filter-nama"
-                        ).value,
+                    search: document.getElementById(
+                        "filter-nama"
+                    ).value,
 
-                    id_thn_ajaran:
-                        document.getElementById(
-                            "filter-tahun-ajaran"
-                        ).value,
+                    id_thn_ajaran: document.getElementById(
+                        "filter-tahun-ajaran"
+                    ).value,
 
-                    id_jurusan:
-                        document.getElementById(
-                            "filter-jurusan"
-                        ).value,
+                    id_jurusan: document.getElementById(
+                        "filter-jurusan"
+                    ).value,
 
-                    id_gelombang:
-                        document.getElementById(
-                            "filter-gelombang"
-                        ).value
+                    id_gelombang: document.getElementById(
+                        "filter-gelombang"
+                    ).value
 
                 };
 
@@ -1336,7 +1340,7 @@
         .getElementById("filter-nama")
         .addEventListener(
             "keydown",
-            function (event) {
+            function(event) {
 
                 if (
                     event.key === "Enter"
@@ -1370,7 +1374,7 @@
 
         modalDaftarUlang.addEventListener(
             "click",
-            function (event) {
+            function(event) {
 
                 if (
                     event.target === this
@@ -1394,7 +1398,7 @@
 
     document.addEventListener(
         "keydown",
-        function (event) {
+        function(event) {
 
             if (
                 event.key === "Escape"
@@ -1406,8 +1410,6 @@
 
         }
     );
-
 </script>
 
 @endsection
-

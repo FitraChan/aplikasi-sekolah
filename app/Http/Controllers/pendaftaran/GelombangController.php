@@ -36,7 +36,7 @@ class GelombangController extends Controller
             'calonSiswas',
             // Pendaftar yang sudah terverifikasi
             'calonSiswas as terverifikasi_count' => function ($query) {
-                $query->where('status_daftar', 0);
+                $query->whereIn('status_daftar', [1,3,4]);
             },
         ])
             ->where('id_tahun', $this->tahun)
@@ -47,13 +47,9 @@ class GelombangController extends Controller
                 return [
 
                     'id' => $item->id,
-
                     'nama_gelombang' => $item->nama_gelombang,
-
                     'id_tahun' => $item->id_tahun,
-
                     'awal' => $item->awal,
-
                     'akhir' => $item->akhir,
 
                     'is_current' => $item->is_current,

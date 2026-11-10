@@ -101,18 +101,14 @@
             {
                 title: "Soal",
                 field: "soal",
-                width: 650,
+                width: 500,
                 formatter: "html",
                 variableHeight: true
-
             },
-
 
             {
                 title: "Aksi",
-
                 width: 130,
-
                 formatter: function(cell) {
 
                     const row = cell.getRow().getData();

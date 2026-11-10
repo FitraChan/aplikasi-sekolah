@@ -55,7 +55,11 @@ class CalonSiswaController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-       $tahunAjaran = TahunAjaran::whereBetween('id', [
+
+        $status_daftar = StatusDaftar::orderBy('id', 'asc')
+            ->get();
+
+        $tahunAjaran = TahunAjaran::whereBetween('id', [
                         $tahunSekarang - 3,
                         $tahunSekarang
                     ])
@@ -69,7 +73,8 @@ class CalonSiswaController extends Controller
             'side',
             'gelombang',
             'jurusan',
-            'tahunAjaran'
+            'tahunAjaran',
+            'status_daftar'
         ), ['side'  => 'calon-siswa']);
     }
 
@@ -105,6 +110,71 @@ class CalonSiswaController extends Controller
     public function create()
     {
         $side = 'calon-siswa';
+
+        $rows = new CalonSiswa();
+
+        // $rows = CalonSiswa::findOrFail($id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | MASTER DATA
+        |--------------------------------------------------------------------------
+        */
+
+        $gel = Gelombang::orderBy('idx', 'asc')->get();
+
+        $itemBayar = ItemBayar::where('id_kategori', 2)
+            ->get();
+
+        $thn = TahunAjaran::orderBy('id', 'desc')->get();
+
+        $lists = Jurusan::orderBy('nama_jurusan', 'asc')->get();
+
+        $jobs = Pekerjaan::orderBy('nama_pekerjaan', 'asc')->get();
+        $agama = Agama::orderBy('nama_agama', 'asc')->get();
+
+        $sts_daftar = StatusDaftar::orderBy('keterangan', 'asc')->get();
+
+        $bukti = CalonSiswa::with('buktiPembayaran')
+            ->where('id_user', Auth::id())
+            ->get();
+
+        // $petugas = User::orderBy('name', 'asc')->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS
+        |--------------------------------------------------------------------------
+        */
+        $dataIpaymu = '';
+
+        $stsdaftar =
+            'Belum Ada';
+
+        return view(
+            'pendaftaran.calon_siswa.edit_calon_siswa',
+            compact(
+                'side',
+                'rows',
+                'dataIpaymu',
+                'gel',
+                'thn',
+                'lists',
+                'jobs',
+                'agama',
+                'sts_daftar',
+                // 'petugas',
+                'stsdaftar',
+                'bukti',
+                'itemBayar'
+            )
+        );
+    }
+
+
+     public function createCalonSiswa()
+    {
+         $side = 'daftar-ulang';
 
         $rows = new CalonSiswa();
 
@@ -348,6 +418,8 @@ class CalonSiswaController extends Controller
                     'nisn'            => $item->nisn,
                     'no_hp'           => $item->no_hp,
                     'no_daftar'       => $item->no_daftar,
+                    'email'       => $item->email,
+
                     'status_daftar_id' => $item->status_daftar,
 
                     'status_daftar'   => $item->statusDaftar?->keterangan ?? '-',
@@ -439,7 +511,6 @@ class CalonSiswaController extends Controller
                 $siswa = CalonSiswa::findOrFail($id);
                 // status sudah ujian dan melakukan daftar ulang
                 if ($siswa->status_daftar == 3) {
-
                     $siswa->update([
                         'status_daftar' => 4,
                     ]);
@@ -1044,11 +1115,15 @@ class CalonSiswaController extends Controller
                     );
                 }
 
+                $user = User::where('email',$calonSiswa->email)->first();
+
+
                 /*
                 * 3. Salin tb_tmp_siswa ke tb_siswa.
                 */
                 $siswa = Siswa::create([
                     'id_cawa'             => $calonSiswa->id,
+                    'id_user' => $user?->id,
                     'no_daftar'           => $calonSiswa->no_daftar,
                     'nipd'                => $request->nipd,
                     'no_registrasi_ulang' => $calonSiswa->no_registrasi_ulang,
@@ -1115,6 +1190,8 @@ class CalonSiswaController extends Controller
                     'ktp_ibu'             => $calonSiswa->ktp_ibu,
                 ]);
 
+                $user->syncRoles(3);
+
                 /*
                 * 4. Ambil seluruh pembayaran calon siswa.
                 */
@@ -1174,6 +1251,12 @@ class CalonSiswaController extends Controller
                 $calonSiswa->update([
                     'status_daftar' => $validated['status_daftar'] ?? 1,
                 ]);
+
+
+
+              
+
+                 
             });
 
             return response()->json([
@@ -1299,6 +1382,5 @@ class CalonSiswaController extends Controller
             'data',           
         ), ['side'  => 'bukti']);
 
-        //return view('keuangan.bayar_calon_siswa.listBuktiBayar', compact('data'));
     }
 }

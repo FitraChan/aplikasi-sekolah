@@ -317,7 +317,7 @@
                 <p class="text-sm text-slate-500">
                     Sudah memiliki akun?
 
-                    <a href="{{ route('login') }}"
+                    <a href="{{ route('form-login') }}"
                         class="font-semibold text-[#02BC9C] transition hover:text-[#02a387] hover:underline">
                         Login di sini
                     </a>

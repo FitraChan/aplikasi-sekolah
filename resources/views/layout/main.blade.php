@@ -122,13 +122,8 @@ License: You must have a valid license purchased only from themeforest(the above
 
                     </a>
                 </li>
-
-
-              
-
+            
                 @endif
-
-
 
                 @if(Auth::user()->hasAnyRole(['admin', 'Akademik']))
                 <li>
@@ -622,7 +617,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <nav id="sidebar" class="side-nav">
 
             <a href="" class="intro-x flex items-center pl-5 pt-4 mt-3">
-                <img alt="Midone - HTML Admin Template" class="w-6" src="{{asset('public/dist/images/open.png')}}">
+                <img alt="Midone - HTML Admin Template" class="w-6" src="{{asset('public/images/Favicon_MOBIS_WARNA.png')}}">
                 <span class="hidden xl:block text-white text-lg ml-3"> OPEN SCHOOL </span>
 
 
@@ -1179,7 +1174,7 @@ License: You must have a valid license purchased only from themeforest(the above
                 <!-- BEGIN: Account Menu -->
                 <div class="intro-x dropdown w-8 h-8">
                     <div class="dropdown-toggle w-8 h-8 rounded-full overflow-hidden shadow-lg image-fit zoom-in" role="button" aria-expanded="false" data-tw-toggle="dropdown">
-                        <img alt="Midone - HTML Admin Template" src="{{asset('public/dist/images/open_green.png')}}">
+                        <img alt="Midone - HTML Admin Template" src="{{asset('public/images/Favicon_MOBIS_WARNA.png')}}">
                     </div>
                     <div class="dropdown-menu w-56">
                         <ul class="dropdown-content bg-primary text-white">

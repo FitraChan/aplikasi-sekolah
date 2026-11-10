@@ -322,41 +322,7 @@
                      BUTTON SIMPAN
                 ================================================== -->
 
-                <div class="flex justify-end
-                            pt-5
-                            border-t border-slate-100">
-
-                    <button
-                        type="submit"
-                        class="inline-flex items-center justify-center gap-2
-                               px-6 py-3
-                               rounded-xl
-                               bg-[#02BC9C]
-                               hover:bg-[#02a387]
-                               text-white
-                               text-sm font-semibold
-                               shadow-sm
-                               hover:shadow-md
-                               transition-all duration-200"
-                    >
-
-                        <svg class="w-5 h-5"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2"
-                             viewBox="0 0 24 24">
-
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M5 12l4 4L19 6"/>
-
-                        </svg>
-
-                        Simpan Status
-
-                    </button>
-
-                </div>
+              
 
             </div>
 

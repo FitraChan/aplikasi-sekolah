@@ -121,6 +121,28 @@
         <!-- Authentication Form -->
         <form action="{{route('login')}}" class="space-y-4" method="POST">
           <!-- Username / Email Field -->
+
+           @csrf
+
+    @if ($errors->has('email'))
+        <div class="flex items-start gap-3 p-4 mb-4 rounded-xl border border-red-200 bg-red-50 text-red-700"
+             role="alert">
+
+            <svg class="w-5 h-5 mt-0.5 flex-shrink-0"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 9v4m0 4h.01M10.3 3.86L1.82 18a2 2 0 001.7 3h16.96a2 2 0 001.7-3L13.7 3.86a2 2 0 00-3.4 0z"/>
+            </svg>
+
+            <div>
+                <p class="text-sm font-bold">Login Gagal!</p>
+                <p class="text-xs mt-1">
+                    {{ $errors->first('email') }}
+                </p>
+            </div>
+        </div>
+    @endif
           <div data-purpose="form-input-username">
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2" for="username">
               Username atau Email
@@ -133,7 +155,12 @@
                 </svg>
               </div>
               <input
-                class="block w-full pl-11 pr-4 py-2.5 bg-[#f5f8fc] border border-[#d6e0ec] rounded-lg text-slate-700 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#02BC9C] focus:border-transparent transition-all duration-150"
+                class="block w-full pl-11 pr-4 py-2.5
+bg-[#f5f8fc]
+border {{ $errors->has('email') ? 'border-red-400' : 'border-[#d6e0ec]' }}
+rounded-lg text-slate-700 placeholder-slate-400 text-sm
+focus:bg-white focus:outline-none focus:ring-2
+focus:ring-[#02BC9C] focus:border-transparent transition-all duration-150"
                 id="username" value="{{old('email')}}" name="email" placeholder="nama@sekolah.sch.id" type="text" />
             </div>
           </div>
@@ -156,8 +183,8 @@
                 </svg>
               </div>
               <input
-                class="block w-full pl-11 pr-11 py-2.5 bg-[#f5f8fc] border border-[#d6e0ec] rounded-lg text-slate-700 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#02BC9C] focus:border-transparent tracking-widest transition-all duration-150"
-                id="password" name="password" type="password" value="secretpassword" />
+                class="block w-full pl-11 pr-11 py-2.5 bg-[#f5f8fc] border {{ $errors->has('password') ? 'border-red-400' : 'border-[#d6e0ec]' }} rounded-lg text-slate-700 placeholder-slate-400 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#02BC9C] focus:border-transparent tracking-widest transition-all duration-150"
+                id="password" name="password" type="password" value="" />
               <button id="togglePassword" aria-label="Tampilkan atau sembunyikan kata sandi"
                 class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
                 type="button">

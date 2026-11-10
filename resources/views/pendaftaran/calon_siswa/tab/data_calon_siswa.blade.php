@@ -62,10 +62,10 @@
                     </option>
 
                     @foreach($gel as $list)
-                        <option value="{{ $list->id }}"
-                            {{ old('id_gelombang', $rows->id_gelombang ?? '') == $list->id ? 'selected' : '' }}>
-                            {{ $list->nama_gelombang }}
-                        </option>
+                    <option value="{{ $list->id }}"
+                        {{ old('id_gelombang', $rows->id_gelombang ?? '') == $list->id ? 'selected' : '' }}>
+                        {{ $list->nama_gelombang }}
+                    </option>
                     @endforeach
 
                 </select>
@@ -91,10 +91,10 @@
                     </option>
 
                     @foreach($thn as $list)
-                        <option value="{{ $list->id }}"
-                            {{ old('id_thn_ajaran', $rows->id_thn_ajaran ?? '') == $list->id ? 'selected' : '' }}>
-                            {{ $list->thn_ajaran }}
-                        </option>
+                    <option value="{{ $list->id }}"
+                        {{ old('id_thn_ajaran', $rows->id_thn_ajaran ?? '') == $list->id ? 'selected' : '' }}>
+                        {{ $list->thn_ajaran }}
+                    </option>
                     @endforeach
 
                 </select>
@@ -139,32 +139,33 @@
 
             @if(Auth::user()->hasRole('admin'))
 
-                <!-- STATUS -->
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                        Status Siswa
-                    </label>
 
-                    <select
-                        name="status_daftar"
-                        class="w-full bg-white border border-slate-200
-                               rounded-lg text-sm text-slate-700
-                               px-3.5 py-2.5 focus:outline-none
-                               focus:ring-1 focus:ring-[#00B686]
-                               focus:border-[#00B686]">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Status Daftar
+                </label>
 
-                        <option value="1"
-                            {{ old('status_daftar', $rows->status_daftar ?? '') == 1 ? 'selected' : '' }}>
-                            Aktif
-                        </option>
+                <select
+                    name="status_daftar"
+                    class="w-full bg-white border border-slate-200
+               rounded-lg text-sm text-slate-700
+               px-3.5 py-2.5 focus:outline-none
+               focus:ring-1 focus:ring-[#00B686]
+               focus:border-[#00B686]">
 
-                        <option value="0"
-                            {{ old('status_daftar', $rows->status_daftar ?? '') == 0 ? 'selected' : '' }}>
-                            Tidak Aktif
-                        </option>
+                    <option value="">-- Pilih Status Daftar --</option>
 
-                    </select>
-                </div>
+                    @foreach ($sts_daftar as $status)
+                    <option
+                        value="{{ $status->id }}"
+                        {{ (string) old('status_daftar', $rows->status_daftar ?? '') === (string) $status->id ? 'selected' : '' }}>
+                        {{ $status->keterangan }}
+                    </option>
+                    @endforeach
+
+                </select>
+            </div>
+
 
             @endif
 
@@ -189,10 +190,10 @@
                     </option>
 
                     @foreach($lists as $list)
-                        <option value="{{ $list->id }}"
-                            {{ old('id_jurusan', $rows->id_jurusan ?? '') == $list->id ? 'selected' : '' }}>
-                            {{ $list->nama_jurusan }}
-                        </option>
+                    <option value="{{ $list->id }}"
+                        {{ old('id_jurusan', $rows->id_jurusan ?? '') == $list->id ? 'selected' : '' }}>
+                        {{ $list->nama_jurusan }}
+                    </option>
                     @endforeach
 
                 </select>
@@ -369,12 +370,12 @@
 
                         @foreach($agama as $list)
 
-                            <option value="{{ $list->id }}"
-                                {{ old('id_agama', $rows->id_agama ?? '') == $list->id ? 'selected' : '' }}>
+                        <option value="{{ $list->id }}"
+                            {{ old('id_agama', $rows->id_agama ?? '') == $list->id ? 'selected' : '' }}>
 
-                                {{ $list->nama_agama }}
+                            {{ $list->nama_agama }}
 
-                            </option>
+                        </option>
 
                         @endforeach
 

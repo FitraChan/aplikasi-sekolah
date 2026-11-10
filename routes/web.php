@@ -8,9 +8,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\KonfigController;
 use App\Http\Controllers\IpaymuController;
 
-
-// use App\Http\Controllers\GelombangController;
-
 use App\Http\Controllers\pendaftaran\GelombangController;
 use App\Http\Controllers\pendaftaran\CalonSiswaController;
 use App\Http\Controllers\pendaftaran\SetKelasController;
@@ -89,95 +86,13 @@ Route::get('/cancelPembayaranIpaymu', [IpaymuController::class, 'cancel'])
     ->name('cancelPembayaranIpaymu');
 
 
+Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
 
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-
-
-    Route::prefix('pendaftaran')->group(function () {
-    
-        Route::get(
-            '/hasil-wawancara',
-            [HasilTestWawancaraController::class, 'index']
-        )->name('hasilWawancara');
-
-
-        // Data untuk Tabulator
-        Route::get(
-            '/hasil-wawancara/data',
-            [HasilTestWawancaraController::class, 'data']
-        )->name('hasilWawancara.data');
-
-
-        // Detail hasil wawancara
-        Route::get(
-            '/hasil-wawancara/{id}',
-            [HasilTestWawancaraController::class, 'show']
-        )->name('hasilWawancara.show');
-
-    });
-
-    Route::get('/jadwal-wawancara', [JadwalWawancaraController::class, 'index'])
-        ->name('jadwal-wawancara.index');
-
-    Route::get('/jadwal-wawancara/data', [JadwalWawancaraController::class, 'data'])
-        ->name('jadwal-wawancara.data');  
-        
-    Route::get('/jadwal-wawancara/create', [JadwalWawancaraController::class, 'create'])
-        ->name('jadwal-wawancara.create'); 
-        
-    Route::get('/jadwal-wawancara/edit/{id}', [JadwalWawancaraController::class, 'edit'])
-        ->name('jadwal-wawancara.edit'); 
-
-    Route::put('/jadwal-wawancara/update/{id}', [JadwalWawancaraController::class, 'update'])
-        ->name('jadwal-wawancara.update'); 
-
-    Route::post('/jadwal-wawancara/store', [JadwalWawancaraController::class, 'store'])
-        ->name('jadwal-wawancara.store'); 
-
-    Route::delete('/jadwal-wawancara/delete/{id}', [JadwalWawancaraController::class, 'destroy'])
-        ->name('jadwal-wawancara.destroy'); 
-    
-        
-
-    Route::get('/masterGuru', [MasterGuruController::class, 'index'])
-        ->name('masterGuru.index');
-    Route::get('/masterGuru/data', [MasterGuruController::class, 'data'])
-        ->name('masterGuru.data');
-    Route::post('/masterGuru/store', [MasterGuruController::class, 'store'])
-        ->name('masterGuru.store');
-    Route::post('/masterGuru/update/{id}', [MasterGuruController::class, 'update'])
-        ->name('masterGuru.update');
-    Route::delete('/masterGuru/delete/{id}', [MasterGuruController::class, 'destroy'])
-        ->name('masterGuru.destroy');
-
-   
-
-    Route::get('/tahunAjaran', [TahunAjaranController::class, 'index'])
-        ->name('tahunAjaran.index');
-
-    Route::get('tahunAjaran/data', [TahunAjaranController::class, 'data'])
-        ->name('tahunAjaran.data');
-
-    Route::post('tahunAjaran/store', [TahunAjaranController::class, 'store'])
-        ->name('tahunAjaran.store');
-
-    Route::post('tahunAjaran/update/{id}', [TahunAjaranController::class, 'update'])
-        ->name('tahunAjaran.update');
-
-    Route::delete('tahunAjaran/delete/{id}', [TahunAjaranController::class, 'destroy'])
-        ->name('tahunAjaran.destroy');
-
-    Route::get('/role', [RoleController::class, 'index'])
-        ->name('role.index');
-    Route::get('/role/data', [RoleController::class, 'data'])
-        ->name('role.data');
-    Route::post('/role/store', [RoleController::class, 'storeRole'])->name('role.store');
-    Route::get('/role/data-role', [RoleController::class, 'dataRole'])->name('role.dataRole');
-    Route::post('/role/storeUser', [RoleController::class, 'storeUser'])->name('role.store');
-    Route::get('/role/editUser/{id}', [RoleController::class, 'editUser'])->name('role.editUser');
-    Route::post('/role/updateUser/{id}', [RoleController::class, 'updateUser'])->name('role.updateUser');
-    Route::delete('/role/deleteRole/{id}', [RoleController::class, 'deleteRole'])->name('role.deleteRole');
+    Route::get(
+            '/listBuktiPembayaran',
+            [CalonSiswaController::class, 'listBuktiPembayaran']
+        )->name('listBuktiPembayaran');
 
     Route::get('kat-item-bayar', [KatItemBayarController::class, 'index'])
         ->name('kat-item-bayar.index');
@@ -195,6 +110,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         '/kat-periode-bayar',
         [KatPeriodeBayarController::class, 'index']
     )->name('kat-periode-bayar.index');
+
+    
 
     Route::get(
         '/kat-periode-bayar/data',
@@ -378,6 +295,304 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
 
+});
+
+
+
+
+Route::middleware(['auth', 'role:admin|Pendaftaran|keuangan|Akademik'])->group(function () {
+
+Route::get(
+        '/listBuktiPembayaran',
+        [CalonSiswaController::class, 'listBuktiPembayaran']
+    )->name('listBuktiPembayaran');
+
+
+    Route::prefix('pendaftaran')->group(function () {
+
+        Route::get(
+            '/hasil-wawancara',
+            [HasilTestWawancaraController::class, 'index']
+        )->name('hasilWawancara');
+
+
+        // Data untuk Tabulator
+        Route::get(
+            '/hasil-wawancara/data',
+            [HasilTestWawancaraController::class, 'data']
+        )->name('hasilWawancara.data');
+
+
+        // Detail hasil wawancara
+        Route::get(
+            '/hasil-wawancara/{id}',
+            [HasilTestWawancaraController::class, 'show']
+        )->name('hasilWawancara.show');
+    });
+
+    Route::get('/jadwal-wawancara', [JadwalWawancaraController::class, 'index'])
+        ->name('jadwal-wawancara.index');
+
+    Route::get('/jadwal-wawancara/data', [JadwalWawancaraController::class, 'data'])
+        ->name('jadwal-wawancara.data');
+
+    Route::get('/jadwal-wawancara/create', [JadwalWawancaraController::class, 'create'])
+        ->name('jadwal-wawancara.create');
+
+    Route::get('/jadwal-wawancara/edit/{id}', [JadwalWawancaraController::class, 'edit'])
+        ->name('jadwal-wawancara.edit');
+
+    Route::put('/jadwal-wawancara/update/{id}', [JadwalWawancaraController::class, 'update'])
+        ->name('jadwal-wawancara.update');
+
+    Route::post('/jadwal-wawancara/store', [JadwalWawancaraController::class, 'store'])
+        ->name('jadwal-wawancara.store');
+
+    Route::delete('/jadwal-wawancara/delete/{id}', [JadwalWawancaraController::class, 'destroy'])
+        ->name('jadwal-wawancara.destroy');
+
+
+
+    Route::get('/masterGuru', [MasterGuruController::class, 'index'])
+        ->name('masterGuru.index');
+    Route::get('/masterGuru/data', [MasterGuruController::class, 'data'])
+        ->name('masterGuru.data');
+    Route::post('/masterGuru/store', [MasterGuruController::class, 'store'])
+        ->name('masterGuru.store');
+    Route::post('/masterGuru/update/{id}', [MasterGuruController::class, 'update'])
+        ->name('masterGuru.update');
+    Route::delete('/masterGuru/delete/{id}', [MasterGuruController::class, 'destroy'])
+        ->name('masterGuru.destroy');
+
+
+
+    Route::get('/tahunAjaran', [TahunAjaranController::class, 'index'])
+        ->name('tahunAjaran.index');
+
+    Route::get('tahunAjaran/data', [TahunAjaranController::class, 'data'])
+        ->name('tahunAjaran.data');
+
+    Route::post('tahunAjaran/store', [TahunAjaranController::class, 'store'])
+        ->name('tahunAjaran.store');
+
+    Route::post('tahunAjaran/update/{id}', [TahunAjaranController::class, 'update'])
+        ->name('tahunAjaran.update');
+
+    Route::delete('tahunAjaran/delete/{id}', [TahunAjaranController::class, 'destroy'])
+        ->name('tahunAjaran.destroy');
+
+    Route::get('/role', [RoleController::class, 'index'])
+        ->name('role.index');
+    Route::get('/role/data', [RoleController::class, 'data'])
+        ->name('role.data');
+    Route::post('/role/store', [RoleController::class, 'storeRole'])->name('role.store');
+    Route::get('/role/data-role', [RoleController::class, 'dataRole'])->name('role.dataRole');
+    Route::post('/role/storeUser', [RoleController::class, 'storeUser'])->name('role.store');
+    Route::get('/role/editUser/{id}', [RoleController::class, 'editUser'])->name('role.editUser');
+    Route::post('/role/updateUser/{id}', [RoleController::class, 'updateUser'])->name('role.updateUser');
+    Route::delete('/role/deleteRole/{id}', [RoleController::class, 'deleteRole'])->name('role.deleteRole');
+
+    Route::get('kat-item-bayar', [KatItemBayarController::class, 'index'])
+        ->name('kat-item-bayar.index');
+    Route::get('kat-item-bayar/data', [KatItemBayarController::class, 'data'])
+        ->name('kat-item-bayar.data');
+    Route::post('kat-item-bayar/store', [KatItemBayarController::class, 'store'])
+        ->name('kat-item-bayar.store');
+    Route::get('kat-item-bayar/edit/{id}', [KatItemBayarController::class, 'edit'])
+        ->name('kat-item-bayar.edit');
+    Route::post('kat-item-bayar/update/{id}', [KatItemBayarController::class, 'update'])
+        ->name('kat-item-bayar.update');
+    Route::delete('kat-item-bayar/delete/{id}', [KatItemBayarController::class, 'destroy'])
+        ->name('kat-item-bayar.delete');
+    Route::get(
+        '/kat-periode-bayar',
+        [KatPeriodeBayarController::class, 'index']
+    )->name('kat-periode-bayar.index');
+
+    Route::get(
+        '/kat-periode-bayar/data',
+        [KatPeriodeBayarController::class, 'data']
+    )->name('kat-periode-bayar.data');
+
+    Route::post(
+        '/kat-periode-bayar/store',
+        [KatPeriodeBayarController::class, 'store']
+    )->name('kat-periode-bayar.store');
+
+    Route::post(
+        '/kat-periode-bayar/update/{id}',
+        [KatPeriodeBayarController::class, 'update']
+    )->name('kat-periode-bayar.update');
+
+    Route::delete(
+        '/kat-periode-bayar/delete/{id}',
+        [KatPeriodeBayarController::class, 'destroy']
+    )->name('kat-periode-bayar.delete');
+
+    Route::get(
+        '/item-bayar',
+        [ItemBayarController::class, 'index']
+    )->name('item-bayar.index');
+
+    Route::get(
+        '/item-bayar/data',
+        [ItemBayarController::class, 'data']
+    )->name('item-bayar.data');
+
+    Route::post(
+        '/item-bayar/store',
+        [ItemBayarController::class, 'store']
+    )->name('item-bayar.store');
+
+    Route::post(
+        '/item-bayar/update/{id}',
+        [ItemBayarController::class, 'update']
+    )->name('item-bayar.update');
+
+    Route::delete(
+        '/item-bayar/delete/{id}',
+        [ItemBayarController::class, 'destroy']
+    )->name('item-bayar.delete');
+
+    Route::get(
+        '/template-bayar',
+        [TemplateBayarController::class, 'index']
+    )->name('template-bayar.index');
+
+    Route::get(
+        '/template-bayar/data',
+        [TemplateBayarController::class, 'data']
+    )->name('template-bayar.data');
+
+    Route::post(
+        '/template-bayar/store',
+        [TemplateBayarController::class, 'store']
+    )->name('template-bayar.store');
+
+    Route::post(
+        '/template-bayar/update/{id}',
+        [TemplateBayarController::class, 'update']
+    )->name('template-bayar.update');
+
+    Route::delete(
+        '/template-bayar/delete/{id}',
+        [TemplateBayarController::class, 'delete']
+    )->name('template-bayar.delete');
+
+    Route::get(
+        '/template-bayar/detail/{id}',
+        [TemplateBayarController::class, 'detail']
+    )->name('template-bayar.detail');
+
+    Route::post(
+        '/template-bayar/set-default/{id}',
+        [TemplateBayarController::class, 'setDefault']
+    )->name('template-bayar.set-default');
+
+    Route::post(
+        '/template-bayar-detail/storeDetail',
+        [TemplateBayarController::class, 'storeDetail']
+    )->name('template-bayar-detail.storeDetail');
+
+
+    Route::post(
+        '/template-bayar-detail/updateDetail/{id}',
+        [TemplateBayarController::class, 'updateDetail']
+    )->name('template-bayar-detail.updateDetail');
+
+    Route::delete(
+        '/template-bayar-detail/deleteDetail/{id}',
+        [TemplateBayarController::class, 'deleteDetail']
+    )->name('template-bayar-detail.deleteDetail');
+
+
+    Route::get('/bayar', [BayarController::class, 'index'])
+        ->name('bayar.index');
+
+    Route::put('/bayar/{id}', [BayarController::class, 'update'])
+        ->name('bayar.update');
+
+    // Data siswa untuk DataTables/Ajax
+    Route::get('/bayar/data', [BayarController::class, 'data'])
+        ->name('bayar.data');
+
+    // Detail pembayaran berdasarkan NIPD
+    Route::get('/bayar/detail/{nipd}', [BayarController::class, 'detail'])
+        ->name('bayar.detail');
+
+    Route::get('/bayar/detailBayar/{nipd}', [BayarController::class, 'detailBayar'])
+        ->name('bayar.detailBayar');
+
+    Route::post('/bayar/setDefBulan', [BayarController::class, 'setDefBulan'])
+        ->name('bayar.setDefBulan');
+
+    Route::post('/bayar/set-lunas/{id}', [BayarController::class, 'setLunas'])
+        ->name('bayar.set-lunas');
+
+    Route::post('/bayar/simpanCicilan', [BayarController::class, 'simpanCicilan'])
+        ->name('bayar.simpanCicilan');
+
+    Route::get('/bayar/createReportPdf/{id}', [BayarController::class, 'createReportPdf'])
+        ->name('bayar.createReportPdf');
+
+    
+
+    Route::post('/det-bayar/store', [DetBayarController::class, 'store'])
+        ->name('det-bayar.store');
+
+    Route::put('/det-bayar/{id}', [DetBayarController::class, 'update'])
+        ->name('det-bayar.update');
+
+    Route::delete('/det-bayar/{id}', [DetBayarController::class, 'destroy'])
+        ->name('det-bayar.destroy');
+
+    Route::post('/det-bayar/set-regis', [DetBayarController::class, 'setRegis'])
+        ->name('det-bayar.set-regis');
+
+    Route::delete('/bayar/{id}', [BayarController::class, 'destroy'])
+        ->name('bayar.destroy');
+
+    Route::get('/bayar-calon-siswa', [BayarCalonSiswaController::class, 'index'])
+        ->name('bayar-calon-siswa.index');
+
+    Route::put('/bayar-calon-siswa/{id}', [BayarCalonSiswaController::class, 'update'])
+        ->name('bayar-calon-siswa.update');
+
+    Route::delete('/bayar-calon-siswa/{id}', [BayarCalonSiswaController::class, 'destroy'])
+        ->name('bayar-calon-siswa.destroy');
+
+    Route::get('/bayar-calon-siswa/data', [BayarCalonSiswaController::class, 'data'])
+        ->name('bayar-calon-siswa.data');
+
+    Route::get('/bayar-calon-siswa/detail/{nipd}', [BayarCalonSiswaController::class, 'detail'])
+        ->name('bayar-calon-siswa.detail');
+
+    Route::get('/bayar-calon-siswa/detailBayar/{nipd}', [BayarCalonSiswaController::class, 'detailBayar'])
+        ->name('bayar-calon-siswa.detailBayar');
+
+    Route::post('/bayar-calon-siswa/setDefBulan', [BayarCalonSiswaController::class, 'setDefBulan'])
+        ->name('bayar-calon-siswa.setDefBulan');
+
+    Route::post('/bayar-calon-siswa/set-lunas/{id}', [BayarCalonSiswaController::class, 'setLunas'])
+        ->name('bayar-calon-siswa.set-lunas');
+
+    Route::post('/bayar-calon-siswa/simpanCicilan', [BayarCalonSiswaController::class, 'simpanCicilan'])
+        ->name('bayar-calon-siswa.simpanCicilan');
+
+    Route::get('/bayar-calon-siswa/createReportPdf/{id}', [BayarCalonSiswaController::class, 'createReportPdf'])
+        ->name('bayar-calon-siswa.createReportPdf');
+
+    Route::post('det-bayar-calon-siswa/store', [DetBayarCalonSiswaController::class, 'store'])
+        ->name('det-bayar-calon-siswa.store');
+
+    Route::put('det-bayar-calon-siswa/{id}', [DetBayarCalonSiswaController::class, 'update'])
+        ->name('det-bayar-calon-siswa.update');
+
+    Route::delete('det-bayar-calon-siswa/{id}', [DetBayarCalonSiswaController::class, 'destroy'])
+        ->name('det-bayar-calon-siswa.destroy');
+
+
+
 
 
     Route::get('/kelas', [KelasController::class, 'index'])->name('kelas.index');
@@ -449,7 +664,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 
 
-     Route::post(
+    Route::post(
         '/detail-jadwal/destroy',
         [MasterJadwalController::class, 'destroyDetail']
     )->name('detail-jadwal.destroy');
@@ -549,9 +764,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('ujianCalonAdmin', UjianCalonAdminController::class);
 
     Route::delete(
-    '/ujian-calon-admin/{id}/hapus',
-    [UjianCalonAdminController::class, 'hapus']
-)->name('ujianCalonAdmin.hapus');
+        '/ujian-calon-admin/{id}/hapus',
+        [UjianCalonAdminController::class, 'hapus']
+    )->name('ujianCalonAdmin.hapus');
 
     Route::get(
         'ujianCalonAdmin/{ujianCalonAdmin}/peserta',
@@ -629,49 +844,49 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
                 ->name('destroy');
         });
 
-            Route::put('/siswa/{id?}/orang-tua', [
-                SiswaController::class,
-                'updateOrangTua'
-            ])->name('siswa.update.orangtua');
+    Route::put('/siswa/{id?}/orang-tua', [
+        SiswaController::class,
+        'updateOrangTua'
+    ])->name('siswa.update.orangtua');
 
-            Route::post('/siswa/akademik/{id?}', [
-                SiswaController::class,
-                'updateAkademik'
-            ])->name('siswa.update-akademik');
+    Route::post('/siswa/akademik/{id?}', [
+        SiswaController::class,
+        'updateAkademik'
+    ])->name('siswa.update-akademik');
 
-            Route::put('/siswa/{id?}/upload', [
-                SiswaController::class,
-                'updateUpload'
-            ])->name('siswa.update.upload');
-
-
-            Route::get('/siswaBaru', [
-                SiswaController::class,
-                'siswaBaru'
-            ])->name('siswaBaru');
-
-              Route::get('/dataSiswaBaru', [
-                SiswaController::class,
-                'dataSiswaBaru'
-            ])->name('dataSiswaBaru');
+    Route::put('/siswa/{id?}/upload', [
+        SiswaController::class,
+        'updateUpload'
+    ])->name('siswa.update.upload');
 
 
-             Route::post('/setNipd', [
-                SiswaController::class,
-                'setNipd'
-            ])->name('setNipd');
+    Route::get('/siswaBaru', [
+        SiswaController::class,
+        'siswaBaru'
+    ])->name('siswaBaru');
+
+    Route::get('/dataSiswaBaru', [
+        SiswaController::class,
+        'dataSiswaBaru'
+    ])->name('dataSiswaBaru');
 
 
-        Route::get(
-            'templatePendaftaran',
-            [TemplatePendaftaranController::class, 'index']
-        )->name('templatePendaftaran.index');  
-        
-        
-        Route::get(
-            'templatePendaftaran/data',
-            [TemplatePendaftaranController::class, 'data']
-        )->name('templatePendaftaran.data'); 
+    Route::post('/setNipd', [
+        SiswaController::class,
+        'setNipd'
+    ])->name('setNipd');
+
+
+    Route::get(
+        'templatePendaftaran',
+        [TemplatePendaftaranController::class, 'index']
+    )->name('templatePendaftaran.index');
+
+
+    Route::get(
+        'templatePendaftaran/data',
+        [TemplatePendaftaranController::class, 'data']
+    )->name('templatePendaftaran.data');
 
 
 
@@ -692,7 +907,12 @@ Route::middleware(['auth', 'role:admin|calon'])->group(function () {
 
 
 
-Route::middleware(['auth', 'role:admin|Akademik'])->group(function () {
+Route::middleware(['auth', 'role:admin|Akademik|Pendaftaran|keuangan'])->group(function () {
+
+    Route::get(
+        '/listBuktiPembayaran',
+        [CalonSiswaController::class, 'listBuktiPembayaran']
+    )->name('listBuktiPembayaran');
 
     Route::get('/admin', [Home::class, 'index'])
         ->name('admin');
@@ -716,28 +936,23 @@ Route::middleware(['auth', 'role:admin|Akademik'])->group(function () {
         ->name('calon-siswa.edit');
     Route::get('/calon-siswa/create', [CalonSiswaController::class, 'create'])
         ->name('calon-siswa.create');
+
+    Route::get('/createCalonSiswa', [CalonSiswaController::class, 'createCalonSiswa'])
+        ->name('createCalonSiswa');
     Route::delete('/calon-siswa/delete/{id}', [CalonSiswaController::class, 'destroy'])->name('calon-siswa.delete');
 
-     Route::get('/daftarCalonSiswa', [CalonSiswaController::class, 'daftarCalonSiswa'])
+    Route::get('/daftarCalonSiswa', [CalonSiswaController::class, 'daftarCalonSiswa'])
         ->name('daftarCalonSiswa');
 
     Route::post(
-    '/calon-siswa/save-daftar-siswa',
-    [CalonSiswaController::class, 'saveDaftarSiswa']
+        '/calon-siswa/save-daftar-siswa',
+        [CalonSiswaController::class, 'saveDaftarSiswa']
     )->name('calon-siswa.save-daftar-siswa');
 
     Route::get(
         '/calon-siswa/generate-nipd',
         [CalonSiswaController::class, 'generateNipd']
     )->name('calon-siswa.generate-nipd');
-
-
-Route::get(
-    '/listBuktiPembayaran',
-    [CalonSiswaController::class, 'listBuktiPembayaran']
-)->name('listBuktiPembayaran');
-
-
 
     Route::post(
         '/calon-siswa/update/orang-tua/{id}',
@@ -853,8 +1068,7 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
     Route::post('/calon-siswa/ipaymu', [BayarCalonSiswaController::class, 'ipaymu'])
         ->name('calon-siswa.ipaymu');
 
-    // Route::post('/ipaymu/callback', [CalonSiswaController::class, 'callback'])
-    // ->name('ipaymu.callback');
+
 
     Route::get('/calon-siswa/successPembayaran', [BayarCalonSiswaController::class, 'successPembayaran'])
         ->name('calon-siswa.success-pembayaran');
@@ -908,7 +1122,7 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
 
 Route::middleware(['auth', 'role:guru'])->group(function () {
 
-      Route::get(
+    Route::get(
         '/guru/jadwal-wawancara/wawancara/{id}',
         [HasilWawancaraController::class, 'create']
     )->name('hasilWawancara.create');
@@ -930,18 +1144,18 @@ Route::middleware(['auth', 'role:guru'])->group(function () {
 
 
     Route::get(
-    '/guru/jadwal-wawancara',
-    [JadwalWawancaraController::class, 'jadwalGuru']
+        '/guru/jadwal-wawancara',
+        [JadwalWawancaraController::class, 'jadwalGuru']
     )->name('jadwalWawancaraGuru');
 
     Route::get(
         '/guru/jadwal-wawancara/data',
         [JadwalWawancaraController::class, 'dataJadwalGuru']
-    )->name('jadwalGuru.data');    
+    )->name('jadwalGuru.data');
 
     Route::get('/dashboard', [Home::class, 'index'])
         ->name('dashboard');
-         Route::get('/masterGuru/profile', [MasterGuruController::class, 'profile'])
+    Route::get('/masterGuru/profile', [MasterGuruController::class, 'profile'])
         ->name('masterGuru.profile');
 
     Route::get(
@@ -1034,7 +1248,6 @@ Route::middleware(['auth', 'role:guru|admin'])->group(function () {
 });
 
 
-Route::middleware(['auth', 'role:keuangan'])->group(function () {});
 
 Route::middleware(['auth', 'role:siswa'])->group(function () {});
 
