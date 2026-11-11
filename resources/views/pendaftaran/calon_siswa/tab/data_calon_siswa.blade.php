@@ -110,7 +110,7 @@
                 <input
                     type="text"
                     name="no_daftar"
-                    value="{{ old('no_daftar', $rows->no_daftar ?? '') }}"
+                    value="{{ old('no_daftar', $rows->no_daftar ?? $nodaftar) }}"
                     readonly
                     class="w-full bg-[#f8fafc] border border-slate-200
                            rounded-lg text-sm text-slate-700

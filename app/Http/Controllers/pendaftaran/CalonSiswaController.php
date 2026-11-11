@@ -7,6 +7,8 @@ use App\Models\CalonSiswa;
 use App\Models\Gelombang;
 use App\Models\Jurusan;
 use App\Models\TahunAjaran;
+use App\Models\TemplateBayar;
+
 use App\Models\Agama;
 use App\Models\ItemBayar;
 use App\Models\Pekerjaan;
@@ -17,6 +19,10 @@ use App\Models\BuktiBayarCalon;
 use App\Models\Siswa;
 use App\Models\Bayar;
 use App\Models\DetBayar;
+
+use App\Models\DetTempBayar;
+
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\Konfig;
 
@@ -36,14 +42,13 @@ use App\Models\DetBayarCalonSiswa;
 class CalonSiswaController extends Controller
 {
 
-     var $tahun, $smt;
-  
+    var $tahun, $smt;
+
     public function __construct()
     {
         $konfig = Konfig::first();
         $this->tahun = $konfig->id_thn_ppdb;
         $this->smt = $konfig->smt;
-      
     }
 
     public function index()
@@ -60,11 +65,11 @@ class CalonSiswaController extends Controller
             ->get();
 
         $tahunAjaran = TahunAjaran::whereBetween('id', [
-                        $tahunSekarang - 3,
-                        $tahunSekarang
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->get();
+            $tahunSekarang - 3,
+            $tahunSekarang
+        ])
+            ->orderBy('id', 'desc')
+            ->get();
 
 
         $jurusan = Jurusan::all();
@@ -89,11 +94,13 @@ class CalonSiswaController extends Controller
             ->orderBy('id', 'asc')
             ->get();
         $tahunAjaran = TahunAjaran::whereBetween('id', [
-                        $tahunSekarang - 3,
-                        $tahunSekarang
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->get();
+            $tahunSekarang - 3,
+            $tahunSekarang
+        ])
+            ->orderBy('id', 'desc')
+            ->get();
+
+
 
         $jurusan = Jurusan::all();
 
@@ -121,7 +128,11 @@ class CalonSiswaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $gel = Gelombang::orderBy('idx', 'asc')->get();
+        $gel = Gelombang::where('id_tahun', $this->tahun)
+            ->orderBy('id', 'asc')
+            ->get();
+
+
 
         $itemBayar = ItemBayar::where('id_kategori', 2)
             ->get();
@@ -172,9 +183,9 @@ class CalonSiswaController extends Controller
     }
 
 
-     public function createCalonSiswa()
+    public function createCalonSiswa()
     {
-         $side = 'daftar-ulang';
+        $side = 'daftar-ulang';
 
         $rows = new CalonSiswa();
 
@@ -186,12 +197,19 @@ class CalonSiswaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $gel = Gelombang::orderBy('idx', 'asc')->get();
+        $gel = Gelombang::where('id_tahun', $this->tahun)
+            ->orderBy('id', 'asc')
+            ->get();
 
         $itemBayar = ItemBayar::where('id_kategori', 2)
             ->get();
 
-        $thn = TahunAjaran::orderBy('id', 'desc')->get();
+        $thn = TahunAjaran::whereBetween('id', [
+            $this->tahun - 3,
+            $this->tahun
+        ])
+            ->orderBy('id', 'desc')
+            ->get();
 
         $lists = Jurusan::orderBy('nama_jurusan', 'asc')->get();
 
@@ -216,6 +234,15 @@ class CalonSiswaController extends Controller
         $stsdaftar =
             'Belum Ada';
 
+
+        $leMineral = DB::table('tb_tmp_siswa')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $hasil = $leMineral ? ((int) $leMineral->id) + 1 : 1;
+
+        $nodaftar = sprintf("E%03d", $hasil);
+
         return view(
             'pendaftaran.calon_siswa.edit_calon_siswa',
             compact(
@@ -228,7 +255,7 @@ class CalonSiswaController extends Controller
                 'jobs',
                 'agama',
                 'sts_daftar',
-                // 'petugas',
+                'nodaftar',
                 'stsdaftar',
                 'bukti',
                 'itemBayar'
@@ -439,122 +466,228 @@ class CalonSiswaController extends Controller
 
     public function store(Request $request)
     {
-        $siswa = CalonSiswa::create($request->all());
+        $request->validate([
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
 
-        LogModel::create([
-            'tanggal' => now(),
-            'tabel' => 'tb_calon_siswa',
-            'aksi' => 'create',
-            'user' => auth()->user()->id,
-            'ip' => $request->ip(),
-            'keterangan' => json_encode($request->all()),
-            'serial' => url('simpan')
         ]);
 
-        return response()->json([
-            'success' => true
-        ]);
+        try {
+
+            DB::transaction(function () use ($request) {
+
+                // Simpan data calon siswa
+                $siswa = CalonSiswa::create($request->except('password'));
+
+                // Buat akun user
+
+
+                // Catat log
+                LogModel::create([
+                    'tanggal'     => now(),
+                    'tabel'       => 'tb_calon_siswa',
+                    'aksi'        => 'create',
+                    'user'        => auth()->id(),
+                    'ip'          => $request->ip(),
+                    'keterangan'  => json_encode($siswa->toArray()),
+                    'serial'      => url('simpan')
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data calon siswa berhasil disimpan.'
+            ]);
+        } catch (\Throwable $e) {
+
+            Log::error('Gagal menyimpan calon siswa: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data.'
+            ], 500);
+        }
     }
 
     public function updateRegistrasiSiswa(Request $request, $id = null)
     {
+        $request->validate([
+            // INFORMASI PENDAFTARAN
+            'id_gelombang'  => 'required',
+            'id_thn_ajaran' => 'required',
+            'id_jurusan'    => 'required',
+            'no_daftar'     => 'required|string|max:100',
+            'tgl_daftar'    => 'nullable|date',
+            'tmp_daftar'    => 'nullable|string|max:255',
+            'status_daftar' => 'nullable',
 
+            // BIODATA SISWA
+            'nama_lengkap'  => 'nullable|string|max:255',
+            'jk'            => 'nullable|string|max:1',
+            'id_agama'      => 'nullable',
+            'tmp_lahir'     => 'nullable|string|max:255',
+            'tgl_lahir'     => 'nullable|date',
+            'alamat'        => 'nullable|string',
+            'dusun'         => 'nullable|string|max:255',
+            'desa'          => 'nullable|string|max:255',
+            'kecamatan'     => 'nullable|string|max:255',
+            'kota'          => 'nullable|string|max:255',
+            'provinsi'      => 'nullable|string|max:255',
+            'no_hp'         => 'nullable|string|max:20',
+            'no_telp'       => 'nullable|string|max:20',
+            'email'         => 'nullable|email|max:255',
+        ]);
 
         try {
-            $request->validate([
 
+            DB::transaction(function () use ($request, $id) {
 
-                /*
-
-                
-            |--------------------------------------------------------------------------
-            | INFORMASI PENDAFTARAN
-            |--------------------------------------------------------------------------
-            */
-                'id_gelombang'      => 'nullable',
-                'id_thn_ajaran'     => 'nullable',
-                'id_jurusan'        => 'nullable',
-                'no_daftar'         => 'nullable|string|max:100',
-                'tgl_daftar'        => 'nullable|date',
-                'tmp_daftar'        => 'nullable|string|max:255',
-                'status_daftar'     => 'nullable',
+                $userId = null;
 
                 /*
             |--------------------------------------------------------------------------
-            | BIODATA SISWA
+            | CEK EDIT / TAMBAH
             |--------------------------------------------------------------------------
             */
-                'nama_lengkap'      => 'nullable|string|max:255',
-                'jk'                => 'nullable|string|max:1',
-                'id_agama'          => 'nullable',
-                'tmp_lahir'         => 'nullable|string|max:255',
-                'tgl_lahir'         => 'nullable|date',
-                'alamat'            => 'nullable|string',
-                'dusun'             => 'nullable|string|max:255',
-                'desa'              => 'nullable|string|max:255',
-                'kecamatan'         => 'nullable|string|max:255',
-                'kota'              => 'nullable|string|max:255',
-                'provinsi'          => 'nullable|string|max:255',
-                'no_hp'             => 'nullable|string|max:20',
-                'no_telp'           => 'nullable|string|max:20',
-                'email'             => 'nullable|email|max:255',
-            ]);
 
-            /*
-        |--------------------------------------------------------------------------
-        | CEK EDIT / TAMBAH
-        |--------------------------------------------------------------------------
-        */
+                if (!empty($id)) {
 
-            if (!empty($id)) {
-                // UPDATE
-                $siswa = CalonSiswa::findOrFail($id);
-                // status sudah ujian dan melakukan daftar ulang
-                if ($siswa->status_daftar == 3) {
-                    $siswa->update([
-                        'status_daftar' => 4,
+                    // UPDATE
+                    $siswa = CalonSiswa::findOrFail($id);
+
+                    if ($siswa->status_daftar == 3) {
+                        $siswa->status_daftar = 4;
+                    }
+                } else {
+
+                    // TAMBAH
+                    $siswa = new CalonSiswa();
+
+                    /*
+                |--------------------------------------------------------------------------
+                | CARI TEMPLATE PEMBAYARAN
+                |--------------------------------------------------------------------------
+                */
+
+                    $template = TemplateBayar::query()
+                        ->where('id_jurusan', $request->id_jurusan)
+                        ->where('id_gelombang', $request->id_gelombang)
+                        ->where('id_tahun', $this->tahun)
+                        ->first();
+
+                    if (!$template) {
+                        throw new \Exception(
+                            'Detail template pembayaran belum tersedia.'
+                        );
+                    }
+
+                    /*
+                |--------------------------------------------------------------------------
+                | BUAT USER
+                |--------------------------------------------------------------------------
+                */
+
+                    $userId = DB::table('users')->insertGetId([
+                        'name'              => $request->nama_lengkap,
+                        'email'             => $request->email,
+                        'password'          => Hash::make('password'),
+                        'email_verified_at' => null,
+                        'created_at'        => now(),
+                        'updated_at'        => now(),
                     ]);
+
+                    // Assign role calon
+                    $user = User::findOrFail($userId);
+                    $user->assignRole('calon');
+
+                    // Hubungkan user dengan calon siswa
+                    $siswa->id_user = $userId;
+                    $siswa->id_template_bayar = $template->id;
                 }
-            } else {
 
-                // TAMBAH
-                $siswa = new CalonSiswa();
-            }
+                /*
+            |--------------------------------------------------------------------------
+            | ISI DATA PENDAFTARAN DAN BIODATA
+            |--------------------------------------------------------------------------
+            */
 
+                if (auth()->user()->hasAnyRole(['admin', 'Akademik'])) {
 
+                    $siswa->id_gelombang  = $request->id_gelombang;
+                    $siswa->id_thn_ajaran = $request->id_thn_ajaran;
+                    $siswa->id_jurusan    = $request->id_jurusan;
+                    $siswa->status_daftar = $request->status_daftar;
+                }
 
-            /*
-        |--------------------------------------------------------------------------
-        | SIMPAN DATA
-        |--------------------------------------------------------------------------
-        */
+                $siswa->no_daftar    = $request->no_daftar;
+                $siswa->tgl_daftar   = $request->tgl_daftar;
+                $siswa->tmp_daftar   = $request->tmp_daftar;
 
-            if (auth()->user()->hasAnyRole(['admin', 'Akademik'])) {
-                $siswa->id_gelombang  = $request->id_gelombang;
-                $siswa->id_thn_ajaran = $request->id_thn_ajaran;
-                $siswa->id_jurusan    = $request->id_jurusan;
-                $siswa->status_daftar     = $request->status_daftar;
-            }
-            $siswa->no_daftar         = $request->no_daftar;
-            $siswa->tgl_daftar        = $request->tgl_daftar;
-            $siswa->tmp_daftar        = $request->tmp_daftar;
+                $siswa->nama_lengkap = $request->nama_lengkap;
+                $siswa->jk           = $request->jk;
+                $siswa->id_agama     = $request->id_agama;
+                $siswa->tmp_lahir    = $request->tmp_lahir;
+                $siswa->tgl_lahir    = $request->tgl_lahir;
+                $siswa->alamat       = $request->alamat;
+                $siswa->dusun        = $request->dusun;
+                $siswa->desa         = $request->desa;
+                $siswa->kecamatan    = $request->kecamatan;
+                $siswa->kota         = $request->kota;
+                $siswa->provinsi     = $request->provinsi;
+                $siswa->no_hp        = $request->no_hp;
+                $siswa->no_telp      = $request->no_telp;
+                $siswa->email        = $request->email;
 
+                /*
+            |--------------------------------------------------------------------------
+            | SIMPAN CALON SISWA
+            |--------------------------------------------------------------------------
+            */
 
-            $siswa->nama_lengkap      = $request->nama_lengkap;
-            $siswa->jk                = $request->jk;
-            $siswa->id_agama          = $request->id_agama;
-            $siswa->tmp_lahir         = $request->tmp_lahir;
-            $siswa->tgl_lahir         = $request->tgl_lahir;
-            $siswa->alamat            = $request->alamat;
-            $siswa->dusun             = $request->dusun;
-            $siswa->desa              = $request->desa;
-            $siswa->kecamatan         = $request->kecamatan;
-            $siswa->kota              = $request->kota;
-            $siswa->provinsi          = $request->provinsi;
-            $siswa->no_hp             = $request->no_hp;
-            $siswa->no_telp           = $request->no_telp;
-            $siswa->email             = $request->email;
-            $siswa->save();
+                $siswa->save();
+
+                /*
+            |--------------------------------------------------------------------------
+            | GENERATE TAGIHAN (KHUSUS TAMBAH)
+            |--------------------------------------------------------------------------
+            */
+
+                if (empty($id)) {
+
+                    Log::info('DATA CALON SISWA TERSIMPAN', [
+                        'id'        => $siswa->id,
+                        'no_daftar' => $siswa->no_daftar,
+                        'id_user'   => $siswa->id_user,
+                    ]);
+
+                    $result = $this->generateTagihanCalonSiswa(
+                        siswa: $siswa,
+                        idTahun: (int) $request->id_thn_ajaran,
+                        idUser: $userId,
+                        ip: $request->ip(),
+                    );
+
+                    Log::info('HASIL GENERATE TAGIHAN', $result);
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | LOG AKTIVITAS
+            |--------------------------------------------------------------------------
+            */
+
+                LogModel::create([
+                    'tanggal'    => now(),
+                    'tabel'      => 'tb_calon_siswa',
+                    'aksi'       => !empty($id) ? 'update' : 'create',
+                    'user'       => auth()->id(),
+                    'ip'         => $request->ip(),
+                    'keterangan' => json_encode($siswa),
+                    'serial'     => !empty($id)
+                        ? url('ubah/' . $id)
+                        : url('simpan'),
+                ]);
+            });
 
             /*
         |--------------------------------------------------------------------------
@@ -562,25 +695,9 @@ class CalonSiswaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-            LogModel::create([
-                'tanggal' => now(),
-                'tabel' => 'tb_calon_siswa',
-                'aksi' => !empty($id) ? 'update' : 'create',
-                'user' => auth()->user()->id,
-                'ip' => $request->ip(),
-                'keterangan' => json_encode($siswa),
-                'serial' => !empty($id) ? url('ubah/' . $id) : url('simpan')
-            ]);
-
-            if ($id != null) {
-
-                $message = 'Data registrasi & biodata siswa berhasil diperbarui';
-            } else {
-
-                $message = 'Data registrasi & biodata siswa berhasil ditambahkan';
-            }
-
-
+            $message = !empty($id)
+                ? 'Data registrasi & biodata siswa berhasil diperbarui'
+                : 'Data registrasi & biodata siswa berhasil ditambahkan';
 
             if (auth()->user()->hasRole('calon')) {
                 return redirect()
@@ -588,15 +705,118 @@ class CalonSiswaController extends Controller
                     ->with('success', $message);
             }
 
-            return redirect()->back()->with('success', $message);
-        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('success', $message);
+        } catch (\Throwable $e) {
 
-            print_r($e->getMessage());
-            // return redirect()
-            //     ->back()
-            //     ->withInput()
-            //     ->with('error', 'Terjadi kesalahan saat menyimpan data');
+            Log::error('GAGAL UPDATE REGISTRASI SISWA', [
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
+    }
+
+    private function generateTagihanCalonSiswa(
+        CalonSiswa $siswa,
+        int $idTahun,
+        ?int $idUser = null,
+        ?string $ip = null
+    ): array {
+        $berhasil = 0;
+        $gagal = 0;
+
+        // Hindari tagihan ganda
+        $sudahAda = BayarCalonSiswa::where('id_tahun', $idTahun)
+            ->where('id_calon_siswa', $siswa->no_daftar)
+            ->exists();
+
+        if ($sudahAda) {
+            return [
+                'success'   => true,
+                'generated' => false,
+                'berhasil'  => 0,
+                'gagal'     => 0,
+                'message'   => 'Tagihan calon siswa sudah tersedia.',
+            ];
+        }
+
+        $bulan = (int) now()->format('m');
+
+        $bayar = BayarCalonSiswa::create([
+            'id_tahun'        => $idTahun,
+            'id_bulan'        => $bulan,
+            'id_calon_siswa'  => $siswa->no_daftar,
+        ]);
+
+        $detailTemplate = DetTempBayar::query()
+            ->where('id_template', $siswa->id_template_bayar)
+            ->whereHas('itemBayar', function ($query) {
+                $query->whereIn('id_kategori', [1, 2]);
+            })
+            ->get();
+
+        if ($detailTemplate->isEmpty()) {
+            throw new \Exception(
+                'Detail template pembayaran belum tersedia.'
+            );
+        }
+
+        foreach ($detailTemplate as $item) {
+            DetBayarCalonSiswa::create([
+                'id_bayar'        => $bayar->id,
+                'id_item'         => $item->id_item,
+                'kwajiban_bayar'  => $item->jml_bayar,
+                'potongan'        => 0,
+                'jml_bayar'       => 0,
+            ]);
+
+            $berhasil++;
+        }
+
+        $this->updateTotalBayar($bayar->id);
+
+        LogModel::create([
+            'tanggal'   => now(),
+            'tabel'     => 'tb_bayar_regis',
+            'aksi'      => 'create',
+            'user'      => $idUser,
+            'ip'        => $ip,
+            'keterangan' => json_encode([
+                'id_bayar'       => $bayar->id,
+                'no_daftar'      => $siswa->no_daftar,
+                'jumlah_detail'  => $berhasil,
+            ]),
+            'serial'    => url('pendaftaran/online'),
+        ]);
+
+        return [
+            'success'   => true,
+            'generated' => true,
+            'berhasil'  => $berhasil,
+            'gagal'     => $gagal,
+            'id_bayar'  => $bayar->id,
+            'message'   => 'Tagihan berhasil dibuat.',
+        ];
+    }
+
+    public function updateTotalBayar($id)
+    {
+        $total = DetBayarCalonSiswa::where('id_bayar', $id)
+            ->sum('kwajiban_bayar')
+            - DetBayarCalonSiswa::where('id_bayar', $id)
+            ->sum('potongan');
+
+        BayarCalonSiswa::where('id', $id)
+            ->update([
+                'total_kwajiban' => $total
+            ]);
     }
 
 
@@ -839,6 +1059,20 @@ class CalonSiswaController extends Controller
 
         try {
 
+        $request->validate([
+    'bukti_transfer' => [
+        'required',
+        'image',
+        'mimes:jpg,jpeg,png',
+        'max:2048',
+    ],
+], [
+    'bukti_transfer.required' => 'Anda belum mengunggah bukti pembayaran.',
+    'bukti_transfer.image'    => 'File yang diunggah harus berupa gambar.',
+    'bukti_transfer.mimes'    => 'Format gambar harus JPG, JPEG, atau PNG.',
+    'bukti_transfer.max'      => 'Ukuran gambar maksimal 2 MB.',
+]);
+
             DB::beginTransaction();
 
             $data = [];
@@ -887,7 +1121,7 @@ class CalonSiswaController extends Controller
         } catch (\Exception $e) {
 
             DB::rollBack();
-            
+
             // Simpan log error
             Log::error('Upload bukti transfer gagal', [
                 'message' => $e->getMessage(),
@@ -1057,6 +1291,16 @@ class CalonSiswaController extends Controller
 
             $calonSiswa->delete();
 
+            BayarCalonSiswa::where('id_calon_siswa', $calonSiswa->no_daftar)->delete();
+            DetBayarCalonSiswa::whereIn('id_bayar', function ($query) use ($calonSiswa) {
+                $query->select('id')
+                    ->from('tb_bayar_regis')
+                    ->where('id_calon_siswa', $calonSiswa->no_daftar);
+            })->delete();
+
+
+
+
             LogModel::create([
                 'tanggal'     => now(),
                 'tabel'       => 'tb_calon_siswa',
@@ -1115,7 +1359,7 @@ class CalonSiswaController extends Controller
                     );
                 }
 
-                $user = User::where('email',$calonSiswa->email)->first();
+                $user = User::where('email', $calonSiswa->email)->first();
 
 
                 /*
@@ -1251,12 +1495,6 @@ class CalonSiswaController extends Controller
                 $calonSiswa->update([
                     'status_daftar' => $validated['status_daftar'] ?? 1,
                 ]);
-
-
-
-              
-
-                 
             });
 
             return response()->json([
@@ -1365,7 +1603,7 @@ class CalonSiswaController extends Controller
             'nama',
             'itemBayar',
             'id',
-           
+
             'profile'
         ), ['side'  => 'pembayaranCalonSiswa']);
     }
@@ -1375,12 +1613,11 @@ class CalonSiswaController extends Controller
         $data = BuktiBayarCalon::with([
             'calonSiswa',
         ])->where('status', 1)
-        ->latest('id')
-        ->get();
+            ->latest('id')
+            ->get();
 
-           return view('keuangan.bayar_calon_siswa.listBuktiBayar', compact(
-            'data',           
+        return view('keuangan.bayar_calon_siswa.listBuktiBayar', compact(
+            'data',
         ), ['side'  => 'bukti']);
-
     }
 }

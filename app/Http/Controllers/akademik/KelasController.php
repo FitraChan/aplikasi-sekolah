@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Kelas;
 use App\Models\LogModel;
 use App\Models\Jurusan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 
 class KelasController extends Controller
@@ -40,31 +43,49 @@ class KelasController extends Controller
         return response()->json($data);
     }
 
-   public function store(Request $request)
+  public function store(Request $request)
     {
-        $idx = (Kelas::max('idx') ?? 0) + 1;
+        try {
+            $kelas = DB::transaction(function () use ($request) {
 
-        $kelas = Kelas::create([
-            'nama_kelas' => $request->nama_kelas,
-            'id_jurusan' => $request->id_jurusan,
-            'kelas'      => $request->kelas,
-            'alias'      => $request->alias,
-            'idx'        => $idx,
-        ]);
+                $idx = (Kelas::max('idx') ?? 0) + 1;
 
-        LogModel::create([
-            'tanggal' => now(),
-            'tabel' => 'tb_kelas',
-            'aksi' => 'create',
-            'user' => auth()->user()->id,
-            'ip' => $request->ip(),
-            'keterangan' => json_encode($kelas),
-            'serial' => url('kelas/store')
-        ]);
+                $kelas = Kelas::create([
+                    'nama_kelas' => $request->nama_kelas,
+                    'id_jurusan' => $request->id_jurusan,
+                    'kelas'      => $request->kelas,
+                    'alias'      => $request->alias,
+                    'idx'        => $idx,
+                ]);
 
-        return response()->json([
-            'success' => true
-        ]);
+                LogModel::create([
+                    'tanggal'     => now(),
+                    'tabel'       => 'tb_kelas',
+                    'aksi'        => 'create',
+                    'user'        => auth()->id(),
+                    'ip'          => $request->ip(),
+                    'keterangan'  => json_encode($kelas),
+                    'serial'      => url('kelas/store'),
+                ]);
+
+                return $kelas;
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data kelas berhasil disimpan.',
+                'data'    => $kelas
+            ]);
+
+        } catch (Throwable $e) {
+
+        
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data kelas.'
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)

@@ -170,9 +170,10 @@ focus:ring-[#02BC9C] focus:border-transparent transition-all duration-150"
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider" for="password">
                 Kata Sandi
               </label>
-              <!--<a class="text-xs font-semibold text-[#02BC9C] hover:text-[#02a387] hover:underline transition-colors" href="LupaPassword.html">
+              <a href="{{ route('password.request') }}"
+                class="text-xs font-semibold text-[#02BC9C] hover:text-[#02a387] hover:underline transition-colors">
                 Lupa Password?
-              </a>-->
+            </a>
             </div>
             <div class="relative rounded-lg shadow-sm">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">

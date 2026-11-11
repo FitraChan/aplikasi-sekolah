@@ -74,3 +74,15 @@ Stack trace:
 #33 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1227): Illuminate\Foundation\Http\Kernel->handle()
 #34 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/index.php(18): Illuminate\Foundation\Application->handleRequest()
 #35 {main}
+[10-Nov-2026 16:02:33 Asia/Makassar] PHP Fatal error:  Uncaught ErrorException: Cannot modify header information - headers already sent by (output started at /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/symfony/http-foundation/Response.php:393) in /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/symfony/http-foundation/Response.php:328
+Stack trace:
+#0 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(265): Illuminate\Foundation\Bootstrap\HandleExceptions->handleError()
+#1 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->{closure:Illuminate\Foundation\Bootstrap\HandleExceptions::forwardsTo():264}()
+#2 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/symfony/http-foundation/Response.php(328): header()
+#3 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/symfony/http-foundation/Response.php(407): Symfony\Component\HttpFoundation\Response->sendHeaders()
+#4 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(228): Symfony\Component\HttpFoundation\Response->send()
+#5 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(205): Illuminate\Foundation\Bootstrap\HandleExceptions->renderHttpResponse()
+#6 /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(265): Illuminate\Foundation\Bootstrap\HandleExceptions->handleException()
+#7 [internal function]: Illuminate\Foundation\Bootstrap\HandleExceptions->{closure:Illuminate\Foundation\Bootstrap\HandleExceptions::forwardsTo():264}()
+#8 {main}
+  thrown in /home/mbcconsu/aplikasisekolah.mbcconsulting.id/vendor/symfony/http-foundation/Response.php on line 328

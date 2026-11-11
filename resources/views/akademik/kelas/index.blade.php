@@ -604,6 +604,9 @@ function saveData()
         ? "{{ url('kelas/update') }}/" + id
         : "{{ url('kelas/store') }}";
 
+       
+        
+
     const button =
         document.getElementById('btn-simpan-kelas');
 

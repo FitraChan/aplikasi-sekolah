@@ -417,6 +417,8 @@
                     Unggah Bukti
                 </h3>
 
+               
+
 
                 <form action="{{ route('calon-siswa.pembayaran', $id ?? 0) }}"
                     method="POST"
@@ -519,12 +521,19 @@
                             </p>
 
 
-                            <input
-                                accept=".jpg,.jpeg,.png,.pdf"
-                                class="hidden"
-                                id="file_upload"
+                           <input
+                                type="file"
                                 name="bukti_transfer"
-                                type="file">
+                                accept="image/jpeg,image/png"
+                                class="form-control @error('bukti_transfer') border-danger @enderror"
+                            >
+
+                            @error('bukti_transfer')
+                                <div class="text-danger text-xs mt-1">
+                                    <i class="fa fa-exclamation-circle"></i>
+                                    {{ $message }}
+                                </div>
+                            @enderror
 
                         </div>
 

@@ -60,7 +60,7 @@
             aria-expanded="false" aria-haspopup="true" aria-label="Menu Calon Siswa">
             <div class="text-right hidden sm:block">
               <div class="font-bold text-sm text-slate-800 leading-tight">    {{ auth()->user()->name }}</div>
-              <div class="text-[11px] text-slate-400 font-medium mt-0.5">Calon Siswa</div>
+              <div class="text-[11px] text-slate-400 font-medium mt-0.5"> {{ auth()->user()->getRoleNames()->first() ?? 'Belum memiliki role' }}</div>
             </div>
             <div class="relative">
               <img alt="Budi Santoso Avatar"
@@ -84,27 +84,7 @@
                 Siswa</span>
             </div>
 
-            <!-- Dropdown Menu Links -->
-            <div class="py-1">
-              <!-- Ubah Password -->
-              <a href="DashboardUbahPassword.html"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-teal-50/60 hover:text-[#00B686] transition-colors group"
-                role="menuitem">
-                <div
-                  class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center group-hover:bg-teal-100 group-hover:text-[#00B686] transition-colors">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
-                  </svg>
-                </div>
-                <div>
-                  <span class="block font-semibold text-xs text-slate-800 group-hover:text-[#00B686]">Ubah
-                    Password</span>
-                  <span class="block text-[10px] text-slate-400">Ganti kata sandi akun</span>
-                </div>
-              </a>
-            </div>
-
+         
             <!-- Dropdown Logout -->
             <div class="py-1">
               <a href="{{ route('logout') }}"

@@ -521,6 +521,13 @@
                             <div class="text-base font-bold text-slate-900">
                                 ${escapeHtml(item.nama_mapel || '-')}
                             </div>
+
+                            <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14H4V6a1 1 0 011-1z"/>
+                                </svg>
+                                TA ${escapeHtml(item.tahun_ajaran || '-')}
+                            </div>
                         </div>
 
                         <!-- JAM -->
@@ -711,10 +718,7 @@
 
                 const mapelSelect = document.getElementById('modal-mapel');
                 const pengajarSelect = document.getElementById('modal-pengajar');
-
-                console.log('data', data);
-
-
+              
                 if (mode === 'edit' && data) {
 
                     // Simpan data slot yang sedang diedit

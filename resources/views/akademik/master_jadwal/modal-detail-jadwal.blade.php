@@ -146,7 +146,7 @@
 
                                 @foreach($kelas as $item)
 
-                                <option value="{{ $item->id }}">
+                                <option value="{{ $item->idx }}">
                                     {{ $item->nama_kelas }}
                                 </option>
 
@@ -188,6 +188,36 @@
                         </div>
 
 
+                        <div class="w-full">
+
+                            <select
+                                id="filter_angkatan_detail_modal"
+                                class="w-full h-11 px-3
+                               rounded-xl
+                               border border-slate-200
+                               text-sm
+                               bg-white
+                               focus:border-[#02BC9C]
+                               focus:ring-1
+                               focus:ring-[#02BC9C]">
+
+                                <option value="">
+                                    Semua Angkatan
+                                </option>
+
+                                @foreach($tahun as $item)
+
+                                <option value="{{ $item->id }}">
+                                    {{ $item->thn_ajaran }}
+                                </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
                         <!-- Mata Pelajaran -->
                         <div class="w-full">
 
@@ -205,6 +235,10 @@
                                 placeholder="🔍 Cari Mata Pelajaran...">
 
                         </div>
+
+
+
+                        
 
 
                         <!-- Tombol -->
@@ -358,14 +392,14 @@ window.tampilkanTableDetail = function() {
 
     if (tableDetail) {
         tableDetail.setData(
-            "{{ route('detail-jadwal.data') }}",
+            "{{ route('detail-jadwal-modal.data') }}",
             { id_hari: idHari }
         );
         return;
     }
 
     tableDetail = new Tabulator("#table-detail-jadwal", {
-        ajaxURL: "{{ route('detail-jadwal.data') }}",
+        ajaxURL: "{{ route('detail-jadwal-modal.data') }}",
 
         ajaxParams: {
             id_hari: idHari
@@ -530,14 +564,14 @@ window.tampilkanTableDetailFull = function() {
  tableDetailFull = null;
     if (tableDetailFull) {
         tableDetailFull.setData(
-            "{{ route('detail-jadwal.data') }}",
+            "{{ route('detail-jadwal-modal.data') }}",
            
         );
         return;
     }
 
     tableDetailFull = new Tabulator("#table-detail-jadwal", {
-        ajaxURL: "{{ route('detail-jadwal.data') }}",
+        ajaxURL: "{{ route('detail-jadwal-modal.data') }}",
 
        
         selectableRows: 1,
@@ -620,7 +654,6 @@ window.tampilkanTableDetailFull = function() {
                     }
                 },
 
-
                 {
                     title: "Jam Pelajaran",
                     field: "id_jam",
@@ -644,7 +677,6 @@ window.tampilkanTableDetailFull = function() {
                         ] ?? "-";
                     }
                 },
-
 
                 {
                     title: "Waktu",
@@ -706,9 +738,7 @@ window.tampilkanTableDetailFull = function() {
 
     function loadDetailDataPelajaran() {
 
-    console.log('loadDetailDataPelajaran dipanggil', document.getElementById(
-                'filter_mapel_detail_modal'
-            ).value);
+
 
         let params = {
 
@@ -724,6 +754,11 @@ window.tampilkanTableDetailFull = function() {
                 'filter_kelas_detail_modal'
             ).value,
 
+
+             id_angkatan: document.getElementById(
+                'filter_angkatan_detail_modal'
+            ).value,
+
             smt: document.getElementById(
                 'filter_semester_detail_modal'
             ).value,
@@ -734,13 +769,10 @@ window.tampilkanTableDetailFull = function() {
 
         };
 
-        console.log(
-            'Filter:',
-            params
-        );
+     
 if(tableDetail) {
         tableDetail.setData(
-            "{{ route('detail-jadwal.data') }}",
+            "{{ route('detail-jadwal-modal.data') }}",
             params
         );
 
@@ -749,7 +781,7 @@ if(tableDetail) {
 if(tableDetailFull) {
 
          tableDetailFull.setData(
-            "{{ route('detail-jadwal.data') }}",
+            "{{ route('detail-jadwal-modal.data') }}",
             params
         );
 

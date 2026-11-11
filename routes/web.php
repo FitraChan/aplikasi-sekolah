@@ -31,6 +31,7 @@ use App\Http\Controllers\akademik\NilaiController;
 use App\Http\Controllers\akademik\AbsensiController;
 use App\Http\Controllers\akademik\SoalController;
 use App\Http\Controllers\akademik\TahunAjaranController;
+use App\Http\Controllers\auth\ForgotPasswordController;
 
 use App\Http\Controllers\guru\PenilaianGuruController;
 
@@ -90,9 +91,9 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
 
 
     Route::get(
-            '/listBuktiPembayaran',
-            [CalonSiswaController::class, 'listBuktiPembayaran']
-        )->name('listBuktiPembayaran');
+        '/listBuktiPembayaran',
+        [CalonSiswaController::class, 'listBuktiPembayaran']
+    )->name('listBuktiPembayaran');
 
     Route::get('kat-item-bayar', [KatItemBayarController::class, 'index'])
         ->name('kat-item-bayar.index');
@@ -111,7 +112,7 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
         [KatPeriodeBayarController::class, 'index']
     )->name('kat-periode-bayar.index');
 
-    
+
 
     Route::get(
         '/kat-periode-bayar/data',
@@ -292,9 +293,6 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
 
     Route::delete('det-bayar-calon-siswa/{id}', [DetBayarCalonSiswaController::class, 'destroy'])
         ->name('det-bayar-calon-siswa.destroy');
-
-
-
 });
 
 
@@ -302,7 +300,7 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
 
 Route::middleware(['auth', 'role:admin|Pendaftaran|keuangan|Akademik'])->group(function () {
 
-Route::get(
+    Route::get(
         '/listBuktiPembayaran',
         [CalonSiswaController::class, 'listBuktiPembayaran']
     )->name('listBuktiPembayaran');
@@ -535,7 +533,7 @@ Route::get(
     Route::get('/bayar/createReportPdf/{id}', [BayarController::class, 'createReportPdf'])
         ->name('bayar.createReportPdf');
 
-    
+
 
     Route::post('/det-bayar/store', [DetBayarController::class, 'store'])
         ->name('det-bayar.store');
@@ -651,6 +649,12 @@ Route::get(
         '/detail-jadwal/data',
         [MasterJadwalController::class, 'dataDetail']
     )->name('detail-jadwal.data');
+
+
+     Route::get(
+        '/detail-jadwal-modal/data',
+        [MasterJadwalController::class, 'dataDetailModal']
+    )->name('detail-jadwal-modal.data');
 
     Route::post(
         '/detail-jadwal/update',
@@ -1257,3 +1261,20 @@ Route::get(
     [BayarCalonSiswaController::class, 'download']
 )->middleware('signed')
     ->name('kartuUjian.download');
+
+
+
+Route::middleware('guest')->group(function () {
+
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'forgot'])
+        ->name('password.request');
+
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
+        ->name('password.email');
+
+    Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'resetForm'])
+        ->name('password.reset');
+
+    Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])
+        ->name('password.update');
+});

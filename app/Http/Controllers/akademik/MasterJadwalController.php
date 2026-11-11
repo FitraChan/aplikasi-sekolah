@@ -20,21 +20,21 @@ use App\Models\LogModel;
 class MasterJadwalController extends Controller
 {
 
-      var $tahun, $smt;
+      var $tahun_ppdb, $smt,$tahun_ajaran_sekarang;
   
     public function __construct()
     {
         $konfig = Konfig::first();
-        $this->tahun = $konfig->id_thn_ppdb;
+        $this->tahun_ppdb = $konfig->id_thn_ppdb;
         $this->smt = $konfig->smt;
+        $this->tahun_ajaran_sekarang = $konfig->id_tahun;
 
-      
     }   
 
     public function index()
     {
 
-        $tahunSekarang = $this->tahun;
+        $tahunSekarang = $this->tahun_ppdb;
 
         return view('akademik.master_jadwal.index', [
             'side'  => 'master-jadwal',
@@ -72,7 +72,7 @@ class MasterJadwalController extends Controller
     public function data(Request $request)
     {
 
-       $tahunSekarang = $this->tahun;
+       $tahunSekarang = $this->tahun_ppdb;
         $query = MasterJadwal::with([
             'tahun',
             'kelas',
@@ -145,7 +145,7 @@ class MasterJadwalController extends Controller
     public function dataDetail(Request $request)
     {
 
-        $tahunSekarang = $this->tahun;
+        $tahunSekarang = $this->tahun_ajaran_sekarang;
 
         $query = PenjadwalanHari::with([
             'jam',
@@ -154,11 +154,12 @@ class MasterJadwalController extends Controller
             'jadwal.mapel',
             'jadwal.guru'
         ])
-        ->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan')             
-        ->whereBetween('id_tahun', [
-            $tahunSekarang - 3,
-            $tahunSekarang - 1
-        ]);
+        ->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan') ;
+        //->where('id_tahun', $tahunSekarang);
+        // ->whereBetween('id_tahun', [
+        //     $tahunSekarang - 3,
+        //     $tahunSekarang - 1
+        // ]);
 
      
 
@@ -176,11 +177,22 @@ class MasterJadwalController extends Controller
             $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('id_tahun', $request->id_tahun);
             });
+        }else{
+            $query->whereHas('jadwal', function ($q) use ($tahunSekarang) {
+                $q->where('id_tahun', $tahunSekarang);
+            });
+
         }
 
         if ($request->filled('id_kelas')) {
             $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('id_kelas', $request->id_kelas);
+            });
+        }
+
+        if ($request->filled('id_angkatan')) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
+                $q->where('angkatan', $request->id_angkatan);
             });
         }
 
@@ -232,6 +244,9 @@ class MasterJadwalController extends Controller
 
                      'id_kelas'         => $item->jadwal?->id_kelas ?? '',
 
+                        'id_tahun'         => $item->jadwal?->id_tahun ?? '',
+
+
 
                     'hari'            => $hari[$item->id_hari] ?? '',
 
@@ -270,7 +285,152 @@ class MasterJadwalController extends Controller
     }
 
 
+ public function dataDetailModal(Request $request)
+    {
 
+        $tahunSekarang = $this->tahun_ajaran_sekarang;
+
+        $query = PenjadwalanHari::with([
+    'jam',
+    'jadwal.tahun',
+    'jadwal.kelas',
+    'jadwal.mapel',
+    'jadwal.guru'
+])
+->leftJoin(
+    'tb_master_jadwal',
+    'tb_master_jadwal.id',
+    '=',
+    'tb_penjadwalan_hari.idpenjadwalan'
+)
+->where(function ($q) {
+    $q->whereNull('tb_penjadwalan_hari.id_jam')
+      ->orWhereNull('tb_penjadwalan_hari.id_hari');
+})
+->where('tb_master_jadwal.id_tahun', $tahunSekarang);
+        
+     
+
+        if ($request->id_hari) {
+            $query->where(function ($q) use ($request) {
+                $q->where('id_hari', $request->id_hari)
+                ->orWhereNull('id_hari');
+            });
+        }
+      
+
+         
+
+        if ($request->filled('id_tahun')) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
+                $q->where('id_tahun', $request->id_tahun);
+            });
+        }else{
+            $query->whereHas('jadwal', function ($q) use ($tahunSekarang) {
+                $q->where('id_tahun', $tahunSekarang);
+            });
+
+        }
+
+        if ($request->filled('id_kelas')) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
+                $q->where('id_kelas', $request->id_kelas);
+            });
+        }
+
+        if ($request->filled('id_angkatan')) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
+                $q->where('angkatan', $request->id_angkatan);
+            });
+        }
+
+        if ($request->filled('id_jurusan')) {
+            $query->whereHas('jadwal.kelas', function ($q) use ($request) {
+                $q->where('id_jurusan', $request->id_jurusan);
+            });
+        }
+
+        if ($request->filled('nama_pelajaran')) {
+            $query->whereHas('jadwal.mapel', function ($q) use ($request) {
+                $q->where('nama_mapel', 'like', '%' . $request->nama_pelajaran . '%');
+            });
+        }
+
+        if ($request->filled('smt')) {
+            $query->whereHas('jadwal', function ($q) use ($request) {
+                $q->where('semester', $request->smt);
+            });
+        }
+
+        $hari = [
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu',
+            7 => 'Minggu',
+        ];
+
+        $data['jam'] = JamPelajaran::all();
+
+        
+        $data['gtk'] = Gtk::all();
+
+        $data = $query
+            ->select('tb_penjadwalan_hari.*')
+            ->leftjoin('tb_jam_pelajaran', 'tb_jam_pelajaran.id', '=', 'tb_penjadwalan_hari.id_jam')
+            ->orderBy('tb_jam_pelajaran.jam_ke', 'asc')  
+            // ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($item) use ($hari) {
+
+                return [
+                    'id'              => $item->id,
+                    'idpenjadwalan'   => $item->idpenjadwalan,
+                    'id_hari'         => $item->id_hari,
+
+                     'id_kelas'         => $item->jadwal?->id_kelas ?? '',
+
+                        'id_tahun'         => $item->jadwal?->id_tahun ?? '',
+
+
+
+                    'hari'            => $hari[$item->id_hari] ?? '',
+
+                    'jam_ke'          => $item->jam->jam_ke ?? '',
+                    'jam_awal'        => $item->jam->jam_awal ?? '',
+                    'jam_akhir'       => $item->jam->jam_akhir ?? '',
+                    'id_jam'          => $item->id_jam,
+                    'id_mapel'          => $item->jadwal?->id_mapel ?? '',
+
+                    
+   
+                    'tahun_ajaran'    => $item->jadwal->tahun->thn_ajaran ?? '',
+
+                    'semester'        => $item->jadwal?->semester == 1
+                        ? 'Ganjil'
+                        : 'Genap',
+
+                    'angkatan'       => $item->jadwal->angkatan ?? '',
+
+                    'nama_kelas'     => trim(
+                        ($item->jadwal?->nkelas ?? '') . ' ' .
+                        ($item->jadwal?->kelas?->nama_kelas ?? '')
+                    ),
+
+                    'nama_mapel'     => $item->jadwal?->mapel?->nama_mapel ?? '',
+
+                    'nama_gtk'       => $item->jadwal?->guru?->nama_gtk ?? '',
+
+                    'id_gtk'       => $item->jadwal?->id_gtk ?? '',
+
+                    'jml_jam'        => $item->jadwal?->jml_jam ?? '',
+                ];
+            });
+
+        return response()->json($data);
+    }
    
 
     public function store(Request $request)
@@ -531,6 +691,8 @@ class MasterJadwalController extends Controller
                     ->where('id_jam', $row['id_jam'])
                     ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt,$row) {
                         $q->where('id_gtk', $row['id_gtk']);
+
+                        $q->where('id_tahun', $row['id_tahun']);
                       //  $q->where('id_kelas', $row['id_kelas']);
                         $q->where('semester', $smt);
                     })
