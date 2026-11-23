@@ -3,14 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class KatItemBayar extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'tb_kat_itembayar';
 
     protected $fillable = [
         'nama_kategori'
     ];
 
- //   public $timestamps = false;
+    // protected $primaryKey = 'id';
+    // public $timestamps = false;
 }

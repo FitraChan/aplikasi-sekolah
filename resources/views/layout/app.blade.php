@@ -267,6 +267,291 @@
       
     </style>
 
+    <style>
+    /* Container */
+    .btn-detail-siswa {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        border: 1px solid #bae6fd;
+        background: linear-gradient(135deg, #eff6ff, #ecfeff);
+        color: #0284c7;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+    .btn-detail-siswa:hover {
+        background: #0284c7;
+        border-color: #0284c7;
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(2, 132, 199, .2);
+        transform: translateY(-1px);
+    }
+
+    .btn-detail-siswa svg {
+        width: 14px;
+        height: 14px;
+        stroke-width: 2.2;
+    }
+    #tableBayar {
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+    }
+
+    /* Tabulator */
+    #tableBayar .tabulator {
+        border: none;
+        background: #fff;
+        font-size: 12px;
+    }
+
+    /* Header */
+    #tableBayar .tabulator-header {
+        background: linear-gradient(135deg, #ecfeff, #eff6ff);
+        border-bottom: 1px solid #dbeafe;
+    }
+
+    #tableBayar .tabulator-col {
+        background: transparent;
+        border-right: none;
+    }
+
+    #tableBayar .tabulator-col-title {
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    /* Row */
+    #tableBayar .tabulator-row {
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background .2s ease;
+    }
+
+    #tableBayar .tabulator-row:hover {
+        background: #f0fdfa !important;
+    }
+
+    #tableBayar .tabulator-row.tabulator-selected {
+        background: #ccfbf1 !important;
+        border-left: 3px solid #0d9488;
+    }
+
+    /* Cell */
+    #tableBayar .tabulator-cell {
+        border-right: none;
+        padding: 12px;
+        color: #475569;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.5;
+    }
+
+    /* Nomor */
+    #tableBayar .col-number {
+        color: #94a3b8;
+        font-weight: 700;
+    }
+
+    /* NIPD */
+    #tableBayar .siswa-nipd {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 7px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    /* Nama */
+    #tableBayar .siswa-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #tableBayar .siswa-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #ccfbf1, #dbeafe);
+        color: #0f766e;
+    }
+
+    #tableBayar .siswa-avatar svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    #tableBayar .siswa-name-text {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 12px;
+    }
+
+    /* Kelas */
+    #tableBayar .siswa-kelas {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #fef3c7;
+        color: #b45309;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    #tableBayar .siswa-kelas svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    /* Tahun */
+    #tableBayar .siswa-tahun {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        border-radius: 7px;
+        background: #f0fdf4;
+        color: #15803d;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    #tableBayar .siswa-tahun svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    /* Pagination */
+    #tableBayar .tabulator-footer {
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .detail-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #f0fdfa, #f8fafc);
+        border: 1px solid #ccfbf1;
+        border-radius: 10px;
+    }
+
+    .detail-title-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        background: #ccfbf1;
+        color: #0f766e;
+    }
+
+    .detail-title-text {
+        font-size: 13px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .detail-title-sub {
+        margin-top: 3px;
+        font-size: 11px;
+        color: #94a3b8;
+    }
+
+    .detail-table {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    /* Container */
+    #tableHistoryBayar {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    /* Tabulator */
+    #tableHistoryBayar .tabulator {
+        border: none;
+        background: #fff;
+        font-size: 12px;
+    }
+
+    /* Header */
+    #tableHistoryBayar .tabulator-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        color: #64748b;
+        font-weight: 700;
+    }
+
+    /* Row */
+    #tableHistoryBayar .tabulator-row {
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
+        flex-wrap: nowrap;
+    }
+
+    #tableHistoryBayar .tabulator-row:hover {
+        background: #f8fafc;
+    }
+
+    /* Cell */
+    #tableHistoryBayar .tabulator-cell {
+        border-right: none;
+        padding: 14px 12px;
+        color: #475569;
+        white-space: nowrap;
+    }
+
+    /* Header cell */
+    #tableHistoryBayar .tabulator-col {
+        background: transparent;
+        border-right: none;
+    }
+
+    /* Horizontal scroll */
+    #tableHistoryBayar .tabulator-tableholder {
+        overflow-x: auto !important;
+    }
+
+    /* Detail */
+    #tableHistoryBayar .detail-holder {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 16px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+    }
+</style>
+
     @stack('styles')
 </head>
 

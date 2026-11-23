@@ -31,7 +31,9 @@ class Bayar extends Model
         'bukti_bayar',
         'tot_kwajiban',
         'payment_id',
-        'via',
+        'via', // bank penerima
+        'bank_pengirim',
+        'bank_penerima',
         'sts_trans',
         'id_tmp_bayar',
     ];
@@ -112,5 +114,32 @@ class Bayar extends Model
             ->update([
                 'tot_kwajiban' => $total
             ]);
+    }
+
+    public function bankPenerima()
+    {
+        return $this->belongsTo(
+            Bank::class,
+            'bank_penerima',
+            'id'
+        );
+    }
+
+    public function bankPengirim()
+    {
+        return $this->belongsTo(
+            Bank::class,
+            'bank_pengirim',
+            'id'
+        );
+    }
+
+    public function statusTransaksi()
+    {
+        return $this->belongsTo(
+            StatusTransaksi::class,
+            'sts_trans',
+            'id'
+        );
     }
 }

@@ -19,26 +19,39 @@
                        px-6 py-5"
             >
 
-                <div class="flex items-center gap-3">
+                  {{-- INFORMASI KARTU UJIAN --}}
+<div class="mt-4 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
 
-                    <div
-                        class="flex h-10 w-10 items-center justify-center
-                               rounded-xl bg-emerald-50 text-emerald-600"
-                    >
-                        <i data-lucide="credit-card" class="w-5 h-5"></i>
-                    </div>
+    <div class="mt-0.5 shrink-0 text-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M12 22a10 10 0 110-20 10 10 0 010 20z" />
+        </svg>
+    </div>
 
-                    <div>
-                        <h2 class="text-base font-semibold text-slate-800">
-                            Input Pembayaran Cicilan
-                        </h2>
+    <div>
+        <h3 class="text-sm font-bold text-blue-800">
+            Informasi Kartu Ujian
+        </h3>
 
-                        <p class="mt-0.5 text-xs text-slate-500">
-                            Masukkan detail pembayaran cicilan siswa.
-                        </p>
-                    </div>
+        <p class="text-xs sm:text-sm text-blue-700 mt-1 leading-relaxed">
+            Setelah pembayaran pendaftaran berhasil dilakukan dan diverifikasi,
+            kartu ujian akan dikirimkan ke alamat email (Gmail) yang telah
+            didaftarkan. 
+        </p>
+    </div>
 
-                </div>
+</div>
+
+                
+
+                
 
             </div>
 

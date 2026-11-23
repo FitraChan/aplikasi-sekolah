@@ -65,112 +65,132 @@
 
     function initTableSiswa() {
 
-        tableSiswa = new Tabulator(
-            "#tableBayar",
-            {
+        tableSiswa = new Tabulator("#tableBayar", {
 
-                ajaxURL:
-                    "{{ route('bayar.data') }}",
+            ajaxURL: "{{ route('bayar.data') }}",
 
-                selectableRows: 1,
+            selectableRows: 1,
 
-                pagination: true,
+            pagination: true,
+            paginationSize: 10,
 
-                paginationSize: 10,
+            layout: "fitColumns",
 
-                layout: "fitDataStretch",
+            responsiveLayout: false,
 
-                columns: [
+            columns: [
 
-                    {
-                        title: "No",
-                        formatter: "rownum",
-                        width: 60
-                    },
+                {
+                    title: "No",
+                    formatter: "rownum",
+                    width: 65,
+                    hozAlign: "center",
+                    headerSort: false,
+                    cssClass: "col-number"
+                },
 
-                    {
-                        title: "NIPD",
-                        field: "nipd"
-                    },
+                {
+                    title: "NIPD",
+                    field: "nipd",
+                    minWidth: 110,
 
-                    {
-                        title: "Nama",
-                        field: "nama_lengkap",
-                         width: 150
-                    },
-
-                    {
-                        title: "Kelas",
-                        field: "kelas.nama_kelas",
-                         width: 100
-
-                    },
-
-                    // {
-                    //     title: "Jurusan",
-                    //     field: "jurusan.nama_jurusan"
-                    // },
-
-                    {
-                        title: "Tahun",
-                        field: "tahun_ajaran.thn_ajaran",
-                        
+                    formatter: function(cell) {
+                        return `
+                        <span class="siswa-nipd">
+                            ${cell.getValue() ?? '-'}
+                        </span>
+                    `;
                     }
+                },
 
-                ]
+                {
+                    title: "Nama Siswa",
+                    field: "nama_lengkap",
+                    minWidth: 180,
+                    variableHeight: true,
 
+                    formatter: function(cell) {
+                        return `
+                        <div class="siswa-name">
+                            <div class="siswa-avatar">
+                                <i data-lucide="user-round"></i>
+                            </div>
+                            <div class="siswa-name-text">
+                                ${cell.getValue() ?? '-'}
+                            </div>
+                        </div>
+                    `;
+                    }
+                },
+
+                {
+                    title: "Kelas",
+                    field: "kelas.nama_kelas",
+                    minWidth: 110,
+
+                    formatter: function(cell) {
+                        return `
+                        <span class="siswa-kelas">
+                            <i data-lucide="graduation-cap"></i>
+                            ${cell.getValue() ?? '-'}
+                        </span>
+                    `;
+                    }
+                },
+
+                {
+                    title: "Tahun Ajaran",
+                    field: "tahun_ajaran.thn_ajaran",
+                    minWidth: 130,
+
+                    formatter: function(cell) {
+                        return `
+                        <span class="siswa-tahun">
+                            <i data-lucide="calendar-days"></i>
+                            ${cell.getValue() ?? '-'}
+                        </span>
+                    `;
+                    }
+                }
+
+            ],
+
+            rowFormatter: function(row) {
+                row.getElement().style.cursor = "pointer";
             }
-        );
+
+        });
 
 
-        tableSiswa.on(
-            "rowClick",
-            function(e, row) {
+        tableSiswa.on("rowClick", function(e, row) {
 
-                const data =
-                    row.getData();
+            const data = row.getData();
 
+            console.log('data', data.nipd);
 
-                console.log(
-                    'data',
-                    data.nipd
-                );
+            document.getElementById('nipd_detail').value =
+                data.nipd ?? '';
 
+            document.getElementById('nama_siswa_detail').value =
+                data.nama_lengkap ?? '';
 
-                document.getElementById(
-                    'nipd_detail'
-                ).value =
-                    data.nipd ?? '';
+            document.getElementById('jurusan_siswa_detail').value =
+                data.jurusan?.nama_jurusan ?? '';
 
+            document.getElementById('nipd').value =
+                data.nipd ?? '';
 
-                document.getElementById(
-                    'nama_siswa_detail'
-                ).value =
-                    data.nama_lengkap ?? '';
+            selectedSiswaId = data.nipd ?? null;
 
+            showDetail(data.nipd);
 
-                document.getElementById(
-                    'jurusan_siswa_detail'
-                ).value =
-                    data.jurusan?.nama_jurusan ?? '';
+        });
 
-
-                document.getElementById(
-                    'nipd'
-                ).value =
-                    data.nipd ?? '';
-
-
-                selectedSiswaId =
-                    data.nipd ?? null;
-
-
-                showDetail(
-                    data.nipd
-                );
-
+        tableSiswa.on("tableBuilt", function() {
+            if (window.lucide) {
+                lucide.createIcons();
             }
-        );
+        });
 
     }
 
@@ -181,50 +201,60 @@
 
     function initTableHistory() {
 
-        tableDetail = new Tabulator(
-            "#tableHistoryBayar",
-            {
+        const formatRupiah = function(value) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(value || 0);
+        };
 
-                layout: "fitDataStretch",
+
+        /*
+        |--------------------------------------------------------------------------
+        | TABEL HISTORY PEMBAYARAN
+        |--------------------------------------------------------------------------
+        */
+
+        tableDetail = new Tabulator(
+            "#tableHistoryBayar", {
+
+                layout: "fitData",
 
                 height: "500px",
 
                 selectableRows: 1,
 
+                placeholder: "Belum ada riwayat pembayaran",
+
+                columnHeaderVertAlign: "middle",
 
                 rowHeader: {
 
                     formatter: function(cell) {
 
                         return `
-                            <span
-                                style="font-size:18px">
-                                +
-                            </span>
-                        `;
+                        <span class="history-expand-btn">
+                            +
+                        </span>
+                    `;
 
                     },
 
-
-                    width: 50,
+                    width: 45,
 
                     hozAlign: "center",
 
+                    headerSort: false,
 
                     cellClick: function(e, cell) {
 
-                        let row =
-                            cell.getRow();
+                        let row = cell.getRow();
 
-                        let data =
-                            row.getData();
+                        let data = row.getData();
 
-
-                        let holder =
-                            row.getElement()
-                               .querySelector(
-                                   ".detail-holder"
-                               );
+                        let holder = row.getElement()
+                            .querySelector(".detail-holder");
 
 
                         /*
@@ -237,16 +267,13 @@
 
                             holder.remove();
 
-                            cell.getElement()
-                                .innerHTML = `
-                                    <span
-                                        style="font-size:18px">
-                                        +
-                                    </span>
-                                `;
+                            cell.getElement().innerHTML = `
+                            <span class="history-expand-btn">
+                                +
+                            </span>
+                        `;
 
                             return;
-
                         }
 
 
@@ -256,45 +283,35 @@
                         |--------------------------------------------------------------------------
                         */
 
-                        let detailDiv =
-                            document.createElement(
-                                "div"
-                            );
+                        let detailDiv = document.createElement("div");
+
+                        detailDiv.classList.add("detail-holder");
 
 
-                        detailDiv.classList.add(
-                            "detail-holder"
-                        );
+                        detailDiv.innerHTML = `
+                        <div class="detail-title">
+                            <span class="detail-title-icon">
+                                <i data-lucide="receipt-text"></i>
+                            </span>
+                            <div>
+                                <div class="detail-title-text">Rincian Item Pembayaran</div>
+                                <div class="detail-title-sub">Detail komponen transaksi</div>
+                            </div>
+                        </div>
+                        <div class="detail-table"></div>
+                    `;
+
+                        row.getElement().appendChild(detailDiv);
 
 
-                        detailDiv.style.padding =
-                            "10px";
+                        cell.getElement().innerHTML = `
+                        <span class="history-expand-btn">
+                            −
+                        </span>
+                    `;
 
 
-                        let tableDiv =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        detailDiv.appendChild(
-                            tableDiv
-                        );
-
-
-                        row.getElement()
-                           .appendChild(
-                               detailDiv
-                           );
-
-
-                        cell.getElement()
-                            .innerHTML = `
-                                <span
-                                    style="font-size:18px">
-                                    -
-                                </span>
-                            `;
+                        let tableDiv = detailDiv.querySelector(".detail-table");
 
 
                         /*
@@ -304,123 +321,73 @@
                         */
 
                         new Tabulator(
-                            tableDiv,
-                            {
+                            tableDiv, {
 
-                                ajaxURL:
-                                    "{{ url('/bayar/detailBayar') }}/" +
-                                    data.id,
+                                ajaxURL: "{{ url('/bayar/detailBayar') }}/" + data.id,
 
-                                layout:
-                                    "fitColumns",
+                                layout: "fitData",
 
-                                placeholder:
-                                    "Tidak ada detail pembayaran",
-
+                                placeholder: "Tidak ada detail pembayaran",
 
                                 columns: [
 
                                     {
-                                        title:
-                                            "Item Bayar",
+                                        title: "Item Pembayaran",
+                                        field: "nama_item",
+                                        minWidth: 180,
+                                        formatter: function(cell) {
 
-                                        field:
-                                            "nama_item"
+                                            return `
+                                            <span class="font-semibold text-slate-700">
+                                                ${cell.getValue() || '-'}
+                                            </span>
+                                        `;
 
+                                        }
                                     },
 
-
                                     {
-                                        title:
-                                            "Kewajiban",
+                                        title: "Kewajiban",
+                                        field: "kwajiban_bayar",
+                                        hozAlign: "right",
+                                        formatter: function(cell) {
 
-                                        field:
-                                            "kwajiban_bayar",
+                                            return formatRupiah(cell.getValue());
 
-                                        formatter:
-                                            function(cell) {
-
-                                                return new Intl.NumberFormat(
-                                                    'id-ID',
-                                                    {
-                                                        style:
-                                                            'currency',
-
-                                                        currency:
-                                                            'IDR',
-
-                                                        minimumFractionDigits:
-                                                            0
-                                                    }
-                                                ).format(
-                                                    cell.getValue() || 0
-                                                );
-
-                                            }
-
+                                        }
                                     },
 
-
                                     {
-                                        title:
-                                            "Potongan",
+                                        title: "Potongan",
+                                        field: "potongan",
+                                        hozAlign: "right",
+                                        formatter: function(cell) {
 
-                                        field:
-                                            "potongan",
+                                            return `
+                                            <span class="text-rose-600">
+                                                ${formatRupiah(cell.getValue())}
+                                            </span>
+                                        `;
 
-                                        formatter:
-                                            function(cell) {
-
-                                                return new Intl.NumberFormat(
-                                                    'id-ID',
-                                                    {
-                                                        style:
-                                                            'currency',
-
-                                                        currency:
-                                                            'IDR',
-
-                                                        minimumFractionDigits:
-                                                            0
-                                                    }
-                                                ).format(
-                                                    cell.getValue() || 0
-                                                );
-
-                                            }
-
+                                        }
                                     },
 
-
                                     {
-                                        title:
-                                            "Jumlah Bayar",
+                                        title: "Jumlah Bayar",
+                                        field: "jml_bayar",
+                                        hozAlign: "right",
+                                        formatter: function(cell) {
 
-                                        field:
-                                            "jml_bayar",
+                                            return `
+                                            <span class="font-bold text-emerald-600">
+                                                ${formatRupiah(cell.getValue())}
+                                            </span>
+                                        `;
 
-                                        formatter:
-                                            function(cell) {
-
-                                                return new Intl.NumberFormat(
-                                                    'id-ID',
-                                                    {
-                                                        style:
-                                                            'currency',
-
-                                                        currency:
-                                                            'IDR',
-
-                                                        minimumFractionDigits:
-                                                            0
-                                                    }
-                                                ).format(
-                                                    cell.getValue() || 0
-                                                );
-
-                                            }
-
+                                        }
                                     }
+
+
 
                                 ]
 
@@ -432,137 +399,163 @@
                 },
 
 
+                /*
+                |--------------------------------------------------------------------------
+                | KOLOM UTAMA
+                |--------------------------------------------------------------------------
+                */
+
                 columns: [
 
                     {
                         title: "No",
                         formatter: "rownum",
-                        width: 60,
-                        hozAlign: "center"
+                        width: 55,
+                        hozAlign: "center",
+                        headerSort: false
                     },
-
 
                     {
                         title: "Tahun",
-                        field: "tahun_ajaran"
+                        field: "tahun_ajaran",
+                        minWidth: 50
                     },
-
 
                     {
                         title: "Bulan",
-                        field: "bulan"
+                        field: "bulan",
+                        minWidth: 100
                     },
 
+                    {
+                        title: "Status",
+                        field: "status",
+                        minWidth: 150,
+
+                        formatter: function(cell) {
+                            const status = cell.getValue();
+
+                            let color = "bg-slate-100 text-slate-600";
+                            let dot = "bg-slate-400";
+
+                            if (status === "Menunggu Konfirmasi") {
+                                color = "bg-amber-50 text-amber-700";
+                                dot = "bg-amber-500";
+                            } else if (status === "Lunas") {
+                                color = "bg-emerald-50 text-emerald-700";
+                                dot = "bg-emerald-500";
+                            } else if (status === "Belum Lunas") {
+                                color = "bg-red-50 text-red-700";
+                                dot = "bg-red-500";
+                            }
+
+                            return `
+                                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${color}">
+                                            <span class="w-1.5 h-1.5 rounded-full ${dot}"></span>
+                                            ${status ?? '-'}
+                                        </span>
+                                    `;
+                        }
+                    },
 
                     {
-                        title: "Tanggal Bayar",
+                        title: "Tgl Bayar",
                         field: "tgl_bayar",
+                        minWidth: 125,
 
-                        formatter:
-                            function(cell) {
+                        formatter: function(cell) {
 
-                                let value =
-                                    cell.getValue();
+                            let value = cell.getValue();
 
+                            if (!value) return "-";
 
-                                if (!value) {
-                                    return "";
-                                }
+                            let date = new Date(value);
 
+                            if (isNaN(date.getTime())) return "-";
 
-                                let date =
-                                    new Date(value);
+                            return `
+                            <span class="font-medium text-slate-700">
+                                ${String(date.getDate()).padStart(2, '0')}-
+                                ${String(date.getMonth() + 1).padStart(2, '0')}-
+                                ${date.getFullYear()}
+                            </span>
+                        `;
 
-
-                                return String(
-                                    date.getDate()
-                                ).padStart(2, '0') +
-
-                                "-" +
-
-                                String(
-                                    date.getMonth() + 1
-                                ).padStart(2, '0') +
-
-                                "-" +
-
-                                date.getFullYear();
-
-                            }
+                        }
 
                     },
 
-
                     {
-                        title: "Total Bayar",
-
+                        title: "Tot Bayar",
                         field: "tot_bayar",
-
                         hozAlign: "right",
+                        minWidth: 145,
 
-                        formatter:
-                            function(cell) {
+                        formatter: function(cell) {
 
-                                return new Intl.NumberFormat(
-                                    'id-ID',
-                                    {
-                                        style:
-                                            'currency',
+                            return `
+                            <span class="font-bold text-emerald-600">
+                                ${formatRupiah(cell.getValue())}
+                            </span>
+                        `;
 
-                                        currency:
-                                            'IDR',
-
-                                        minimumFractionDigits:
-                                            0
-                                    }
-                                ).format(
-                                    cell.getValue() || 0
-                                );
-
-                            }
+                        }
 
                     },
 
-
                     {
-                        title: "Total Kewajiban",
-
+                        title: "Tot Kewajiban",
                         field: "tot_kwajiban",
-
                         hozAlign: "right",
+                        minWidth: 155,
 
-                        formatter:
-                            function(cell) {
+                        formatter: function(cell) {
 
-                                return new Intl.NumberFormat(
-                                    'id-ID',
-                                    {
-                                        style:
-                                            'currency',
+                            return `
+                            <span class="font-semibold text-slate-800">
+                                ${formatRupiah(cell.getValue())}
+                            </span>
+                        `;
 
-                                        currency:
-                                            'IDR',
-
-                                        minimumFractionDigits:
-                                            0
-                                    }
-                                ).format(
-                                    cell.getValue() || 0
-                                );
-
-                            }
+                        }
 
                     },
 
-
                     {
-                        title: "Keterangan",
+                        title: "Aksi",
+                        width: 110,
+                        hozAlign: "center",
+                        headerSort: false,
 
-                        field: "keterangan",
+                        formatter: function(cell) {
+                            let data = cell.getData();
 
-                        width: 250
+                            return `
+                                <div class="flex items-center justify-center">
+                                    <button
+                                        type="button"
+                                        class="btn-detail-siswa"
+                                        title="Lihat Detail">
+
+                                        <i data-lucide="eye"></i>
+                                        <span>Detail</span>
+
+                                    </button>
+                                </div>
+                            `;
+                        },
+
+                        cellClick: function(e, cell) {
+                            if (!e.target.closest('.btn-detail-siswa')) return;
+
+                            let data = cell.getData();
+
+                            let url = "{{ route('detailVerifikasi', ':id') }}";
+                            url = url.replace(':id', data.id);
+
+                            window.open(url, '_blank');
+                        }
                     }
-
                 ]
 
             }
@@ -571,7 +564,7 @@
 
         /*
         |--------------------------------------------------------------------------
-        | PILIH HISTORY
+        | PILIH HISTORY PEMBAYARAN
         |--------------------------------------------------------------------------
         */
 
@@ -579,19 +572,9 @@
             "rowClick",
             function(e, row) {
 
-                let data =
-                    row.getData();
+                let data = row.getData();
 
-
-                console.log(
-                    data.id
-                );
-
-
-                document.getElementById(
-                    'id_bayar'
-                ).value =
-                    data.id;
+                document.getElementById('id_bayar').value = data.id;
 
             }
         );
@@ -836,46 +819,38 @@
 
             const response =
                 await fetch(
-                    url,
-                    {
+                    url, {
 
                         method: 'POST',
 
                         headers: {
 
-                            'Content-Type':
-                                'application/json',
+                            'Content-Type': 'application/json',
 
-                            'X-CSRF-TOKEN':
-                                document.querySelector(
-                                    'meta[name="csrf-token"]'
-                                ).content,
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]'
+                            ).content,
 
-                            'Accept':
-                                'application/json'
+                            'Accept': 'application/json'
 
                         },
 
 
-                        body:
-                            JSON.stringify({
+                        body: JSON.stringify({
 
-                                tgl_bayar:
-                                    document.getElementById(
-                                        'tgl_bayar'
-                                    ).value,
+                            tgl_bayar: document.getElementById(
+                                'tgl_bayar'
+                            ).value,
 
-                                no_kwitansi:
-                                    document.getElementById(
-                                        'no_kwitansi'
-                                    ).value,
+                            no_kwitansi: document.getElementById(
+                                'no_kwitansi'
+                            ).value,
 
-                                keterangan:
-                                    document.getElementById(
-                                        'keterangan'
-                                    ).value
+                            keterangan: document.getElementById(
+                                'keterangan'
+                            ).value
 
-                            })
+                        })
 
                     }
                 );
@@ -887,16 +862,12 @@
 
             Swal.fire({
 
-                icon:
-                    result.success
-                        ? "success"
-                        : "error",
+                icon: result.success ?
+                    "success" : "error",
 
-                title:
-                    result.title,
+                title: result.title,
 
-                text:
-                    result.msg
+                text: result.msg
 
             });
 
@@ -923,8 +894,7 @@
 
                 title: "Error",
 
-                text:
-                    "Terjadi kesalahan saat menyimpan pembayaran"
+                text: "Terjadi kesalahan saat menyimpan pembayaran"
 
             });
 
@@ -945,309 +915,301 @@
        SAVE CICILAN
     ========================================================== */
 
-   async function saveCicilan() {
+    async function saveCicilan() {
 
-    const button =
-        document.getElementById(
-            'btn-save-cicilan'
-        );
-
-    const buttonText =
-        document.getElementById(
-            'text-save-cicilan'
-        );
-
-    const originalText =
-        buttonText.innerHTML;
-
-    button.disabled = true;
-
-    buttonText.innerHTML =
-        'Tunggu sebentar...';
-
-
-    try {
-
-        /*
-        |--------------------------------------------------------------------------
-        | FORM DATA
-        |--------------------------------------------------------------------------
-        */
-
-        const formData =
-            new FormData();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATA SISWA
-        |--------------------------------------------------------------------------
-        */
-
-        formData.append(
-            'id_csiswa',
+        const button =
             document.getElementById(
-                'nipd'
-            ).value
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DATA PEMBAYARAN
-        |--------------------------------------------------------------------------
-        */
-
-        formData.append(
-            'tgl_bayar',
-            document.getElementById(
-                'tgl_bayar'
-            ).value
-        );
-
-        formData.append(
-            'no_kwitansi',
-            document.getElementById(
-                'no_kwitansi'
-            ).value
-        );
-
-        formData.append(
-            'keterangan',
-            document.getElementById(
-                'keterangan'
-            ).value
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | JUMLAH PEMBAYARAN
-        |--------------------------------------------------------------------------
-        */
-
-        formData.append(
-            'jml_dpp',
-            document.getElementById(
-                'jml_dpp'
-            ).value || 0
-        );
-
-        formData.append(
-            'jml_seragam',
-            document.getElementById(
-                'jml_seragam'
-            ).value || 0
-        );
-
-        formData.append(
-            'jml_spp',
-            document.getElementById(
-                'jml_spp'
-            ).value || 0
-        );
-
-        formData.append(
-            'jml_tabungan',
-            document.getElementById(
-                'jml_tabungan'
-            ).value || 0
-        );
-
-        formData.append(
-            'jml_osis',
-            document.getElementById(
-                'jml_osis'
-            ).value || 0
-        );
-
-        formData.append(
-            'jml_lain',
-            document.getElementById(
-                'jml_lain'
-            )?.value || 0
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | UPLOAD BUKTI BAYAR
-        |--------------------------------------------------------------------------
-        */
-
-        const fileInput =
-            document.getElementById(
-                'bukti_bayar_cicilan'
+                'btn-save-cicilan'
             );
 
-        if (
-            fileInput &&
-            fileInput.files &&
-            fileInput.files.length > 0
-        ) {
+        const buttonText =
+            document.getElementById(
+                'text-save-cicilan'
+            );
+
+        const originalText =
+            buttonText.innerHTML;
+
+        button.disabled = true;
+
+        buttonText.innerHTML =
+            'Tunggu sebentar...';
+
+
+        try {
+
+            /*
+            |--------------------------------------------------------------------------
+            | FORM DATA
+            |--------------------------------------------------------------------------
+            */
+
+            const formData =
+                new FormData();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DATA SISWA
+            |--------------------------------------------------------------------------
+            */
 
             formData.append(
-                'bukti_bayar',
-                fileInput.files[0]
+                'id_csiswa',
+                document.getElementById(
+                    'nipd'
+                ).value
             );
 
-        }
+
+            /*
+            |--------------------------------------------------------------------------
+            | DATA PEMBAYARAN
+            |--------------------------------------------------------------------------
+            */
+
+            formData.append(
+                'tgl_bayar',
+                document.getElementById(
+                    'tgl_bayar'
+                ).value
+            );
+
+            formData.append(
+                'no_kwitansi',
+                document.getElementById(
+                    'no_kwitansi'
+                ).value
+            );
+
+            formData.append(
+                'keterangan',
+                document.getElementById(
+                    'keterangan'
+                ).value
+            );
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | REQUEST
-        |--------------------------------------------------------------------------
-        */
+            /*
+            |--------------------------------------------------------------------------
+            | JUMLAH PEMBAYARAN
+            |--------------------------------------------------------------------------
+            */
 
-        const response =
-            await fetch(
-                '{{ route("bayar.simpanCicilan") }}',
-                {
+            formData.append(
+                'jml_dpp',
+                document.getElementById(
+                    'jml_dpp'
+                ).value || 0
+            );
 
-                    method: 'POST',
+            formData.append(
+                'jml_seragam',
+                document.getElementById(
+                    'jml_seragam'
+                ).value || 0
+            );
 
-                    headers: {
+            formData.append(
+                'jml_spp',
+                document.getElementById(
+                    'jml_spp'
+                ).value || 0
+            );
 
-                        'X-CSRF-TOKEN':
-                            document.querySelector(
+            formData.append(
+                'jml_tabungan',
+                document.getElementById(
+                    'jml_tabungan'
+                ).value || 0
+            );
+
+            formData.append(
+                'jml_osis',
+                document.getElementById(
+                    'jml_osis'
+                ).value || 0
+            );
+
+            formData.append(
+                'jml_lain',
+                document.getElementById(
+                    'jml_lain'
+                )?.value || 0
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPLOAD BUKTI BAYAR
+            |--------------------------------------------------------------------------
+            */
+
+            const fileInput =
+                document.getElementById(
+                    'bukti_bayar_cicilan'
+                );
+
+            if (
+                fileInput &&
+                fileInput.files &&
+                fileInput.files.length > 0
+            ) {
+
+                formData.append(
+                    'bukti_bayar',
+                    fileInput.files[0]
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | REQUEST
+            |--------------------------------------------------------------------------
+            */
+
+            const response =
+                await fetch(
+                    '{{ route("bayar.simpanCicilan") }}', {
+
+                        method: 'POST',
+
+                        headers: {
+
+                            'X-CSRF-TOKEN': document.querySelector(
                                 'meta[name="csrf-token"]'
                             ).getAttribute(
                                 'content'
                             ),
 
-                        'Accept':
-                            'application/json'
+                            'Accept': 'application/json'
 
-                    },
+                        },
 
-                    body: formData
+                        body: formData
+
+                    }
+                );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RESPONSE
+            |--------------------------------------------------------------------------
+            */
+
+            const result =
+                await response.json();
+
+
+            if (result.success) {
+
+                Swal.fire({
+
+                    icon: 'success',
+
+                    title: result.title,
+
+                    text: result.msg
+
+                });
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | TUTUP MODAL
+                |--------------------------------------------------------------------------
+                */
+
+                closeModalCicilan();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | REFRESH TABLE
+                |--------------------------------------------------------------------------
+                */
+
+                tableDetail.replaceData();
+
+                window.tableHistoryDetail.replaceData();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | RESET FILE
+                |--------------------------------------------------------------------------
+                */
+
+                if (fileInput) {
+
+                    fileInput.value = '';
 
                 }
+
+
+                const namaFile =
+                    document.getElementById(
+                        'nama-file-bukti-cicilan'
+                    );
+
+                if (namaFile) {
+
+                    namaFile.textContent = '';
+
+                    namaFile.classList.add(
+                        'hidden'
+                    );
+
+                }
+
+
+            } else {
+
+                Swal.fire({
+
+                    icon: 'error',
+
+                    title: result.title,
+
+                    text: result.msg
+
+                });
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                error
             );
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RESPONSE
-        |--------------------------------------------------------------------------
-        */
-
-        const result =
-            await response.json();
-
-
-        if (result.success) {
-
-            Swal.fire({
-
-                icon: 'success',
-
-                title:
-                    result.title,
-
-                text:
-                    result.msg
-
-            });
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TUTUP MODAL
-            |--------------------------------------------------------------------------
-            */
-
-            closeModalCicilan();
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | REFRESH TABLE
-            |--------------------------------------------------------------------------
-            */
-
-            tableDetail.replaceData();
-
-             window.tableHistoryDetail.replaceData();
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | RESET FILE
-            |--------------------------------------------------------------------------
-            */
-
-            if (fileInput) {
-
-                fileInput.value = '';
-
-            }
-
-
-            const namaFile =
-                document.getElementById(
-                    'nama-file-bukti-cicilan'
-                );
-
-            if (namaFile) {
-
-                namaFile.textContent = '';
-
-                namaFile.classList.add(
-                    'hidden'
-                );
-
-            }
-
-
-        } else {
 
             Swal.fire({
 
                 icon: 'error',
 
-                title:
-                    result.title,
+                title: 'Error',
 
-                text:
-                    result.msg
+                text: 'Terjadi kesalahan saat menyimpan data'
 
             });
 
+
+        } finally {
+
+            button.disabled =
+                false;
+
+            buttonText.innerHTML =
+                originalText;
+
         }
 
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        Swal.fire({
-
-            icon: 'error',
-
-            title: 'Error',
-
-            text:
-                'Terjadi kesalahan saat menyimpan data'
-
-        });
-
-
-    } finally {
-
-        button.disabled =
-            false;
-
-        buttonText.innerHTML =
-            originalText;
-
     }
-
-}
 
 
     /* =========================================================
@@ -1270,38 +1232,38 @@
 
             const idThnAjaran =
                 document
-                    .getElementById(
-                        'id_thn_ajaran'
-                    )
-                    .value
-                    .trim();
+                .getElementById(
+                    'id_thn_ajaran'
+                )
+                .value
+                .trim();
 
 
             const idJurusan =
                 document
-                    .getElementById(
-                        'id_jurusan'
-                    )
-                    .value
-                    .trim();
+                .getElementById(
+                    'id_jurusan'
+                )
+                .value
+                .trim();
 
 
             const idTahun =
                 document
-                    .getElementById(
-                        'id_tahun'
-                    )
-                    .value
-                    .trim();
+                .getElementById(
+                    'id_tahun'
+                )
+                .value
+                .trim();
 
 
             const idBulan =
                 document
-                    .getElementById(
-                        'id_bulan'
-                    )
-                    .value
-                    .trim();
+                .getElementById(
+                    'id_bulan'
+                )
+                .value
+                .trim();
 
 
             /*
@@ -1323,8 +1285,7 @@
 
                     title: "Peringatan",
 
-                    text:
-                        "Semua data wajib diisi."
+                    text: "Semua data wajib diisi."
 
                 });
 
@@ -1343,8 +1304,7 @@
 
                     title: "Peringatan",
 
-                    text:
-                        "Tahun harus terdiri dari 4 digit."
+                    text: "Tahun harus terdiri dari 4 digit."
 
                 });
 
@@ -1394,41 +1354,32 @@
 
             const response =
                 await fetch(
-                    "{{ route('bayar.setDefBulan') }}",
-                    {
+                    "{{ route('bayar.setDefBulan') }}", {
 
                         method: "POST",
 
                         headers: {
 
-                            "Content-Type":
-                                "application/json",
+                            "Content-Type": "application/json",
 
-                            "X-CSRF-TOKEN":
-                                "{{ csrf_token() }}",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
 
-                            "Accept":
-                                "application/json"
+                            "Accept": "application/json"
 
                         },
 
 
-                        body:
-                            JSON.stringify({
+                        body: JSON.stringify({
 
-                                id_thn_ajaran:
-                                    idThnAjaran,
+                            id_thn_ajaran: idThnAjaran,
 
-                                id_jurusan:
-                                    idJurusan,
+                            id_jurusan: idJurusan,
 
-                                id_tahun:
-                                    idTahun,
+                            id_tahun: idTahun,
 
-                                id_bulan:
-                                    idBulan
+                            id_bulan: idBulan
 
-                            })
+                        })
 
                     }
                 );
@@ -1455,11 +1406,9 @@
 
                     icon: "success",
 
-                    title:
-                        result.title,
+                    title: result.title,
 
-                    text:
-                        result.msg
+                    text: result.msg
 
                 });
 
@@ -1480,11 +1429,9 @@
 
                     icon: "error",
 
-                    title:
-                        result.title,
+                    title: result.title,
 
-                    text:
-                        result.msg
+                    text: result.msg
 
                 });
 
@@ -1504,8 +1451,7 @@
 
                 title: "Error",
 
-                text:
-                    error.message
+                text: error.message
 
             });
 
@@ -1530,28 +1476,26 @@
     function applyFilter() {
 
         tableSiswa.setData(
-            "{{ route('bayar.data') }}",
-            {
+            "{{ route('bayar.data') }}", {
 
-                tahun:
-                    document.getElementById(
-                        'filter_tahun'
-                    ).value,
+                tahun: document.getElementById(
+                    'filter_tahun'
+                ).value,
 
-                jurusan:
-                    document.getElementById(
-                        'filter_jurusan'
-                    ).value,
+                jurusan: document.getElementById(
+                    'filter_jurusan'
+                ).value,
 
-                kelas:
-                    document.getElementById(
-                        'filter_kelas'
-                    ).value,
+                kelas: document.getElementById(
+                    'filter_kelas'
+                ).value,
 
-                keyword:
-                    document.getElementById(
-                        'filter_keyword'
-                    ).value
+                keyword: document.getElementById(
+                    'filter_keyword'
+                ).value,
+                sts_trans: document.getElementById(
+                    'filter_sts_trans'
+                ).value,
 
             }
         );
@@ -1618,5 +1562,4 @@
         );
 
     }
-
 </script>

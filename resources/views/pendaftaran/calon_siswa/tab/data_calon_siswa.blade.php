@@ -4,6 +4,41 @@
 
     @csrf
 
+    {{-- WARNING VALIDASI --}}
+@if ($errors->any())
+<div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4">
+
+    <div class="flex items-start gap-3">
+
+        <div class="text-red-500 mt-0.5">
+            <svg class="w-5 h-5" fill="none"
+                 stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 9v4m0 4h.01M10.29 3.86
+                      L1.82 18a2 2 0 001.71 3h16.94
+                      a2 2 0 001.71-3L13.71 3.86
+                      a2 2 0 00-3.42 0z"/>
+            </svg>
+        </div>
+
+        <div>
+            <h4 class="text-sm font-bold text-red-700">
+                Periksa Kembali Data Anda!
+            </h4>
+
+            <ul class="mt-2 text-xs text-red-600 space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+
+    </div>
+</div>
+@endif
+
     <!-- INFORMASI PENDAFTARAN -->
     <section class="bg-white rounded-xl border border-slate-200/90 shadow-sm p-6">
 

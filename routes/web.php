@@ -214,6 +214,14 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
     Route::get('/bayar', [BayarController::class, 'index'])
         ->name('bayar.index');
 
+    Route::get('/updateStatusTransaksi/{id}', [BayarController::class, 'updateStatusTransaksi'])->name('updateStatusTransaksi');
+
+    Route::put('/updateStatusDanBayarTransaksi', [BayarController::class, 'updateStatusDanBayarTransaksi'])->name('updateStatusDanBayarTransaksi');
+
+
+    Route::get('/detailVerifikasi/{id}', [BayarController::class, 'detailVerifikasi'])
+        ->name('detailVerifikasi');
+
     Route::put('/bayar/{id}', [BayarController::class, 'update'])
         ->name('bayar.update');
 
@@ -946,7 +954,7 @@ Route::middleware(['auth', 'role:admin|Akademik|Pendaftaran|keuangan'])->group(f
     Route::delete('/calon-siswa/delete/{id}', [CalonSiswaController::class, 'destroy'])->name('calon-siswa.delete');
 
     Route::get('/daftarCalonSiswa', [CalonSiswaController::class, 'daftarCalonSiswa'])
-        ->name('daftarCalonSiswa');
+        ->name('daftarCalonSiswa'); //pendaftaran.calon_siswa.index
 
     Route::post(
         '/calon-siswa/save-daftar-siswa',
@@ -1062,15 +1070,18 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
         '/calon-siswa/update/registrasi/{id}',
         [CalonSiswaController::class, 'updateRegistrasi']
     )->name('calon-siswa.update.registrasi');
-    // Route::post(
-    //     '/calon-siswa/update-status/{id}',
-    //     [CalonSiswaController::class, 'updateStatus']
-    // )->name('calon-siswa.update-status');
+   
 
     Route::post('/calon-siswa/upload/{id}', [CalonSiswaController::class, 'updateUpload'])->name('calon-siswa.update.upload');
 
     Route::post('/calon-siswa/ipaymu', [BayarCalonSiswaController::class, 'ipaymu'])
         ->name('calon-siswa.ipaymu');
+
+
+    Route::get(
+        'kartu-test/{calonSiswa}/download',
+        [BayarCalonSiswaController::class, 'download']
+    )->name('kartuUjianTest.download');
 
 
 
@@ -1086,6 +1097,10 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
         [CalonSiswaController::class, 'pembayaran']
     )->name('calon-siswa.pembayaran');
 
+
+   
+    Route::get('ujianCalon/kartu/{id}', [CalonSiswaUjianController::class, 'downloadKartu'])
+    ->name('ujianCalon.kartu');
 
     Route::get(
         'ujianCalon',

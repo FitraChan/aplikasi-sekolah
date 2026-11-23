@@ -114,7 +114,6 @@
 
                             {{-- NIPD --}}
                             <div>
-
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">
                                     NIPD
                                     <span class="text-red-500">*</span>
@@ -123,27 +122,32 @@
                                 <input
                                     type="text"
                                     name="nipd"
-                                    value="{{ old('nipd', $rows->nipd ?? '') }}"
-                                    placeholder="Masukkan NIPD siswa"
+                                    value="{{ old('nipd', $nipd ?? $rows->nipd ?? '') }}"
+                                    placeholder="NIPD akan dibuat otomatis"
                                     required
+                                    readonly
                                     class="w-full rounded-xl border
                                         @error('nipd')
                                             border-red-400
                                         @else
                                             border-slate-200
                                         @enderror
-                                        bg-white px-4 py-2.5 text-sm text-slate-700
+                                        bg-slate-50 px-4 py-2.5 text-sm text-slate-700
                                         placeholder:text-slate-400
                                         focus:border-teal-500 focus:ring-2
                                         focus:ring-teal-500/20 outline-none
-                                        transition">
+                                        transition cursor-not-allowed">
+
+                                <div class="mt-1.5 text-xs text-slate-500">
+                                    <i class="fa fa-info-circle mr-1"></i>
+                                    NIPD dibuat otomatis berdasarkan nomor yang belum digunakan.
+                                </div>
 
                                 @error('nipd')
                                     <div class="mt-1.5 text-sm text-red-600">
                                         {{ $message }}
                                     </div>
                                 @enderror
-
                             </div>
 
 
@@ -196,6 +200,10 @@
                                 @enderror
 
                             </div>
+
+
+
+                            
 
 
                             {{-- JURUSAN --}}
@@ -420,6 +428,7 @@
 
                             </div>
 
+                             
 
                             {{-- NISN --}}
                             <div class="md:col-span-1.5">

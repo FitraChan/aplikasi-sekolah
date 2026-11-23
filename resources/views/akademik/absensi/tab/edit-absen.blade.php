@@ -1,188 +1,321 @@
-<div id="modal-edit-jadwal" class="modal" tabindex="-1" aria-hidden="true">
+{{-- MODAL EDIT MASTER JADWAL --}}
+<div id="modal-edit-jadwal"
+     class="fixed inset-0 z-50 hidden items-center justify-center
+            bg-slate-900/50 backdrop-blur-sm p-4"
+     aria-hidden="true">
 
-    <div class="modal-dialog modal-xl">
+    <div class="w-full max-w-3xl
+                max-h-[90vh] overflow-y-auto
+                rounded-2xl bg-white shadow-2xl">
 
-        <div class="modal-content">
+        {{-- MODAL HEADER --}}
+        <div class="flex items-center justify-between
+                    px-6 py-4
+                    border-b border-slate-200">
 
-            <div class="modal-header">
-                <h2 class="font-medium text-base mr-auto">
-                    Edit Master Jadwal
-                </h2>
+            <div class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-lg
+                            bg-teal-50 border border-teal-100
+                            flex items-center justify-center
+                            text-teal-600">
+
+                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
+
+                </div>
+
+                <div>
+
+                    <h3 class="text-lg font-semibold text-slate-900">
+                        Edit Master Jadwal
+                    </h3>
+
+                    <p class="text-xs text-slate-500">
+                        Perbarui informasi jadwal mata pelajaran.
+                    </p>
+
+                </div>
+
             </div>
 
-            <div class="modal-body grid grid-cols-12 gap-4 gap-y-3">
+            <button type="button"
+                    onclick="closeModalEditJadwal()"
+                    class="w-9 h-9 rounded-lg
+                           flex items-center justify-center
+                           text-slate-400
+                           hover:text-slate-600
+                           hover:bg-slate-100
+                           transition-colors">
 
-                <input
-                    type="hidden"
-                    id="edit_id">
+                <i data-lucide="x" class="w-5 h-5"></i>
 
-                <div class="col-span-12 sm:col-span-6">
+            </button>
 
-                    <label class="form-label">
+        </div>
+
+
+        {{-- MODAL BODY --}}
+        <div class="p-6 space-y-5">
+
+            <input type="hidden" id="edit_id">
+
+
+            {{-- TAHUN AJARAN & SEMESTER --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+
+                    <label for="edit_id_tahun"
+                           class="block text-sm font-semibold text-slate-700 mb-2">
                         Tahun Ajaran
+                        <span class="text-rose-500">*</span>
                     </label>
 
-                    <select
-                        id="edit_id_tahun"
-                        class="form-select">
+                    <select id="edit_id_tahun"
+                            class="w-full rounded-xl
+                                   border border-slate-300
+                                   bg-white
+                                   px-4 py-3
+                                   text-sm text-slate-800
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2 focus:ring-[#02BC9C]/20
+                                   outline-none transition">
 
-                        <option value="">
-                            Pilih Tahun Ajaran
-                        </option>
+                        <option value="">Pilih Tahun Ajaran</option>
 
                         @foreach($tahun as $item)
-
-                        <option value="{{ $item->id }}">
-                            {{ $item->thn_ajaran }}
-                        </option>
-
+                            <option value="{{ $item->id }}">
+                                {{ $item->thn_ajaran }}
+                            </option>
                         @endforeach
 
                     </select>
 
                 </div>
 
-                <div class="col-span-12 sm:col-span-6">
 
-                    <label class="form-label">
+                <div>
+
+                    <label for="edit_semester"
+                           class="block text-sm font-semibold text-slate-700 mb-2">
                         Semester
+                        <span class="text-rose-500">*</span>
                     </label>
 
-                    <select
-                        id="edit_semester"
-                        class="form-select">
+                    <select id="edit_semester"
+                            class="w-full rounded-xl
+                                   border border-slate-300
+                                   bg-white
+                                   px-4 py-3
+                                   text-sm text-slate-800
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2 focus:ring-[#02BC9C]/20
+                                   outline-none transition">
 
-                        <option value="1">
-                            Semester 1
-                        </option>
-
-                        <option value="2">
-                            Semester 2
-                        </option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
 
                     </select>
 
                 </div>
 
-                <div class="col-span-12 sm:col-span-6">
+            </div>
 
-                    <label class="form-label">
+
+            {{-- KELAS & MATA PELAJARAN --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div>
+
+                    <label for="edit_id_kelas"
+                           class="block text-sm font-semibold text-slate-700 mb-2">
                         Kelas
+                        <span class="text-rose-500">*</span>
                     </label>
 
-                    <select
-                        id="edit_id_kelas"
-                        class="form-select">
+                    <select id="edit_id_kelas"
+                            class="w-full rounded-xl
+                                   border border-slate-300
+                                   bg-white
+                                   px-4 py-3
+                                   text-sm text-slate-800
+                                   focus:border-[#02BC9C]
+                                   focus:ring-2 focus:ring-[#02BC9C]/20
+                                   outline-none transition">
 
-                        <option value="">
-                            Pilih Kelas
-                        </option>
+                        <option value="">Pilih Kelas</option>
 
                         @foreach($kelas as $item)
-
-                        <option value="{{ $item->idx }}">
-                            {{ $item->nama_kelas }}
-                        </option>
-
+                            <option value="{{ $item->idx }}">
+                                {{ $item->nama_kelas }}
+                            </option>
                         @endforeach
 
                     </select>
 
                 </div>
 
-                <div class="col-span-12 sm:col-span-6">
 
-                    <label class="form-label">
+                <div>
+
+                    <label for="edit_id_mapel"
+                           class="block text-sm font-semibold text-slate-700 mb-2">
                         Mata Pelajaran
+                        <span class="text-rose-500">*</span>
                     </label>
 
-                    <select
-                        id="edit_id_mapel"
-                        class="tom-select w-full">
+                    <select id="edit_id_mapel"
+                            class="tom-select w-full">
 
-                        <option value="">
-                            Pilih Mata Pelajaran
-                        </option>
+                        <option value="">Pilih Mata Pelajaran</option>
 
                         @foreach($mapel as $item)
-
-                        <option value="{{ $item->id }}">
-                            {{ $item->nama_mapel }}
-                        </option>
-
+                            <option value="{{ $item->id }}">
+                                {{ $item->nama_mapel }}
+                            </option>
                         @endforeach
 
                     </select>
 
                 </div>
 
-                <div class="col-span-12">
+            </div>
 
-                    <label class="form-label">
-                        Guru Pengajar
-                    </label>
 
-                    <select
-                        id="edit_id_gtk"
-                        class="form-select">
+            {{-- GURU PENGAJAR --}}
+            <div>
 
-                        <option value="">
-                            Pilih Guru
-                        </option>
+                <label for="edit_id_gtk"
+                       class="block text-sm font-semibold text-slate-700 mb-2">
+                    Guru Pengajar
+                    <span class="text-rose-500">*</span>
+                </label>
 
-                        @foreach($guru as $item)
+                <select id="edit_id_gtk"
+                        class="w-full rounded-xl
+                               border border-slate-300
+                               bg-white
+                               px-4 py-3
+                               text-sm text-slate-800
+                               focus:border-[#02BC9C]
+                               focus:ring-2 focus:ring-[#02BC9C]/20
+                               outline-none transition">
 
+                    <option value="">Pilih Guru</option>
+
+                    @foreach($guru as $item)
                         <option value="{{ $item->id }}">
                             {{ $item->nama_gtk }}
                         </option>
+                    @endforeach
 
-                        @endforeach
-
-                    </select>
-
-                </div>
-
-                <div class="col-span-12 sm:col-span-6">
-
-                    <label class="form-label">
-                        Jumlah Jam
-                    </label>
-
-                    <input
-                        type="number"
-                        id="edit_jml_jam"
-                        class="form-control">
-
-                </div>
-
-               
+                </select>
 
             </div>
 
-            <div class="modal-footer">
 
-                <button
-                    type="button"
-                    data-tw-dismiss="modal"
-                    class="btn btn-outline-secondary w-24 mr-1">
+            {{-- JUMLAH JAM --}}
+            <div>
 
-                    Batal
+                <label for="edit_jml_jam"
+                       class="block text-sm font-semibold text-slate-700 mb-2">
+                    Jumlah Jam
+                    <span class="text-rose-500">*</span>
+                </label>
 
-                </button>
+                <div class="relative">
 
-                <button
-                    type="button"
+                    <input type="number"
+                           id="edit_jml_jam"
+                           min="0"
+                           class="w-full rounded-xl
+                                  border border-slate-300
+                                  px-4 py-3 pr-16
+                                  text-sm text-slate-800
+                                  focus:border-[#02BC9C]
+                                  focus:ring-2 focus:ring-[#02BC9C]/20
+                                  outline-none transition">
+
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2
+                                 text-xs font-medium text-slate-400">
+                        Jam
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- MODAL FOOTER --}}
+        <div class="flex items-center justify-end gap-3
+                    px-6 py-4
+                    border-t border-slate-200
+                    bg-slate-50 rounded-b-2xl">
+
+            <button type="button"
+                    onclick="closeModalEditJadwal()"
+                    class="inline-flex items-center justify-center
+                           px-4 py-2.5 rounded-lg
+                           border border-slate-300
+                           bg-white text-slate-700
+                           text-sm font-semibold
+                           hover:bg-slate-100
+                           transition-colors">
+
+                Batal
+
+            </button>
+
+
+            <button type="button"
                     onclick="saveData()"
-                    class="btn btn-primary w-24">
+                    class="inline-flex items-center justify-center gap-2
+                           px-4 py-2.5 rounded-lg
+                           bg-[#00bfa5] hover:bg-[#00a892]
+                           text-white text-sm font-semibold
+                           shadow-sm transition-all">
 
-                    Update
+                <i data-lucide="save" class="w-4 h-4"></i>
 
-                </button>
+                Update Jadwal
 
-            </div>
+            </button>
 
         </div>
 
     </div>
 
 </div>
+
+
+<script>
+    function closeModalEditJadwal() {
+        const modal = document.getElementById('modal-edit-jadwal');
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openModalEditJadwal() {
+        const modal = document.getElementById('modal-edit-jadwal');
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        modal.setAttribute('aria-hidden', 'false');
+
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    });
+</script>

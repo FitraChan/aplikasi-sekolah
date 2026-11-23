@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens; // <-- 1. Pastikan ini ada
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class Siswa extends Authenticatable
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory, HasApiTokens,SoftDeletes;
 
     protected $table = 'tb_siswa';
     protected $primaryKey = 'id';
@@ -153,5 +154,10 @@ class Siswa extends Authenticatable
      public function statusSiswa()
     {
         return $this->belongsTo(StsSiswa::class, 'sts_siswa', 'id');
+    }
+
+    public function bayar()
+    {
+        return $this->hasMany(Bayar::class, 'id_siswa', 'nipd');
     }
 }

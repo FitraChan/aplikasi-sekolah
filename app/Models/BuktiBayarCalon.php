@@ -11,6 +11,7 @@ class BuktiBayarCalon extends Model
     protected $table = 'tb_bukti_bayar_calon';
 
     protected $fillable = [
+        'id_item_bayar',
         'id_calon_siswa',
         'bukti_transfer',
         'status'
@@ -21,6 +22,15 @@ class BuktiBayarCalon extends Model
         return $this->belongsTo(
             CalonSiswa::class,
             'id_calon_siswa',
+            'id'
+        );
+    }
+
+    public function itemBayar()
+    {
+        return $this->belongsTo(
+            ItemBayar::class,
+            'id_item_bayar',
             'id'
         );
     }

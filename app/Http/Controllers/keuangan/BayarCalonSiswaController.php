@@ -736,7 +736,7 @@ class BayarCalonSiswaController extends Controller
         return $pdf->stream('laporan-kewajiban-' . $atas->nipd . '.pdf');
     }
 
-    public function download(CalonSiswa $calonSiswa)
+    public function download(CalonSiswa $calonSiswa) //  kartu ujian siswa 
     {
         abort_unless(
             (bool) $calonSiswa->kartu_ujian_terbit,
@@ -755,7 +755,8 @@ class BayarCalonSiswaController extends Controller
             404,
             'Jadwal ujian untuk gelombang calon siswa belum tersedia.'
         );
-
+        
+//return view('pendaftaran.ujian.kartu-ujian', compact('calonSiswa', 'ujian'));
         $pdf = Pdf::loadView(
             'pendaftaran.ujian.kartu-ujian',
             compact('calonSiswa', 'ujian')
@@ -763,7 +764,7 @@ class BayarCalonSiswaController extends Controller
 
         return $pdf->download(
             'kartu-ujian-' . $calonSiswa->no_daftar . '.pdf'
-        );
+       );
     }
 
      public function callback(Request $request)

@@ -9,6 +9,7 @@ use App\Models\TahunAjaran;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\Gtk;
+
 use App\Models\JamPelajaran;
 use App\Models\Jurusan;
 use App\Models\PenjadwalanHari;
@@ -174,7 +175,8 @@ class NilaiController extends Controller
 
     public function detIndex(Request $request,$id)
     {
-        $query = Nilai::where('idjadwal', $id);
+     
+        $query = Nilai::where('idjadwal', $id)->whereHas('siswa');;
         $thn_ajaran =  TahunAjaran::where('isaktiv',1)->first();   
       //  $thn = $request->thn ? $request->thn : $thn_ajaran->id;
         $thn = $request->thn;

@@ -317,7 +317,7 @@
 
                     @if(auth()->user()->hasRole('calon'))
 
-                        <button
+                        <!-- <button
                             type="button"
                             data-tab-target="pembayaran-tab-content"
                             aria-selected="false"
@@ -365,7 +365,7 @@
                                 Pembayaran
                             </span>
 
-                        </button>
+                        </button> -->
 
                     @endif
 

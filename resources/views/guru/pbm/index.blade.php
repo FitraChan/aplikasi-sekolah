@@ -87,10 +87,7 @@ let table = new Tabulator("#table-jadwal", {
             title: "Kelas",
             field: "nama_kelas",
             // width: 100,
-            formatter: function(cell){
-                let data = cell.getData();
-                return data.kelas + " " + data.nama_kelas;
-            }
+           
         },
 
         // {

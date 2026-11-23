@@ -49,8 +49,7 @@
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M12 5v14M5 12h14"
-                            />
+                                d="M12 5v14M5 12h14" />
 
                         </svg>
 
@@ -85,8 +84,7 @@
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M6 9V2h12v7"
-                            />
+                                d="M6 9V2h12v7" />
 
                             <path
                                 stroke-linecap="round"
@@ -94,14 +92,12 @@
                                 d="M6 18H4a2 2 0 0 1-2-2v-5
                                    a2 2 0 0 1 2-2h16
                                    a2 2 0 0 1 2 2v5
-                                   a2 2 0 0 1-2 2h-2"
-                            />
+                                   a2 2 0 0 1-2 2h-2" />
 
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M6 14h12v8H6z"
-                            />
+                                d="M6 14h12v8H6z" />
 
                         </svg>
 
@@ -163,9 +159,9 @@
 
                                 @foreach($tahun as $row)
 
-                                    <option value="{{ $row->thn_ajaran }}">
-                                        {{ $row->thn_ajaran }}
-                                    </option>
+                                <option value="{{ $row->thn_ajaran }}">
+                                    {{ $row->thn_ajaran }}
+                                </option>
 
                                 @endforeach
 
@@ -205,9 +201,9 @@
 
                                 @foreach($jurusan as $row)
 
-                                    <option value="{{ $row->id }}">
-                                        {{ $row->nama_jurusan }}
-                                    </option>
+                                <option value="{{ $row->id }}">
+                                    {{ $row->nama_jurusan }}
+                                </option>
 
                                 @endforeach
 
@@ -247,9 +243,46 @@
 
                                 @foreach($kelas as $row)
 
-                                    <option value="{{ $row->nama_kelas }}">
-                                        {{ $row->nama_kelas }}
-                                    </option>
+                                <option value="{{ $row->nama_kelas }}">
+                                    {{ $row->nama_kelas }}
+                                </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        <!-- STATUS TRANSAKSI -->
+                        <div class="lg:col-span-2">
+
+                            <label
+                                for="filter_sts_trans"
+                                class="block text-xs font-medium text-slate-600 mb-1">
+                                Status
+                            </label>
+
+                            <select
+                                id="filter_sts_trans"
+                                class="w-full rounded-lg
+                                       border border-slate-300
+                                       bg-white
+                                       px-3 py-2
+                                       text-sm text-slate-700
+                                       focus:border-[#02BC9C]
+                                       focus:ring-2
+                                       focus:ring-[#02BC9C]/20
+                                       outline-none">
+
+                                <option value="">
+                                    Status Transaksi
+                                </option>
+
+                                @foreach($status as $row)
+
+                                <option value="{{ $row->id }}">
+                                    {{ $row->nama }}
+                                </option>
 
                                 @endforeach
 
@@ -317,13 +350,11 @@
                                     <circle
                                         cx="11"
                                         cy="11"
-                                        r="7"
-                                    />
+                                        r="7" />
 
                                     <path
                                         stroke-linecap="round"
-                                        d="m20 20-4-4"
-                                    />
+                                        d="m20 20-4-4" />
 
                                 </svg>
 
@@ -401,13 +432,11 @@
                                 y="5"
                                 width="20"
                                 height="14"
-                                rx="2"
-                            />
+                                rx="2" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M2 10h20"
-                            />
+                                d="M2 10h20" />
 
                         </svg>
 
@@ -444,23 +473,19 @@
                                 y="5"
                                 width="20"
                                 height="14"
-                                rx="2"
-                            />
+                                rx="2" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M2 10h20"
-                            />
+                                d="M2 10h20" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M7 15h.01"
-                            />
+                                d="M7 15h.01" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M11 15h6"
-                            />
+                                d="M11 15h6" />
 
                         </svg>
 
@@ -487,14 +512,12 @@
                     <input
                         type="hidden"
                         id="id_bayar"
-                        value=""
-                    >
+                        value="">
 
                     <input
                         type="hidden"
                         id="nipd"
-                        value=""
-                    >
+                        value="">
 
 
                     <!-- =================================================
@@ -505,6 +528,7 @@
                         id="tableHistoryBayar"
                         class="w-full">
                     </div>
+
 
                 </div>
 
@@ -522,13 +546,13 @@
 ============================================================== -->
 
 @include(
-    'keuangan.bayar.modal_history.modal_bulanan_all_siswa'
+'keuangan.bayar.modal_history.modal_bulanan_all_siswa'
 )
 
 @include(
-    'keuangan.bayar.modal_history.modal_bayar'
+'keuangan.bayar.modal_history.modal_bayar'
 )
 
 @include(
-    'keuangan.bayar.modal_history.modal_cicilan'
+'keuangan.bayar.modal_history.modal_cicilan'
 )

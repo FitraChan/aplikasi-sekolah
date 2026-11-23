@@ -148,6 +148,31 @@
 
             </div>
 
+            {{-- Catatan DPP --}}
+<div class="mx-6 mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+    <div class="flex items-start gap-3">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+            <i data-lucide="info" class="h-5 w-5"></i>
+        </div>
+
+        <div>
+            <h3 class="text-sm font-bold text-amber-800">
+                Informasi Penting
+            </h3>
+
+            <p class="mt-1 text-sm leading-relaxed text-amber-700">
+                Untuk dapat resmi menjadi siswa, calon siswa wajib melakukan
+                pembayaran DPP minimal sebesar
+                <strong class="text-amber-900">Rp2.500.000</strong>.
+            </p>
+
+            <p class="mt-1 text-xs text-amber-600">
+                Pastikan pembayaran telah memenuhi ketentuan tersebut sebelum proses daftar ulang diselesaikan.
+            </p>
+        </div>
+    </div>
+</div>
+
 
             {{-- Footer --}}
             <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4">

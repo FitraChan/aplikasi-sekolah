@@ -6,8 +6,7 @@
            p-4
            overflow-y-auto"
     tabindex="-1"
-    aria-hidden="true"
->
+    aria-hidden="true">
 
     <div
         class="w-full max-w-4xl
@@ -16,8 +15,7 @@
                rounded-xl
                shadow-xl
                overflow-hidden
-               flex flex-col"
-    >
+               flex flex-col">
 
         <!-- =====================================================
              HEADER
@@ -27,8 +25,7 @@
             class="flex items-center justify-between
                    px-6 py-4
                    border-b border-slate-200
-                   shrink-0"
-        >
+                   shrink-0">
 
             <h2 class="text-lg font-semibold text-slate-800">
                 Input Pembayaran Cicilan
@@ -46,22 +43,19 @@
                        hover:text-slate-600
                        hover:bg-slate-100
                        transition-colors"
-                aria-label="Tutup"
-            >
+                aria-label="Tutup">
 
                 <svg
                     class="w-5 h-5"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
-                    viewBox="0 0 24 24"
-                >
+                    viewBox="0 0 24 24">
 
                     <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M6 6l12 12M6 18L18 6"
-                    />
+                        d="M6 6l12 12M6 18L18 6" />
 
                 </svg>
 
@@ -78,22 +72,19 @@
         <div
             class="px-6 py-5
                    overflow-y-auto
-                   flex-1"
-        >
+                   flex-1">
 
             <input
                 type="hidden"
                 id="id_csiswa"
-                name="id_csiswa"
-            >
+                name="id_csiswa">
 
 
             <div
                 class="grid
                        grid-cols-1
                        md:grid-cols-2
-                       gap-5"
-            >
+                       gap-5">
 
 
                 <!-- =================================================
@@ -105,8 +96,7 @@
                     <label
                         for="tgl_bayar"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         Tanggal Bayar
                     </label>
 
@@ -124,8 +114,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -139,8 +128,7 @@
                     <label
                         for="no_kwitansi"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         No Kwitansi
                     </label>
 
@@ -160,8 +148,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -175,8 +162,7 @@
                     <label
                         for="keterangan"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         Keterangan
                     </label>
 
@@ -197,8 +183,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    ></textarea>
+                               focus:ring-[#02BC9C]/20"></textarea>
 
                 </div>
 
@@ -212,8 +197,7 @@
                     <label
                         for="bukti_bayar_cicilan"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         Bukti Bayar
                     </label>
 
@@ -225,8 +209,7 @@
                                bg-slate-50
                                hover:border-[#02BC9C]
                                hover:bg-[#02BC9C]/5
-                               transition-colors"
-                    >
+                               transition-colors">
 
                         <input
                             type="file"
@@ -237,16 +220,14 @@
                                    w-full h-full
                                    opacity-0
                                    cursor-pointer"
-                            onchange="previewBuktiBayarCicilan(this)"
-                        >
+                            onchange="previewBuktiBayarCicilan(this)">
 
                         <div
                             class="flex flex-col
                                    items-center
                                    justify-center
                                    px-6 py-6
-                                   text-center"
-                        >
+                                   text-center">
 
                             <!-- ICON UPLOAD -->
 
@@ -256,34 +237,29 @@
                                        rounded-full
                                        bg-[#02BC9C]/10
                                        text-[#02BC9C]
-                                       mb-3"
-                            >
+                                       mb-3">
 
                                 <svg
                                     class="w-6 h-6"
                                     fill="none"
                                     stroke="currentColor"
                                     stroke-width="2"
-                                    viewBox="0 0 24 24"
-                                >
+                                    viewBox="0 0 24 24">
 
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        d="M12 16V4"
-                                    />
+                                        d="M12 16V4" />
 
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        d="M8 8l4-4 4 4"
-                                    />
+                                        d="M8 8l4-4 4 4" />
 
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"
-                                    />
+                                        d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3" />
 
                                 </svg>
 
@@ -307,8 +283,7 @@
                                 id="nama-file-bukti-cicilan"
                                 class="hidden mt-2
                                        text-sm font-medium
-                                       text-[#02BC9C]"
-                            ></p>
+                                       text-[#02BC9C]"></p>
 
                         </div>
 
@@ -330,8 +305,7 @@
                     <label
                         for="jml_dpp"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         DPP
                     </label>
 
@@ -351,8 +325,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -366,8 +339,7 @@
                     <label
                         for="jml_seragam"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         Seragam
                     </label>
 
@@ -387,8 +359,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -402,8 +373,7 @@
                     <label
                         for="jml_spp"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         SPP
                     </label>
 
@@ -423,8 +393,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -438,8 +407,7 @@
                     <label
                         for="jml_tabungan"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         Tabungan
                     </label>
 
@@ -459,8 +427,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -474,8 +441,7 @@
                     <label
                         for="jml_osis"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         OSIS
                     </label>
 
@@ -495,8 +461,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -510,8 +475,7 @@
                     <label
                         for="jml_lain"
                         class="block text-sm font-medium
-                               text-slate-700 mb-1.5"
-                    >
+                               text-slate-700 mb-1.5">
                         Lainnya
                     </label>
 
@@ -531,8 +495,7 @@
                                transition
                                focus:border-[#02BC9C]
                                focus:ring-2
-                               focus:ring-[#02BC9C]/20"
-                    >
+                               focus:ring-[#02BC9C]/20">
 
                 </div>
 
@@ -552,8 +515,7 @@
                    px-6 py-4
                    bg-slate-50
                    border-t border-slate-200
-                   shrink-0"
-        >
+                   shrink-0">
 
             <!-- BATAL -->
 
@@ -568,8 +530,7 @@
                        text-sm font-medium
                        text-slate-700
                        hover:bg-slate-100
-                       transition-colors"
-            >
+                       transition-colors">
                 Batal
             </button>
 
@@ -589,39 +550,33 @@
                        text-white
                        text-sm font-medium
                        shadow-sm
-                       transition-colors"
-            >
+                       transition-colors">
 
                 <svg
                     class="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
-                    viewBox="0 0 24 24"
-                >
+                    viewBox="0 0 24 24">
 
                     <rect
                         x="2"
                         y="5"
                         width="20"
                         height="14"
-                        rx="2"
-                    />
+                        rx="2" />
 
                     <path
                         stroke-linecap="round"
-                        d="M2 10h20"
-                    />
+                        d="M2 10h20" />
 
                     <path
                         stroke-linecap="round"
-                        d="M7 15h.01"
-                    />
+                        d="M7 15h.01" />
 
                     <path
                         stroke-linecap="round"
-                        d="M11 15h6"
-                    />
+                        d="M11 15h6" />
 
                 </svg>
 
@@ -639,7 +594,6 @@
 
 
 <script>
-
     /* =========================================================
        PREVIEW NAMA FILE BUKTI BAYAR
     ========================================================== */
@@ -727,5 +681,4 @@
         );
 
     }
-
 </script>

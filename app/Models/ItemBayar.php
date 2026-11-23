@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ItemBayar extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'tb_itembayar';
 
     protected $fillable = [
@@ -16,7 +19,7 @@ class ItemBayar extends Model
         'def_value'
     ];
 
-   // public $timestamps = false;
+    // public $timestamps = false;
 
     public function kategori()
     {
@@ -31,6 +34,15 @@ class ItemBayar extends Model
         return $this->belongsTo(
             KatPeriodeBayar::class,
             'id_kat_periode'
+        );
+    }
+
+    public function buktiBayarCalon()
+    {
+        return $this->hasMany(
+            BuktiBayarCalon::class,
+            'id_item_bayar',
+            'id'
         );
     }
 }

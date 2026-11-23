@@ -145,8 +145,6 @@ class TemplateBayarController extends Controller
             ]);
         });
 
-
-
         return response()->json([
             'success' => true,
             'title'   => 'Sukses',
@@ -162,8 +160,8 @@ class TemplateBayarController extends Controller
             ],
 
             'tipe_jurusan' => [
-                'required',
-                'in:semua,perjurusan',
+                'nullable',
+                'in:semua,khusus',
             ],
 
             'id_jurusan' => [

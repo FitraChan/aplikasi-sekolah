@@ -20,16 +20,15 @@ use App\Models\LogModel;
 class MasterJadwalController extends Controller
 {
 
-      var $tahun_ppdb, $smt,$tahun_ajaran_sekarang;
-  
+    var $tahun_ppdb, $smt, $tahun_ajaran_sekarang;
+
     public function __construct()
     {
         $konfig = Konfig::first();
         $this->tahun_ppdb = $konfig->id_thn_ppdb;
         $this->smt = $konfig->smt;
         $this->tahun_ajaran_sekarang = $konfig->id_tahun;
-
-    }   
+    }
 
     public function index()
     {
@@ -41,28 +40,28 @@ class MasterJadwalController extends Controller
             'jam' => JamPelajaran::orderBy('id', 'desc')->get(),
             'jurusan' => Jurusan::orderBy('id', 'desc')->get(),
             'tahun' => TahunAjaran::whereBetween('id', [
-                        $tahunSekarang - 3,
-                        $tahunSekarang
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->get(),
+                $tahunSekarang - 3,
+                $tahunSekarang
+            ])
+                ->orderBy('id', 'desc')
+                ->get(),
             'kelas' => Kelas::orderBy('nama_kelas')->get(),
             'mapel' => Mapel::orderBy('nama_mapel')->get(),
             'guru'  => Gtk::orderBy('nama_gtk')->get(),
-            
-        'mapel_2' => PenjadwalanHari::with([
-                        'jam',
-                        'jadwal.tahun',
-                        'jadwal.kelas',
-                        'jadwal.mapel',
-                        'jadwal.guru'
-                ])->select([
+
+            'mapel_2' => PenjadwalanHari::with([
+                'jam',
+                'jadwal.tahun',
+                'jadwal.kelas',
+                'jadwal.mapel',
+                'jadwal.guru'
+            ])->select([
                 'tb_penjadwalan_hari.id as id',
                 'tb_penjadwalan_hari.idpenjadwalan as idpenjadwalan',
                 'tb_penjadwalan_hari.id_hari',
-                'tb_penjadwalan_hari.id_jam',                                              
-            ])->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan')             
-              ->whereBetween('tb_master_jadwal.id_tahun', [
+                'tb_penjadwalan_hari.id_jam',
+            ])->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan')
+                ->whereBetween('tb_master_jadwal.id_tahun', [
                     $tahunSekarang - 3,
                     $tahunSekarang - 1
                 ])->get(),
@@ -72,17 +71,17 @@ class MasterJadwalController extends Controller
     public function data(Request $request)
     {
 
-       $tahunSekarang = $this->tahun_ppdb;
+        $tahunSekarang = $this->tahun_ppdb;
         $query = MasterJadwal::with([
             'tahun',
             'kelas',
             'mapel',
             'guru'
         ])
-        ->whereBetween('id_tahun', [
-            $tahunSekarang - 3,
-            $tahunSekarang - 1
-        ]);;
+            ->whereBetween('id_tahun', [
+                $tahunSekarang - 3,
+                $tahunSekarang - 1
+            ]);;
 
         if ($request->id_tahun) {
             $query->where('id_tahun', $request->id_tahun);
@@ -109,7 +108,7 @@ class MasterJadwalController extends Controller
             });
         }
 
-         if ($request->filled('mapel')) {
+        if ($request->filled('mapel')) {
             $query->whereHas('mapel', function ($q) use ($request) {
                 $q->where('nama_mapel', 'like', '%' . $request->mapel . '%');
             });
@@ -133,7 +132,7 @@ class MasterJadwalController extends Controller
                     'nama_kelas'    => $item->kelas->nama_kelas ?? '',
                     'nama_mapel'    => $item->mapel->nama_mapel ?? '',
                     'nama_gtk'      => $item->guru->nama_gtk ?? '',
-                    'nkelas'        => $item?->nkelas ?? '', 
+                    'nkelas'        => $item?->nkelas ?? '',
 
                 ];
             });
@@ -141,7 +140,7 @@ class MasterJadwalController extends Controller
         return response()->json($data);
     }
 
- 
+
     public function dataDetail(Request $request)
     {
 
@@ -154,34 +153,33 @@ class MasterJadwalController extends Controller
             'jadwal.mapel',
             'jadwal.guru'
         ])
-        ->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan') ;
+            ->leftJoin('tb_master_jadwal', 'tb_master_jadwal.id', '=', 'tb_penjadwalan_hari.idpenjadwalan');
         //->where('id_tahun', $tahunSekarang);
         // ->whereBetween('id_tahun', [
         //     $tahunSekarang - 3,
         //     $tahunSekarang - 1
         // ]);
 
-     
+
 
         if ($request->id_hari) {
             $query->where(function ($q) use ($request) {
                 $q->where('id_hari', $request->id_hari)
-                ->orWhereNull('id_hari');
+                    ->orWhereNull('id_hari');
             });
         }
-      
 
-         
+
+
 
         if ($request->filled('id_tahun')) {
             $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('id_tahun', $request->id_tahun);
             });
-        }else{
+        } else {
             $query->whereHas('jadwal', function ($q) use ($tahunSekarang) {
                 $q->where('id_tahun', $tahunSekarang);
             });
-
         }
 
         if ($request->filled('id_kelas')) {
@@ -226,13 +224,13 @@ class MasterJadwalController extends Controller
 
         $data['jam'] = JamPelajaran::all();
 
-        
+
         $data['gtk'] = Gtk::all();
 
         $data = $query
             ->select('tb_penjadwalan_hari.*')
             ->leftjoin('tb_jam_pelajaran', 'tb_jam_pelajaran.id', '=', 'tb_penjadwalan_hari.id_jam')
-            ->orderBy('tb_jam_pelajaran.jam_ke', 'asc')  
+            ->orderBy('tb_jam_pelajaran.jam_ke', 'asc')
             // ->orderBy('id', 'desc')
             ->get()
             ->map(function ($item) use ($hari) {
@@ -242,9 +240,9 @@ class MasterJadwalController extends Controller
                     'idpenjadwalan'   => $item->idpenjadwalan,
                     'id_hari'         => $item->id_hari,
 
-                     'id_kelas'         => $item->jadwal?->id_kelas ?? '',
+                    'id_kelas'         => $item->jadwal?->id_kelas ?? '',
 
-                        'id_tahun'         => $item->jadwal?->id_tahun ?? '',
+                    'id_tahun'         => $item->jadwal?->id_tahun ?? '',
 
 
 
@@ -256,8 +254,8 @@ class MasterJadwalController extends Controller
                     'id_jam'          => $item->id_jam,
                     'id_mapel'          => $item->jadwal?->id_mapel ?? '',
 
-                    
-   
+
+
                     'tahun_ajaran'    => $item->jadwal->tahun->thn_ajaran ?? '',
 
                     'semester'        => $item->jadwal?->semester == 1
@@ -268,7 +266,7 @@ class MasterJadwalController extends Controller
 
                     'nama_kelas'     => trim(
                         ($item->jadwal?->nkelas ?? '') . ' ' .
-                        ($item->jadwal?->kelas?->nama_kelas ?? '')
+                            ($item->jadwal?->kelas?->nama_kelas ?? '')
                     ),
 
                     'nama_mapel'     => $item->jadwal?->mapel?->nama_mapel ?? '',
@@ -285,51 +283,50 @@ class MasterJadwalController extends Controller
     }
 
 
- public function dataDetailModal(Request $request)
+    public function dataDetailModal(Request $request)
     {
 
         $tahunSekarang = $this->tahun_ajaran_sekarang;
 
         $query = PenjadwalanHari::with([
-    'jam',
-    'jadwal.tahun',
-    'jadwal.kelas',
-    'jadwal.mapel',
-    'jadwal.guru'
-])
-->leftJoin(
-    'tb_master_jadwal',
-    'tb_master_jadwal.id',
-    '=',
-    'tb_penjadwalan_hari.idpenjadwalan'
-)
-->where(function ($q) {
-    $q->whereNull('tb_penjadwalan_hari.id_jam')
-      ->orWhereNull('tb_penjadwalan_hari.id_hari');
-})
-->where('tb_master_jadwal.id_tahun', $tahunSekarang);
-        
-     
+            'jam',
+            'jadwal.tahun',
+            'jadwal.kelas',
+            'jadwal.mapel',
+            'jadwal.guru'
+        ])
+            ->leftJoin(
+                'tb_master_jadwal',
+                'tb_master_jadwal.id',
+                '=',
+                'tb_penjadwalan_hari.idpenjadwalan'
+            )
+            ->where(function ($q) {
+                $q->whereNull('tb_penjadwalan_hari.id_jam')
+                    ->orWhereNull('tb_penjadwalan_hari.id_hari');
+            })
+            ->where('tb_master_jadwal.id_tahun', $tahunSekarang);
+
+
 
         if ($request->id_hari) {
             $query->where(function ($q) use ($request) {
                 $q->where('id_hari', $request->id_hari)
-                ->orWhereNull('id_hari');
+                    ->orWhereNull('id_hari');
             });
         }
-      
 
-         
+
+
 
         if ($request->filled('id_tahun')) {
             $query->whereHas('jadwal', function ($q) use ($request) {
                 $q->where('id_tahun', $request->id_tahun);
             });
-        }else{
+        } else {
             $query->whereHas('jadwal', function ($q) use ($tahunSekarang) {
                 $q->where('id_tahun', $tahunSekarang);
             });
-
         }
 
         if ($request->filled('id_kelas')) {
@@ -374,13 +371,13 @@ class MasterJadwalController extends Controller
 
         $data['jam'] = JamPelajaran::all();
 
-        
+
         $data['gtk'] = Gtk::all();
 
         $data = $query
             ->select('tb_penjadwalan_hari.*')
             ->leftjoin('tb_jam_pelajaran', 'tb_jam_pelajaran.id', '=', 'tb_penjadwalan_hari.id_jam')
-            ->orderBy('tb_jam_pelajaran.jam_ke', 'asc')  
+            ->orderBy('tb_jam_pelajaran.jam_ke', 'asc')
             // ->orderBy('id', 'desc')
             ->get()
             ->map(function ($item) use ($hari) {
@@ -390,9 +387,9 @@ class MasterJadwalController extends Controller
                     'idpenjadwalan'   => $item->idpenjadwalan,
                     'id_hari'         => $item->id_hari,
 
-                     'id_kelas'         => $item->jadwal?->id_kelas ?? '',
+                    'id_kelas'         => $item->jadwal?->id_kelas ?? '',
 
-                        'id_tahun'         => $item->jadwal?->id_tahun ?? '',
+                    'id_tahun'         => $item->jadwal?->id_tahun ?? '',
 
 
 
@@ -404,8 +401,8 @@ class MasterJadwalController extends Controller
                     'id_jam'          => $item->id_jam,
                     'id_mapel'          => $item->jadwal?->id_mapel ?? '',
 
-                    
-   
+
+
                     'tahun_ajaran'    => $item->jadwal->tahun->thn_ajaran ?? '',
 
                     'semester'        => $item->jadwal?->semester == 1
@@ -416,7 +413,7 @@ class MasterJadwalController extends Controller
 
                     'nama_kelas'     => trim(
                         ($item->jadwal?->nkelas ?? '') . ' ' .
-                        ($item->jadwal?->kelas?->nama_kelas ?? '')
+                            ($item->jadwal?->kelas?->nama_kelas ?? '')
                     ),
 
                     'nama_mapel'     => $item->jadwal?->mapel?->nama_mapel ?? '',
@@ -431,7 +428,7 @@ class MasterJadwalController extends Controller
 
         return response()->json($data);
     }
-   
+
 
     public function store(Request $request)
     {
@@ -520,15 +517,15 @@ class MasterJadwalController extends Controller
     public function destroyDetail(Request $request)
     {
         PenjadwalanHari::where('id', $request->id)
-                    ->update([
-                        'id_hari' => null,
-                        'id_jam'  => null,
-                    ]);    
-                    
-                MasterJadwal::where('id', $request->idpenjadwalan)
-                    ->update([
-                        'id_gtk' => null
-                    ]);
+            ->update([
+                'id_hari' => null,
+                'id_jam'  => null,
+            ]);
+
+        MasterJadwal::where('id', $request->idpenjadwalan)
+            ->update([
+                'id_gtk' => null
+            ]);
 
         return response()->json([
             'success' => true,
@@ -554,7 +551,7 @@ class MasterJadwalController extends Controller
     public function inisialisasi(Request $request)
     {
         $thn      = $request->thn;
-        $smt      = $request->smt;       
+        $smt      = $request->smt;
         $jurusan  = $request->jurusan;
 
         if ($smt == 1) {
@@ -581,7 +578,7 @@ class MasterJadwalController extends Controller
         try {
 
             // Hapus jadwal lama
-           $ids = DB::table('tb_master_jadwal')
+            $ids = DB::table('tb_master_jadwal')
                 ->where('id_tahun', $thn)
                 ->where('semester', $smt)
                 ->whereIn(
@@ -679,21 +676,21 @@ class MasterJadwalController extends Controller
 
         try {
 
-         $konfig = konfig();
-        $smt = $konfig['smt'];
+            $konfig = konfig();
+            $smt = $konfig['smt'];
 
             foreach ($request->data as $row) {
 
-             $penjadwalan = PenjadwalanHari::with('jadwal')->findOrFail($row['id']);
+                $penjadwalan = PenjadwalanHari::with('jadwal')->findOrFail($row['id']);
 
                 $bentrok = PenjadwalanHari::where('id', '!=', $row['id'])
                     ->where('id_hari', $row['id_hari'])
                     ->where('id_jam', $row['id_jam'])
-                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt,$row) {
+                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt, $row) {
                         $q->where('id_gtk', $row['id_gtk']);
 
                         $q->where('id_tahun', $row['id_tahun']);
-                      //  $q->where('id_kelas', $row['id_kelas']);
+                        //  $q->where('id_kelas', $row['id_kelas']);
                         $q->where('semester', $smt);
                     })
                     ->exists();
@@ -707,19 +704,19 @@ class MasterJadwalController extends Controller
                     ], 422);
                 }
 
-                 $bentrokKelas = PenjadwalanHari::where('id', '!=', $row['id'])
+                $bentrokKelas = PenjadwalanHari::where('id', '!=', $row['id'])
                     ->where('id_hari', $row['id_hari'])
                     ->where('id_jam', $row['id_jam'])
-                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt,$row) {
-                    
+                    ->whereHas('jadwal', function ($q) use ($penjadwalan, $smt, $row) {
+
                         $q->where('id_kelas', $row['id_kelas']);
-                          $q->where('angkatan', $row['angkatan']);
+                        $q->where('angkatan', $row['angkatan']);
                         $q->where('semester', $smt);
                     })
                     ->exists();
 
 
-                     if ($bentrokKelas) {
+                if ($bentrokKelas) {
                     DB::rollBack();
 
                     return response()->json([
@@ -732,8 +729,8 @@ class MasterJadwalController extends Controller
                     ->update([
                         'id_hari' => $row['id_hari'],
                         'id_jam'  => $row['id_jam'] ?? 0,
-                    ]);    
-                    
+                    ]);
+
                 MasterJadwal::where('id', $row['idpenjadwalan'])
                     ->update([
                         'id_gtk' => $row['id_gtk']
@@ -746,7 +743,6 @@ class MasterJadwalController extends Controller
                 'success' => true,
                 'msg' => 'Detail jadwal berhasil disimpan'
             ]);
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -758,6 +754,136 @@ class MasterJadwalController extends Controller
         }
     }
 
+
+    // public function isiNilai(Request $request)
+    // {
+    //     $thn      = $request->thn;
+    //     $smt      = $request->smt;
+    //     $jurusan  = $request->jurusan;
+    //     $kelas    = $request->kelas;
+    //     $angkatan = $request->angkatan;
+
+    //     DB::beginTransaction();
+
+    //     try {
+
+    //         if (!empty($kelas)) {
+
+    //             DB::statement("
+    //             DELETE FROM tb_nilai
+    //             WHERE idjadwal IN (
+    //                 SELECT id
+    //                 FROM tb_master_jadwal
+    //                 WHERE id_tahun = ?
+    //                 AND semester = ?
+    //                 AND id_kelas = ?
+    //                 AND angkatan = ?
+    //             )
+    //         ", [
+    //                 $thn,
+    //                 $smt,
+    //                 $kelas,
+    //                 $angkatan
+    //             ]);
+
+    //             DB::statement("
+    //             INSERT INTO tb_nilai (
+    //                 idjadwal,
+    //                 nipd
+    //             )
+    //             SELECT
+    //                 tb_master_jadwal.id,
+    //                 tb_siswa.nipd
+    //             FROM tb_master_jadwal
+    //             INNER JOIN tb_siswa
+    //                 ON tb_master_jadwal.id_kelas = tb_siswa.id_kelas
+    //                 AND tb_master_jadwal.angkatan = tb_siswa.id_thn_ajaran
+    //             WHERE tb_master_jadwal.id_tahun = ?
+    //             AND tb_master_jadwal.semester = ?
+    //             AND tb_siswa.id_thn_ajaran = ?
+    //             AND tb_master_jadwal.id_kelas = ?
+    //         ", [
+    //                 $thn,
+    //                 $smt,
+    //                 $angkatan,
+    //                 $kelas
+    //             ]);
+    //         } elseif (!empty($jurusan)) {
+
+    //             DB::statement("
+    //             DELETE FROM tb_nilai
+    //             WHERE idjadwal IN (
+    //                 SELECT id
+    //                 FROM tb_master_jadwal
+    //                 WHERE id_tahun = ?
+    //                 AND semester = ?
+    //                 AND angkatan = ?
+    //                 AND id_kelas IN (
+    //                     SELECT idx
+    //                     FROM tb_kelas
+    //                     WHERE id_jurusan = ?
+    //                 )
+    //             )
+    //         ", [
+    //                 $thn,
+    //                 $smt,
+    //                 $angkatan,
+    //                 $jurusan
+    //             ]);
+
+    //             DB::statement("
+    //             INSERT INTO tb_nilai (
+    //                 idjadwal,
+    //                 nipd
+    //             )
+    //             SELECT
+    //                 tb_master_jadwal.id,
+    //                 tb_siswa.nipd
+    //             FROM tb_master_jadwal
+    //             INNER JOIN tb_siswa
+    //                 ON tb_master_jadwal.id_kelas = tb_siswa.id_kelas
+    //                 AND tb_master_jadwal.angkatan = tb_siswa.id_thn_ajaran
+    //             WHERE tb_master_jadwal.id_tahun = ?
+    //             AND tb_master_jadwal.semester = ?
+    //             AND tb_siswa.id_thn_ajaran = ?
+    //             AND tb_master_jadwal.id_kelas IN (
+    //                 SELECT idx
+    //                 FROM tb_kelas
+    //                 WHERE id_jurusan = ?
+    //             )
+    //         ", [
+    //                 $thn,
+    //                 $smt,
+    //                 $angkatan,
+    //                 $jurusan
+    //             ]);
+    //         } else {
+
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'title'   => 'Peringatan',
+    //                 'msg'     => 'Pilih kelas atau jurusan terlebih dahulu'
+    //             ]);
+    //         }
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'title'   => 'Success',
+    //             'msg'     => 'Proses isi nilai berhasil dilakukan'
+    //         ]);
+    //     } catch (\Exception $e) {
+
+    //         DB::rollBack();
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'title'   => 'Error',
+    //             'msg'     => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     public function isiNilai(Request $request)
     {
@@ -774,38 +900,27 @@ class MasterJadwalController extends Controller
             if (!empty($kelas)) {
 
                 DB::statement("
-                DELETE FROM tb_nilai
-                WHERE idjadwal IN (
-                    SELECT id
-                    FROM tb_master_jadwal
-                    WHERE id_tahun = ?
-                    AND semester = ?
-                    AND id_kelas = ?
-                    AND angkatan = ?
-                )
-            ", [
-                    $thn,
-                    $smt,
-                    $kelas,
-                    $angkatan
-                ]);
-
-                DB::statement("
                 INSERT INTO tb_nilai (
                     idjadwal,
                     nipd
                 )
                 SELECT
-                    tb_master_jadwal.id,
-                    tb_siswa.nipd
-                FROM tb_master_jadwal
-                INNER JOIN tb_siswa
-                    ON tb_master_jadwal.id_kelas = tb_siswa.id_kelas
-                    AND tb_master_jadwal.angkatan = tb_siswa.id_thn_ajaran
-                WHERE tb_master_jadwal.id_tahun = ?
-                AND tb_master_jadwal.semester = ?
-                AND tb_siswa.id_thn_ajaran = ?
-                AND tb_master_jadwal.id_kelas = ?
+                    mj.id,
+                    s.nipd
+                FROM tb_master_jadwal mj
+                INNER JOIN tb_siswa s
+                    ON mj.id_kelas = s.id_kelas
+                    AND mj.angkatan = s.id_thn_ajaran
+                WHERE mj.id_tahun = ?
+                    AND mj.semester = ?
+                    AND s.id_thn_ajaran = ?
+                    AND mj.id_kelas = ?
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM tb_nilai n
+                        WHERE n.idjadwal = mj.id
+                        AND n.nipd = s.nipd
+                    )
             ", [
                     $thn,
                     $smt,
@@ -815,46 +930,31 @@ class MasterJadwalController extends Controller
             } elseif (!empty($jurusan)) {
 
                 DB::statement("
-                DELETE FROM tb_nilai
-                WHERE idjadwal IN (
-                    SELECT id
-                    FROM tb_master_jadwal
-                    WHERE id_tahun = ?
-                    AND semester = ?
-                    AND angkatan = ?
-                    AND id_kelas IN (
-                        SELECT idx
-                        FROM tb_kelas
-                        WHERE id_jurusan = ?
-                    )
-                )
-            ", [
-                    $thn,
-                    $smt,
-                    $angkatan,
-                    $jurusan
-                ]);
-
-                DB::statement("
                 INSERT INTO tb_nilai (
                     idjadwal,
                     nipd
                 )
                 SELECT
-                    tb_master_jadwal.id,
-                    tb_siswa.nipd
-                FROM tb_master_jadwal
-                INNER JOIN tb_siswa
-                    ON tb_master_jadwal.id_kelas = tb_siswa.id_kelas
-                    AND tb_master_jadwal.angkatan = tb_siswa.id_thn_ajaran
-                WHERE tb_master_jadwal.id_tahun = ?
-                AND tb_master_jadwal.semester = ?
-                AND tb_siswa.id_thn_ajaran = ?
-                AND tb_master_jadwal.id_kelas IN (
-                    SELECT idx
-                    FROM tb_kelas
-                    WHERE id_jurusan = ?
-                )
+                    mj.id,
+                    s.nipd
+                FROM tb_master_jadwal mj
+                INNER JOIN tb_siswa s
+                    ON mj.id_kelas = s.id_kelas
+                    AND mj.angkatan = s.id_thn_ajaran
+                WHERE mj.id_tahun = ?
+                    AND mj.semester = ?
+                    AND s.id_thn_ajaran = ?
+                    AND mj.id_kelas IN (
+                        SELECT idx
+                        FROM tb_kelas
+                        WHERE id_jurusan = ?
+                    )
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM tb_nilai n
+                        WHERE n.idjadwal = mj.id
+                        AND n.nipd = s.nipd
+                    )
             ", [
                     $thn,
                     $smt,
@@ -862,6 +962,8 @@ class MasterJadwalController extends Controller
                     $jurusan
                 ]);
             } else {
+
+                DB::rollBack();
 
                 return response()->json([
                     'success' => false,
@@ -875,11 +977,13 @@ class MasterJadwalController extends Controller
             return response()->json([
                 'success' => true,
                 'title'   => 'Success',
-                'msg'     => 'Proses isi nilai berhasil dilakukan'
+                'msg'     => 'Proses sinkronisasi siswa dan nilai berhasil dilakukan'
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             DB::rollBack();
+
+            report($e);
 
             return response()->json([
                 'success' => false,

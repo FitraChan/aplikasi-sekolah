@@ -54,7 +54,10 @@ class PenilaianGuruController extends Controller
 
         $query->where('id_gtk', $gtk->id);
 
-
+        //   'nama_kelas'     => trim(
+        //                         ($item->jadwal?->nkelas ?? '') . ' ' .
+        //                         ($item->jadwal?->kelas?->nama_kelas ?? '')
+        //                     ),
         $data = $query
             ->orderBy('id', 'desc')
             ->get()
@@ -70,7 +73,8 @@ class PenilaianGuruController extends Controller
                     'jml_jam'       => $item->jml_jam,
                     'angkatan'      => $item->angkatan,
                     'tahun_ajaran'  => $item->tahun->thn_ajaran ?? '',
-                    'nama_kelas'    => $item->nkelas->nama_kelas ?? '',
+                    'nama_kelas'    => ($item->nkelas ?? '') . ' ' .
+                        ($item->kelas?->nama_kelas ?? ''),
                     'kelas'         => $item->nkelas ?? '',
                     'nama_mapel'    => $item->mapel->nama_mapel ?? '',
                     'nama_gtk'      => $item->guru->nama_gtk ?? '',
@@ -86,10 +90,26 @@ class PenilaianGuruController extends Controller
     public function dataMateri(Request $request, $id = null)
     {
         $data['isi'] = TransAjar::withCount([
-            'hadir as H',
-            'izin as I',
-            'sakit as S',
-            'alfa as A',
+            'hadir as H' => function ($query) {
+                $query->whereHas('siswa', function ($q) {
+                    $q->whereNull('deleted_at');
+                });
+            },
+            'izin as I' => function ($query) {
+                $query->whereHas('siswa', function ($q) {
+                    $q->whereNull('deleted_at');
+                });
+            },
+            'sakit as S' => function ($query) {
+                $query->whereHas('siswa', function ($q) {
+                    $q->whereNull('deleted_at');
+                });
+            },
+            'alfa as A' => function ($query) {
+                $query->whereHas('siswa', function ($q) {
+                    $q->whereNull('deleted_at');
+                });
+            },
         ])
             ->where('idjadwal', $id)
             ->orderBy('idpertemuan')
@@ -108,7 +128,6 @@ class PenilaianGuruController extends Controller
                     'nama_guru_pengganti' => $item->guruPengganti->nama_gtk ?? '',
                     'judul_tugas'         => $item->judul_tugas ?? '',
                     'keterangan'          => $item->keterangan ?? '',
-
                     'H' => $item->H,
                     'I' => $item->I,
                     'S' => $item->S,
@@ -146,7 +165,7 @@ class PenilaianGuruController extends Controller
 
         $data['isi'] = Absensi::with([
             'siswa'
-        ])
+        ])->whereHas('siswa') // ini fungsinya tidak menampilkan siswa yang deleted_at != null alias sudah di delete
             ->where('idtransajar', $id)
             ->orderBy('nipd')
             ->get()
@@ -331,19 +350,8 @@ class PenilaianGuruController extends Controller
 
             DB::commit();
 
-            return redirect()
-                ->back()
-                ->with(
-                    'success',
-                    'Data berhasil disimpan'
-                );
-
-            //  return response()->json([
-            //     'success' => true,
-            //     'data' => $data,
-            //     'msg' => 'Data berhasil dihapus'
-            // ]);
-
+            return redirect('/pbm/dataMateri/' . $idjadwal)
+                ->with('success', 'Data berhasil disimpan');
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -664,13 +672,13 @@ class PenilaianGuruController extends Controller
             ->where('semester', $konfig['smt'])
             ->get();
 
-        $gtk = Gtk::where('user_id',auth()->id())->first();    
+        $gtk = Gtk::where('user_id', auth()->id())->first();
 
         // Master soal
-            $data['mastersoal'] = Soal::with([
-                'mapel',
-                'jenisSoal'
-            ])
+        $data['mastersoal'] = Soal::with([
+            'mapel',
+            'jenisSoal'
+        ])
             ->where('lecture_id', $gtk->id)
             ->get()
             ->map(function ($row) {
@@ -685,34 +693,32 @@ class PenilaianGuruController extends Controller
                     'jawaban_benar'  => $row->jawaban_benar,
                     'created_at'     => $row->created_at,
                 ];
-
             });
-       
+
         // Jawaban siswa
         $data['jawabansiswa'] = Nilai::with([
             'siswa.jawabanPesertas' => function ($q) use ($id) {
                 $q->where('quiz_id', $id);
             }
         ])
-        ->where('idjadwal', $data['ujian']->master_kelas_id)
-        ->get()
-        ->map(function ($row) {
+            ->where('idjadwal', $data['ujian']->master_kelas_id)
+            ->get()
+            ->map(function ($row) {
 
-            $jawaban = $row->siswa->jawabanPesertas->first();
+                $jawaban = $row->siswa->jawabanPesertas->first();
 
-            return [
-                'id'               => $row->id,
-                'id_jawaban'       =>  optional($jawaban)->id,
-                'nipd'              => $row->siswa->nipd ?? '',
-                'nama_lengkap'       => $row->siswa->nama_lengkap ?? '',
-                'tgl_mulai_quiz'   =>  date('d-m-Y H:i:s', strtotime(optional($jawaban)->tgl_mulai_quiz)),
-                'tgl_selesai_quiz' => date('d-m-Y H:i:s', strtotime(optional($jawaban)->tgl_selesai_quiz)),
-                'jwb_benar'        => optional($jawaban)->jwb_benar ?? 0,
-                'jwb_salah'        => optional($jawaban)->jwb_salah ?? 0,
-                'total_skor'       => optional($jawaban)->total_skor ?? 0,
-            ];
-
-        });
+                return [
+                    'id'               => $row->id,
+                    'id_jawaban'       =>  optional($jawaban)->id,
+                    'nipd'              => $row->siswa->nipd ?? '',
+                    'nama_lengkap'       => $row->siswa->nama_lengkap ?? '',
+                    'tgl_mulai_quiz'   =>  date('d-m-Y H:i:s', strtotime(optional($jawaban)->tgl_mulai_quiz)),
+                    'tgl_selesai_quiz' => date('d-m-Y H:i:s', strtotime(optional($jawaban)->tgl_selesai_quiz)),
+                    'jwb_benar'        => optional($jawaban)->jwb_benar ?? 0,
+                    'jwb_salah'        => optional($jawaban)->jwb_salah ?? 0,
+                    'total_skor'       => optional($jawaban)->total_skor ?? 0,
+                ];
+            });
 
 
 
@@ -749,7 +755,7 @@ class PenilaianGuruController extends Controller
 
             $file = $request->file('upload');
             $filename = time() . '.' . $file->getClientOriginalExtension();
-           
+
             $file->storeAs(
                 'uploads/materi',
                 $filename,
@@ -780,7 +786,7 @@ class PenilaianGuruController extends Controller
 
     public function updateSoal(Request $request)
     {
-      
+
         DB::beginTransaction();
 
         try {
@@ -841,7 +847,7 @@ class PenilaianGuruController extends Controller
         }
     }
 
-    public function storeSoal(Request $request,$quizid)
+    public function storeSoal(Request $request, $quizid)
     {
         DB::beginTransaction();
 
@@ -864,7 +870,7 @@ class PenilaianGuruController extends Controller
             $soal->jawaban_d       = $request->jawaban_d;
             $soal->jawaban_e       = $request->jawaban_e;
 
-                
+
             $soal->save();
 
             $this->createDetQuiz2($quizid, $soal->id);
@@ -885,7 +891,6 @@ class PenilaianGuruController extends Controller
                 'success' => true,
                 'message' => 'Data berhasil ditambahkan'
             ]);
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -896,8 +901,6 @@ class PenilaianGuruController extends Controller
                 'error'   => $e->getMessage(),
             ], 500);
         }
-
-        
     }
 
     public function createDetQuiz2($quizid, $soalid)
@@ -907,7 +910,7 @@ class PenilaianGuruController extends Controller
         try {
 
             $noUrut = DetailQuiz::where('quiz_id', $quizid)
-                        ->max('no_urut');
+                ->max('no_urut');
 
             $detail = DetailQuiz::create([
                 'quiz_id'    => $quizid,
@@ -918,7 +921,6 @@ class PenilaianGuruController extends Controller
             DB::commit();
 
             return $detail;
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -973,7 +975,6 @@ class PenilaianGuruController extends Controller
                 'title'   => 'Success',
                 'message' => 'Proses berhasil dilakukan',
             ]);
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -1030,7 +1031,6 @@ class PenilaianGuruController extends Controller
                 'success' => true,
                 'message' => 'Data telah tersimpan.'
             ]);
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -1040,19 +1040,18 @@ class PenilaianGuruController extends Controller
                 'message' => 'Gagal menyimpan data.',
                 'error'   => $e->getMessage(), // hapus saat production
             ], 500);
-
         }
     }
 
     public function nilai($id = null)
     {
-      $mapel=MasterJadwal::with(['kelas','mapel'])->where('id',$id)->first();
+        $mapel = MasterJadwal::with(['kelas', 'mapel'])->where('id', $id)->first();
 
         return view('guru.pbm.nilai', [
             'side'  => 'pbm',
             'mapel' => $mapel
 
-            
+
 
         ]);
     }
@@ -1081,8 +1080,8 @@ class PenilaianGuruController extends Controller
         $jawabanSiswa = DetailJawabanPeserta::with([
             'detailQuiz.soal'
         ])
-        ->where('jawaban_peserta_id', $id)
-        ->get();
+            ->where('jawaban_peserta_id', $id)
+            ->get();
 
         return view('guru.materi_pbm.ujian.detail-ujian.detail_jawaban', [
 
@@ -1106,5 +1105,4 @@ class PenilaianGuruController extends Controller
 
         ]);
     }
-
 }

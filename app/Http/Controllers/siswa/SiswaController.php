@@ -13,6 +13,10 @@ use App\Models\Kelas;
 use App\Models\Gelombang;
 use App\Models\Bayar;
 use App\Models\DetBayar;
+use App\Models\TemplateBayar;
+
+use App\Models\DetTempBayar;
+
 use App\Models\Konfig;
 use App\Models\TahunAjaran;
 use App\Models\LogModel;
@@ -21,6 +25,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+
 
 class SiswaController extends Controller
 {
@@ -30,14 +36,13 @@ class SiswaController extends Controller
 
 
     var $tahun, $smt;
-  
+
     public function __construct()
     {
         $konfig = Konfig::first();
         $this->tahun = $konfig->id_tahun;
         $this->smt = $konfig->smt;
-      
-    }   
+    }
     public function index()
     {
 
@@ -45,11 +50,11 @@ class SiswaController extends Controller
         $jurusan = Jurusan::orderBy('nama_jurusan')->get();
         $kelas = Kelas::orderBy('nama_kelas')->get();
         $tahunAjaran = TahunAjaran::whereBetween('id', [
-                        $tahunSekarang - 3,
-                        $tahunSekarang
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->get();
+            $tahunSekarang - 3,
+            $tahunSekarang
+        ])
+            ->orderBy('id', 'desc')
+            ->get();
 
         $status_siswa = DB::table('tb_sts_siswa')->orderBy('id', 'asc')->get();
 
@@ -89,7 +94,7 @@ class SiswaController extends Controller
             ->whereHas('tahunAjaran', function ($q) {
                 $q->where('isaktiv', 1);
             })
-            ->where('status_daftar',1)
+            ->where('status_daftar', 1)
             ->latest('id')
             ->get()
             ->map(function ($item) {
@@ -150,39 +155,39 @@ class SiswaController extends Controller
             ])
             ->latest('id');
 
-            if ($request->filled('tahun')) {
-                $query->where('id_thn_ajaran', $request->tahun);
+        if ($request->filled('tahun')) {
+            $query->where('id_thn_ajaran', $request->tahun);
+        }
+
+        if ($request->filled('jurusan')) {
+            $query->where('id_jurusan', $request->jurusan);
+        }
+
+        if ($request->filled('kelas')) {
+            $query->where('id_kelas', $request->kelas);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('nipd', 'like', "%{$search}%")
+                    ->orWhere('nama_lengkap', 'like', "%{$search}%");
+            });
+        }
+
+        $data = $query->get()->map(function ($item) use ($tahun) {
+
+            $kelas;
+            $selisih = $tahun - $item->id_thn_ajaran;
+
+            if ($selisih == 0) {
+                $kelas = 'X';
+            } elseif ($selisih == 1) {
+                $kelas = 'XI';
+            } else {
+                $kelas = 'XII';
             }
-
-            if ($request->filled('jurusan')) {
-                $query->where('id_jurusan', $request->jurusan);
-            }
-
-            if ($request->filled('kelas')) {
-                $query->where('id_kelas', $request->kelas);
-            }
-
-            if ($request->filled('search')) {
-                $search = $request->search;
-
-                $query->where(function ($q) use ($search) {
-                    $q->where('nipd', 'like', "%{$search}%")
-                        ->orWhere('nama_lengkap', 'like', "%{$search}%");
-                });
-            }
-
-        $data = $query->get()->map(function ($item) use($tahun) {
-
-         $kelas;
-         $selisih = $tahun - $item->id_thn_ajaran;
-
-         if ($selisih == 0) {
-             $kelas = 'X';
-         } elseif ($selisih == 1) { 
-             $kelas = 'XI';
-         } else {
-             $kelas = 'XII';
-         }
 
 
             return [
@@ -193,7 +198,7 @@ class SiswaController extends Controller
                 'jk'             => $item->jk,
                 'no_hp'          => $item->no_hp,
                 'email'          => $item->email,
-              
+
                 'nama_jurusan'   => $item->jurusan->nama_jurusan ?? '-',
                 'tahun_ajaran'   => $item->tahunAjaran->thn_ajaran ?? '-',
                 'agama'          => $item->agama->nama_agama ?? '-',
@@ -202,7 +207,7 @@ class SiswaController extends Controller
                 'id_jurusan'     => $item->id_jurusan,
                 'id_thn_ajaran'  => $item->id_thn_ajaran,
                 'status'         => $item->status,
-               'kelas' => trim($kelas . ' ' . ($item->kelas?->nama_kelas ?? '')),
+                'kelas' => trim($kelas . ' ' . ($item->kelas?->nama_kelas ?? '')),
             ];
         });
 
@@ -216,17 +221,58 @@ class SiswaController extends Controller
     {
         $rows = new Siswa();
 
+        $nipd = $this->getNipdBaru();
+
+        //dd($nipd);
+
         $masterData = $this->masterData();
 
         return view('siswa.siswa', array_merge(
             $masterData,
-            compact('rows'),
+            compact('rows', 'nipd'),
             [
                 'side' => 'siswa',
                 'mode' => 'create',
             ]
         ));
     }
+
+
+    /**
+     * Menghasilkan NIPD baru
+     */
+    private function getNipdBaru()
+    {
+         $nipdTerpakai = DB::table('tb_siswa')        
+        ->whereNotNull('nipd')
+        ->whereRaw("nipd REGEXP '^[0-9]+$'")
+        ->pluck('nipd')
+        ->map(fn($nipd) => (int) $nipd)
+        ->unique()
+        ->flip();
+
+    // Ambil batas bawah dan atas berdasarkan data
+    $nomorAwal = $nipdTerpakai->keys()->min() ?? 1000;
+    $nomorAkhir = 9999;
+
+    // Cari nomor kosong terkecil
+    for ($i = $nomorAwal; $i <= $nomorAkhir; $i++) {
+
+        if (!$nipdTerpakai->has($i)) {
+            return str_pad($i, 4, '0', STR_PAD_LEFT);
+        }
+    }
+
+    throw new \RuntimeException(
+        'Seluruh nomor NIPD sudah digunakan.'
+    );
+    }
+
+
+    /**
+     * Endpoint AJAX jika diperlukan
+     */
+    
 
     /**
      * Form edit siswa.
@@ -387,11 +433,22 @@ class SiswaController extends Controller
    public function updateAkademik(Request $request, $id = null)
 {
     $validated = $request->validate([
+
+        /*
+        |--------------------------------------------------------------------------
+        | INFORMASI AKADEMIK
+        |--------------------------------------------------------------------------
+        */
         'nipd'          => 'required|string|max:50',
         'id_thn_ajaran' => 'required|integer',
-        'id_jurusan'    => 'nullable|integer',
+        'id_jurusan'    => $id ? 'nullable|integer' : 'required|integer',
         'id_kelas'      => 'required|integer',
 
+        /*
+        |--------------------------------------------------------------------------
+        | IDENTITAS SISWA
+        |--------------------------------------------------------------------------
+        */
         'sts_siswa'     => 'nullable|integer',
         'nama_lengkap'  => 'required|string|max:255',
         'nisn'          => 'nullable|string|max:30',
@@ -400,48 +457,260 @@ class SiswaController extends Controller
         'id_agama'      => 'nullable|integer',
         'tmp_lahir'     => 'nullable|string|max:100',
         'tgl_lahir'     => 'nullable|date',
+
+        /*
+        |--------------------------------------------------------------------------
+        | ALAMAT
+        |--------------------------------------------------------------------------
+        */
         'alamat'        => 'nullable|string',
         'dusun'         => 'nullable|string|max:100',
         'desa'          => 'nullable|string|max:100',
         'kecamatan'     => 'nullable|string|max:100',
         'kota'          => 'nullable|string|max:100',
         'provinsi'      => 'nullable|string|max:100',
+
+        /*
+        |--------------------------------------------------------------------------
+        | KONTAK
+        |--------------------------------------------------------------------------
+        */
         'no_hp'         => 'nullable|string|max:20',
-        'email'         => 'nullable|email|max:255',
+        'email'         => [
+            'required',
+            'email',
+            'max:255',
+            ...(!$id ? [Rule::unique('users', 'email')] : []),
+        ],
     ]);
 
     try {
-        if (!empty($id)) {
-            // Update data
-            $siswa = Siswa::findOrFail($id);
-            $siswa->update($validated);
 
-            $aksi = 'update-akademik';
-            $pesan = 'Data akademik siswa berhasil diperbarui.';
-        } else {
-            // Tambah data
-            $validated['sts_siswa'] = $validated['sts_siswa'] ?? 1;
+        DB::transaction(function () use ($validated, $request, $id, &$siswa, &$aksi, &$pesan) {
 
-            $siswa = Siswa::create($validated);
+            if (!empty($id)) {
 
-            $aksi = 'tambah-akademik';
-            $pesan = 'Data akademik siswa berhasil ditambahkan.';
-        }
+                /*
+                |--------------------------------------------------------------------------
+                | UPDATE DATA SISWA
+                |--------------------------------------------------------------------------
+                */
 
-        $this->simpanLog(
-            request: $request,
-            aksi: $aksi,
-            siswa: $siswa
-        );
+                $siswa = Siswa::findOrFail($id);
+
+                $siswa->update($validated);
+
+                $aksi  = 'update-akademik';
+                $pesan = 'Data akademik siswa berhasil diperbarui.';
+
+            } else {
+
+                /*
+                |--------------------------------------------------------------------------
+                | TAMBAH DATA SISWA
+                |--------------------------------------------------------------------------
+                */
+
+                $validated['sts_siswa'] = $validated['sts_siswa'] ?? 1;
+
+                /*
+                |--------------------------------------------------------------------------
+                | CEK TEMPLATE PEMBAYARAN
+                |--------------------------------------------------------------------------
+                */
+
+                $template = TemplateBayar::query()
+                    ->where('id_jurusan', $validated['id_jurusan'])
+                    ->where('id_tahun', $this->tahun)
+                    ->first();
+
+                if (!$template) {
+                    throw new \RuntimeException(
+                        'Detail template pembayaran belum tersedia.'
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | BUAT USER
+                |--------------------------------------------------------------------------
+                */
+
+                $userId = DB::table('users')->insertGetId([
+                    'name'              => $validated['nama_lengkap'],
+                    'email'             => $validated['email'],
+                    'password'          => Hash::make('password'),
+                    'email_verified_at' => null,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+
+                /*
+                |--------------------------------------------------------------------------
+                | ASSIGN ROLE
+                |--------------------------------------------------------------------------
+                */
+
+                $user = User::findOrFail($userId);
+
+                $user->assignRole('siswa');
+
+                /*
+                |--------------------------------------------------------------------------
+                | BUAT DATA SISWA
+                |--------------------------------------------------------------------------
+                */
+                $siswa = Siswa::create($validated);
+                /*
+                |--------------------------------------------------------------------------
+                | HUBUNGKAN USER DAN TEMPLATE BAYAR
+                |--------------------------------------------------------------------------
+                */
+                $siswa->id_user = $userId;
+                $siswa->id_template_bayar = $template->id;
+
+                $siswa->save();
+
+                $aksi  = 'tambah-akademik';
+                $pesan = 'Data akademik siswa berhasil ditambahkan.';
+            }
+
+
+                if (empty($id)) {
+
+                 
+
+                    $result = $this->generateTagihanCalonSiswa(
+                        siswa: $siswa,
+                        idTahun: (int) $request->id_thn_ajaran,
+                        idUser: $userId,
+                        ip: $request->ip(),
+                    );
+
+                   
+                }
+
+            /*
+            |--------------------------------------------------------------------------
+            | SIMPAN LOG
+            |--------------------------------------------------------------------------
+            */
+
+            $this->simpanLog(
+                request: $request,
+                aksi: $aksi,
+                siswa: $siswa
+            );
+
+        });
 
         return back()->with('success', $pesan);
 
     } catch (\Throwable $e) {
+
         return back()
             ->withInput()
             ->with('error', $e->getMessage());
     }
 }
+
+
+ private function generateTagihanCalonSiswa(
+        Siswa $siswa,
+        int $idTahun,
+        ?int $idUser = null,
+        ?string $ip = null
+    ): array {
+        $berhasil = 0;
+        $gagal = 0;
+
+        // Hindari tagihan ganda
+        $sudahAda = Bayar::where('id_tahun', $idTahun)
+            ->where('id_siswa', $siswa->nipd)
+            ->exists();
+
+        if ($sudahAda) {
+            return [
+                'success'   => true,
+                'generated' => false,
+                'berhasil'  => 0,
+                'gagal'     => 0,
+                'message'   => 'Tagihan calon siswa sudah tersedia.',
+            ];
+        }
+
+        $bulan = (int) now()->format('m');
+
+        $bayar = Bayar::create([
+            'id_tahun'        => $idTahun,
+            'id_bulan'        => $bulan,
+            'id_siswa'        => $siswa->nipd,
+        ]);
+
+        $detailTemplate = DetTempBayar::query()
+            ->where('id_template', $siswa->id_template_bayar)
+            ->whereHas('itemBayar', function ($query) {
+                $query->whereIn('id_kategori', [1,2,5]);
+            })
+            ->get();
+
+        if ($detailTemplate->isEmpty()) {
+            throw new \Exception(
+                'Detail template pembayaran belum tersedia.'
+            );
+        }
+
+        foreach ($detailTemplate as $item) {
+            DetBayar::create([
+                'id_bayar'        => $bayar->id,
+                'id_item'         => $item->id_item,
+                'kwajiban_bayar'  => $item->jml_bayar,
+                'potongan'        => 0,
+                'jml_bayar'       => 0,
+            ]);
+
+            $berhasil++;
+        }
+
+        $this->updateTotalBayar($bayar->id);
+
+        LogModel::create([
+            'tanggal'   => now(),
+            'tabel'     => 'tb_bayar_regis',
+            'aksi'      => 'create',
+            'user'      => $idUser,
+            'ip'        => $ip,
+            'keterangan' => json_encode([
+                'id_bayar'       => $bayar->id,
+                'nipd'      => $siswa->nipd,
+                'jumlah_detail'  => $berhasil,
+            ]),
+            'serial'    => url('pendaftaran/online'),
+        ]);
+
+        return [
+            'success'   => true,
+            'generated' => true,
+            'berhasil'  => $berhasil,
+            'gagal'     => $gagal,
+            'id_bayar'  => $bayar->id,
+            'message'   => 'Tagihan berhasil dibuat.',
+        ];
+    }
+
+     public function updateTotalBayar($id)
+    {
+        $total = DetBayar::where('id_bayar', $id)
+            ->sum('kwajiban_bayar')
+            - DetBayar::where('id_bayar', $id)
+            ->sum('potongan');
+
+        Bayar::where('id', $id)
+            ->update([
+                'tot_kwajiban' => $total
+            ]);
+    }
+
 
     /**
      * Update data orang tua.
@@ -598,6 +867,7 @@ class SiswaController extends Controller
             /*
             * Simpan data lama untuk log.
             */
+
             $dataLama = $siswa->toArray();
 
             /*
@@ -770,7 +1040,7 @@ class SiswaController extends Controller
                 'id'
             )->get(),
             'status_siswa' => DB::table('tb_sts_siswa')->orderBy('id', 'asc')->get(),
-             'jobs' => Pekerjaan::orderBy('nama_pekerjaan', 'asc')->get()
+            'jobs' => Pekerjaan::orderBy('nama_pekerjaan', 'asc')->get()
 
         ];
     }

@@ -125,7 +125,7 @@
 
                                 @foreach($kelas as $item)
 
-                                <option value="{{ $item->id }}">
+                                <option value="{{ $item->idx }}">
                                     {{ $item->nama_kelas }}
                                 </option>
 

@@ -618,6 +618,27 @@
                 minWidth: 180
             },
 
+           {
+            title: "Status Bayar",
+    hozAlign: "center",
+    minWidth: 180,
+    formatter: function(cell) {
+        const row = cell.getRow().getData();
+
+        return `
+            <a
+                href="/bayar-calon-siswa/createReportPdf/${row.no_daftar}"
+                target="_blank"
+                class="inline-flex items-center gap-1 rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700 transition hover:bg-teal-100"
+                title="Cek Status Pembayaran"
+            >
+                <i data-lucide="file-search" class="w-4 h-4"></i>
+                Cek Status
+            </a>
+        `;
+    }
+        },
+
 
             /*
             |--------------------------------------------------------------------------
@@ -645,8 +666,7 @@
                     if (data.status_daftar_id != 1) {
 
                         tombolDaftarUlang = `
-                    <!-- DAFTAR ULANG -->
-
+                   
                     <button
                         type="button"
                         onclick='openDaftarUlang(${JSON.stringify(data)})'
@@ -721,7 +741,7 @@
                 </a>
 
 
-                <!-- DELETE -->
+              
 
                 <button
                     type="button"

@@ -266,7 +266,6 @@ class CalonSiswaController extends Controller
     public function edit($id)
     {
         $side = 'calon-siswa';
-
         $rows = CalonSiswa::findOrFail($id);
 
         /*
@@ -285,8 +284,6 @@ class CalonSiswaController extends Controller
             'detailBayar',
             'calonSiswa'
         ])->where('id_calon_siswa', $id)->first();
-
-
 
         $bukti = CalonSiswa::with('buktiPembayaran')
             ->where('id', $id)
@@ -533,9 +530,9 @@ class CalonSiswaController extends Controller
             'kecamatan'     => 'nullable|string|max:255',
             'kota'          => 'nullable|string|max:255',
             'provinsi'      => 'nullable|string|max:255',
-            'no_hp'         => 'nullable|string|max:20',
+            'no_hp'         => 'required|string|max:20',
             'no_telp'       => 'nullable|string|max:20',
-            'email'         => 'nullable|email|max:255',
+            'email'         => 'required|email|max:255',
         ]);
 
         try {
@@ -1059,19 +1056,19 @@ class CalonSiswaController extends Controller
 
         try {
 
-        $request->validate([
-    'bukti_transfer' => [
-        'required',
-        'image',
-        'mimes:jpg,jpeg,png',
-        'max:2048',
-    ],
-], [
-    'bukti_transfer.required' => 'Anda belum mengunggah bukti pembayaran.',
-    'bukti_transfer.image'    => 'File yang diunggah harus berupa gambar.',
-    'bukti_transfer.mimes'    => 'Format gambar harus JPG, JPEG, atau PNG.',
-    'bukti_transfer.max'      => 'Ukuran gambar maksimal 2 MB.',
-]);
+            $request->validate([
+                'bukti_transfer' => [
+                    'required',
+                    'image',
+                    'mimes:jpg,jpeg,png',
+                    'max:2048',
+                ],
+            ], [
+                'bukti_transfer.required' => 'Anda belum mengunggah bukti pembayaran.',
+                'bukti_transfer.image'    => 'File yang diunggah harus berupa gambar.',
+                'bukti_transfer.mimes'    => 'Format gambar harus JPG, JPEG, atau PNG.',
+                'bukti_transfer.max'      => 'Ukuran gambar maksimal 2 MB.',
+            ]);
 
             DB::beginTransaction();
 
@@ -1096,6 +1093,7 @@ class CalonSiswaController extends Controller
             $data['updated_at'] = now();
 
             DB::table('tb_bukti_bayar_calon')->insert([
+                'id_item_bayar' => $request->id_item_bayar,
                 'id_calon_siswa' => $id,
                 'bukti_transfer' => $data['bukti_transfer'] ?? null,
                 'status' => 1,
@@ -1520,51 +1518,45 @@ class CalonSiswaController extends Controller
 
 
     public function generateNipd()
-    {
-        $nipdSiswa = Siswa::query()
-            ->whereNotNull('nipd')
-            ->whereRaw("nipd REGEXP '^[0-9]+$'")
-            ->orderByDesc('id')
-            ->value('nipd');
+{
+    // Ambil seluruh NIPD dari tabel siswa dan calon siswa
+    $nipdTerpakai = DB::table('tb_siswa')        
+        ->whereNotNull('nipd')
+        ->whereRaw("nipd REGEXP '^[0-9]+$'")
+        ->pluck('nipd')
+        ->map(fn($nipd) => (int) $nipd)
+        ->unique()
+        ->flip();
 
-        $nipdCalon = CalonSiswa::query()
-            ->whereNotNull('nipd')
-            ->whereRaw("nipd REGEXP '^[0-9]+$'")
-            ->orderByDesc('id')
-            ->value('nipd');
+    // Ambil batas bawah dan atas berdasarkan data
+    $nomorAwal = $nipdTerpakai->keys()->min() ?? 1000;
+    $nomorAkhir = 9999;
 
-        $nomorTerakhir = max(
-            (int) $nipdSiswa,
-            (int) $nipdCalon
-        );
+    // Cari nomor kosong terkecil
+    for ($i = $nomorAwal; $i <= $nomorAkhir; $i++) {
 
-        $nomorBaru = $nomorTerakhir + 1;
-
-        if ($nomorBaru > 9999) {
-            return response()->json([
-                'success' => false,
-                'nipd'    => str_pad($nomorTerakhir, 4, '0', STR_PAD_LEFT),
-                'message' => 'NIPD 4 digit sudah mencapai batas maksimum.',
-            ], 422);
+        if (!$nipdTerpakai->has($i)) {
+            //return str_pad($i, 4, '0', STR_PAD_LEFT);
+             return response()->json([
+                'success' => true,
+                'nipd'    => str_pad($i, 4, '0', STR_PAD_LEFT),
+            ]);
         }
-
-        return response()->json([
-            'success' => true,
-            'nipd'    => str_pad(
-                $nomorBaru,
-                4,
-                '0',
-                STR_PAD_LEFT
-            ),
-        ]);
     }
+
+    throw new \RuntimeException(
+        'Seluruh nomor NIPD sudah digunakan.'
+    );
+
+   
+}
 
     public function pembayaranCalonSiswa()
     {
 
         $side = 'pembayaranCalonSiswa';
 
-        $itemBayar = ItemBayar::where('id_kategori', 2)
+        $itemBayar = ItemBayar::whereIn('id_kategori', [1, 2])
             ->get();
 
         $cs = CalonSiswa::where('id_user', Auth::id())->first();
@@ -1611,7 +1603,7 @@ class CalonSiswaController extends Controller
     public function listBuktiPembayaran()
     {
         $data = BuktiBayarCalon::with([
-            'calonSiswa',
+            'calonSiswa','itemBayar'
         ])->where('status', 1)
             ->latest('id')
             ->get();

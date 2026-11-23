@@ -450,7 +450,7 @@
                     <!-- Item Pembayaran -->
                     <div>
 
-                        <label for="payment_item"
+                        <label for="id_item_bayar"
                             class="block text-xs font-bold text-slate-700 mb-1.5">
 
                             Item Pembayaran
@@ -458,8 +458,8 @@
                         </label>
 
                         <select
-                            id="payment_item"
-                            name="payment_item"
+                            id="id_item_bayar"
+                            name="id_item_bayar"
                             class="w-full text-xs sm:text-sm rounded-lg border-slate-300 px-3.5 py-2.5 sm:py-3 text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition">
 
                             <option value="">

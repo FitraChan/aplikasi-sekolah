@@ -54,6 +54,7 @@ class Nilai extends Model
             'nipd',
             'nipd'
         );
+
     }
 
     public function guru()

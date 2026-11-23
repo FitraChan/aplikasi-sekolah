@@ -26,8 +26,12 @@ Route::post('/login-siswa', [UserController::class, 'index']);
 Route::middleware(['auth:sanctum', 'role:siswa'])->group(function () {
         Route::get('/absensi', [AbsenController::class, 'index']);
         Route::get('/pembayaran', [BayarController::class, 'index']);
+        Route::get('/bank', [BayarController::class, 'bank']);
+
+
         Route::get('/itemBayar', [BayarController::class, 'itemBayar']);
         Route::post('/simpanIpaymu', [BayarController::class, 'simpanIpaymu'])->name('simpanIpaymu');
+        Route::post('/simpanCicilan', [BayarController::class, 'simpanCicilan'])->name('simpanCicilan');
 
         Route::get('/pengumuman', [
                 PengumumanController::class,

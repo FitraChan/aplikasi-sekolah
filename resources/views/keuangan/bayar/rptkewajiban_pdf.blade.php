@@ -1,14 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
     <meta charset="utf-8">
     <title>Laporan Kewajiban Siswa</title>
 
     <style>
+        @page {
+            margin: 30px 35px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: DejaVu Sans, sans-serif;
+            font-size: 10px;
+            color: #334155;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header {
+            margin-bottom: 12px;
+        }
+
+        .header td {
+            vertical-align: middle;
+        }
+
+        .school-name {
+            font-size: 19px;
+            font-weight: bold;
+            color: #0f766e;
+            margin: 0;
+        }
+
+        .school-info {
+            font-size: 9px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .document-label {
+            text-align: right;
+            font-size: 9px;
+            color: #64748b;
+        }
+
+        .document-label strong {
+            display: block;
+            font-size: 12px;
+            color: #0f766e;
+        }
+
+        .divider {
+            height: 3px;
+            background: #0f766e;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .title h2 {
+            font-size: 16px;
+            color: #0f172a;
+            margin: 0 0 4px;
+            letter-spacing: .5px;
+        }
+
+        .title p {
+            color: #64748b;
+            font-size: 9px;
+            margin: 0;
+        }
+
+        .student-card {
+            background: #f0fdfa;
+            border: 1px solid #ccfbf1;
+            margin-bottom: 18px;
+        }
+
+        .student-card td {
+            padding: 9px 12px;
+            vertical-align: top;
+        }
+
+        .label {
+            color: #64748b;
+            font-size: 9px;
+        }
+
+        .value {
+            font-weight: bold;
+            color: #0f172a;
+            font-size: 10px;
+        }
+
+        .section-title {
             font-size: 11px;
+            font-weight: bold;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .tbl th {
+            background: #0f766e;
+            color: #ffffff;
+            padding: 9px 7px;
+            font-size: 9px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .tbl td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 7px;
+            font-size: 9px;
+        }
+
+        .tbl tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .tbl tfoot td {
+            background: #f0fdfa;
+            border-top: 2px solid #0f766e;
+            border-bottom: 1px solid #ccfbf1;
+            font-weight: bold;
+            color: #0f172a;
+            padding: 10px 7px;
         }
 
         .center {
@@ -19,207 +149,305 @@
             text-align: right;
         }
 
-        .bold {
+        .summary {
+            border-spacing: 8px 0;
+            margin: 18px -8px 0;
+            width: calc(100% + 16px);
+        }
+
+        .summary td {
+            width: 33.33%;
+            padding: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .summary-label {
+            font-size: 8px;
+            color: #64748b;
+        }
+
+        .summary-value {
+            font-size: 12px;
             font-weight: bold;
+            color: #0f172a;
+            margin-top: 4px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .green {
+            color: #0f766e;
         }
 
-        .tbl th,
-        .tbl td {
-            border: 1px solid #000;
-            padding: 5px;
+        .red {
+            color: #dc2626;
         }
 
-        .tbl th {
-            background: #eaeaea;
+        .signature {
+            margin-top: 35px;
         }
 
-        .header td {
-            padding: 2px;
+        .signature td {
+            vertical-align: top;
         }
 
-        hr {
-            border: 1px solid #000;
+        .signature-date {
+            color: #64748b;
+            font-size: 9px;
+        }
+
+        .signature-name {
+            font-weight: bold;
+            color: #0f172a;
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 25px;
+            padding-top: 8px;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 8px;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="center">
-
-        <h2 style="margin:0">
-            {{ $profile->nama ?? '-' }}
-        </h2>
-
-        <div>
-            {{ $profile->alamat ?? '-' }}
-        </div>
-
-        <div>
-            Telp. {{ $profile->telp ?? '-' }}
-        </div>
-
-    </div>
-
-    <hr>
-
-    <h3 class="center">
-        LAPORAN CALON KEWAJIBAN SISWA
-    </h3>
-
-    <br>
-
+    {{-- HEADER SEKOLAH --}}
     <table class="header">
         <tr>
-            <td width="120">NIPD</td>
-            <td width="10">:</td>
-            <td>{{ $atas->nipd }}</td>
-        </tr>
+            <td width="70%">
+                <h1 class="school-name">
+                    {{ $profile->nama ?? '-' }}
+                </h1>
 
-        <tr>
-            <td>Nama Siswa</td>
-            <td>:</td>
-            <td>{{ $atas->nama_lengkap }}</td>
-        </tr>
+                <div class="school-info">
+                    {{ $profile->alamat ?? '-' }}
+                    <br>
+                    Telp. {{ $profile->telp ?? '-' }}
+                </div>
+            </td>
 
-        <tr>
-            <td>Kelas</td>
-            <td>:</td>
-            <td>{{ $atas->kelas->nama_kelas ?? '-' }}</td>
-        </tr>
-
-        <tr>
-            <td>Jurusan</td>
-            <td>:</td>
-            <td>{{ $atas->jurusan->nama_jurusan ?? '-' }}</td>
+            <td width="30%" class="document-label">
+                <strong>LAPORAN KEUANGAN</strong>
+                 KEWAJIBAN SISWA
+            </td>
         </tr>
     </table>
 
-    <br>
+    <div class="divider"></div>
 
+    {{-- JUDUL --}}
+    <div class="title">
+        <h2>LAPORAN  KEWAJIBAN SISWA</h2>
+        <p>Rincian kewajiban, potongan, pembayaran dan sisa tagihan</p>
+    </div>
+
+    {{-- IDENTITAS SISWA --}}
+    <table class="student-card">
+        <tr>
+            <td width="50%">
+                <div class="label">NIPD</div>
+                <div class="value">
+                    {{ $atas->nipd ?? '-' }}
+                </div>
+            </td>
+
+            <td width="50%">
+                <div class="label">Nama Siswa</div>
+                <div class="value">
+                    {{ $atas->nama_lengkap ?? '-' }}
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td width="50%">
+                <div class="label">Kelas</div>
+                <div class="value">
+                    {{ $atas->kelas->nama_kelas ?? '-' }}
+                </div>
+            </td>
+
+            <td width="50%">
+                <div class="label">Jurusan</div>
+                <div class="value">
+                    {{ $atas->jurusan->nama_jurusan ?? '-' }}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- PERHITUNGAN --}}
     @php
-    $no = 1;
-    $totBayar = 0;
-    $totKewajiban = 0;
-    $totPotongan = 0;
+        $no = 1;
+        $totBayar = 0;
+        $totKewajiban = 0;
+        $totPotongan = 0;
     @endphp
+
+    {{-- TABEL KEWAJIBAN --}}
+    <div class="section-title">
+        Rincian Kewajiban Pembayaran
+    </div>
 
     <table class="tbl">
 
         <thead>
             <tr>
-                <th width="40">No</th>
+                <th width="35">No</th>
                 <th>Item Pembayaran</th>
-                <th width="120">Kewajiban</th>
-                <th width="120">Potongan</th>
-                <th width="120">Dibayar</th>
-                <th width="120">Sisa</th>
+                <th width="100">Kewajiban</th>
+                <th width="90">Potongan</th>
+                <th width="100">Dibayar</th>
+                <th width="100">Sisa</th>
             </tr>
         </thead>
 
         <tbody>
 
-            @foreach($hasil as $row)
+            @forelse($hasil as $row)
 
-            @php
-            $sisa = $row->SUMK2 - $row->SUMP - $row->SUMB;
+                @php
+                    $kewajiban = (float) ($row->SUMK2 ?? 0);
+                    $potongan = (float) ($row->SUMP ?? 0);
+                    $dibayar = (float) ($row->SUMB ?? 0);
 
-            $totBayar += $row->SUMB;
-            $totKewajiban += $row->SUMK2;
-            $totPotongan += $row->SUMP;
-            @endphp
+                    $sisa = $kewajiban - $potongan - $dibayar;
 
-            <tr>
+                    $totBayar += $dibayar;
+                    $totKewajiban += $kewajiban;
+                    $totPotongan += $potongan;
+                @endphp
 
-                <td class="center">
-                    {{ $no++ }}
-                </td>
+                <tr>
+                    <td class="center">
+                        {{ $no++ }}
+                    </td>
 
-                <td>
-                    {{ $row->nama_item }}
-                </td>
+                    <td>
+                        {{ $row->nama_item ?? '-' }}
+                    </td>
 
-                <td class="right">
-                    {{ number_format($row->SUMK2,0,',','.') }}
-                </td>
+                    <td class="right">
+                        {{ number_format($kewajiban, 0, ',', '.') }}
+                    </td>
 
-                <td class="right">
-                    {{ number_format($row->SUMP,0,',','.') }}
-                </td>
+                    <td class="right">
+                        {{ number_format($potongan, 0, ',', '.') }}
+                    </td>
 
-                <td class="right">
-                    {{ number_format($row->SUMB,0,',','.') }}
-                </td>
+                    <td class="right">
+                        {{ number_format($dibayar, 0, ',', '.') }}
+                    </td>
 
-                <td class="right">
-                    {{ number_format($sisa,0,',','.') }}
-                </td>
+                    <td class="right">
+                        {{ number_format($sisa, 0, ',', '.') }}
+                    </td>
+                </tr>
 
-            </tr>
+            @empty
 
-            @endforeach
+                <tr>
+                    <td colspan="6" class="center">
+                        Belum terdapat data kewajiban pembayaran.
+                    </td>
+                </tr>
+
+            @endforelse
 
         </tbody>
 
         <tfoot>
-
-            <tr class="bold">
-
+            <tr>
                 <td colspan="2" class="center">
-                    TOTAL
+                    TOTAL KESELURUHAN
                 </td>
 
                 <td class="right">
-                    {{ number_format($totKewajiban,0,',','.') }}
+                    {{ number_format($totKewajiban, 0, ',', '.') }}
                 </td>
 
                 <td class="right">
-                    {{ number_format($totPotongan,0,',','.') }}
+                    {{ number_format($totPotongan, 0, ',', '.') }}
                 </td>
 
                 <td class="right">
-                    {{ number_format($totBayar,0,',','.') }}
+                    {{ number_format($totBayar, 0, ',', '.') }}
                 </td>
 
                 <td class="right">
-                    {{ number_format($totKewajiban - $totPotongan - $totBayar,0,',','.') }}
+                    {{ number_format($totKewajiban - $totPotongan - $totBayar, 0, ',', '.') }}
                 </td>
-
             </tr>
-
         </tfoot>
 
     </table>
 
-    <br><br><br>
-
-    <table border="0">
+    {{-- RINGKASAN --}}
+    <table class="summary">
         <tr>
-            <td width="60%"></td>
+            <td>
+                <div class="summary-label">
+                    TOTAL KEWAJIBAN
+                </div>
 
-            <td align="center">
+                <div class="summary-value">
+                    Rp {{ number_format($totKewajiban, 0, ',', '.') }}
+                </div>
+            </td>
 
-                {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+            <td>
+                <div class="summary-label">
+                    TOTAL PEMBAYARAN
+                </div>
 
-                <br><br>
+                <div class="summary-value green">
+                    Rp {{ number_format($totBayar, 0, ',', '.') }}
+                </div>
+            </td>
 
-                Petugas
+            <td>
+                <div class="summary-label">
+                    SISA KEWAJIBAN
+                </div>
 
-                <br><br><br><br>
-
-                <u>
-                    {{ auth()->user()->name ?? '-' }}
-                </u>
-
+                <div class="summary-value red">
+                    Rp {{ number_format($totKewajiban - $totPotongan - $totBayar, 0, ',', '.') }}
+                </div>
             </td>
         </tr>
     </table>
 
-</body>
+    {{-- TANDA TANGAN --}}
+    <table class="signature">
+        <tr>
+            <td width="55%"></td>
 
+            <td width="45%" class="center">
+                <div class="signature-date">
+                    {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
+                </div>
+
+                <br>
+
+                Petugas Keuangan
+
+                <br><br><br><br><br>
+
+                <span class="signature-name">
+                    {{ auth()->user()->name ?? '-' }}
+                </span>
+            </td>
+        </tr>
+    </table>
+
+    {{-- FOOTER --}}
+    <div class="footer">
+        Dokumen ini dicetak secara elektronik melalui sistem informasi sekolah.
+    </div>
+
+</body>
 </html>

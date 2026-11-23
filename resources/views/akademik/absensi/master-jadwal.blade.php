@@ -1,110 +1,172 @@
-<div class="max-w-7xl mx-auto p-6">
-   
-    <div class="grid grid-cols-12 gap-6 mt-5">
+<div class="w-full mx-auto p-3 sm:p-5 lg:p-6">
 
-        <div class="intro-y col-span-12">
+    {{-- ACTION BUTTON --}}
+    {{-- Tambahkan tombol aksi di sini jika diperlukan --}}
 
-            <div class="intro-y box">
+    {{-- MAIN CARD --}}
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-                <div class="flex flex-col sm:flex-row items-center p-5 border-b border-slate-200/60">
-                    <h2 class="font-medium text-base mr-auto">
-                        Daftar Jadwal
-                    </h2>
+        {{-- CARD HEADER --}}
+        <div class="flex flex-col gap-2 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="flex items-center gap-2 text-lg font-bold text-slate-800">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#02BC9C]/10 text-[#02BC9C]">
+                        <i data-lucide="calendar-days" class="h-5 w-5"></i>
+                    </span>
+                    <span>Daftar Jadwal</span>
+                </h2>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Lihat dan cari data jadwal berdasarkan tahun ajaran, jurusan, kelas, semester, dan angkatan.
+                </p>
+            </div>
+        </div>
+
+        {{-- CARD BODY --}}
+        <div class="p-5">
+
+            {{-- FILTER AREA --}}
+            <div class="mb-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+
+                <div class="mb-4 flex items-center gap-2">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-600 shadow-sm">
+                        <i data-lucide="filter" class="h-4 w-4"></i>
+                    </span>
+
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-700">Filter Jadwal</h3>
+                        <p class="text-xs text-slate-500">
+                            Gunakan filter untuk mencari data jadwal.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="p-5">
+                {{-- FILTER INPUT --}}
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 
-                    <div class="overflow-x-auto">
+                    {{-- TAHUN AJARAN --}}
+                    <div>
+                        <label for="filter_tahun" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Tahun Ajaran
+                        </label>
 
-                        <div class="flex flex-wrap gap-3 mb-4">
+                        <select id="filter_tahun"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
 
-                            <select id="filter_tahun" class="form-select w-56">
-                                <option value="">Semua Tahun Ajaran</option>
+                            <option value="">Semua Tahun Ajaran</option>
 
-                                @foreach($tahun as $item)
-                                <option value="{{ $item->id }}">
-                                    {{ $item->thn_ajaran }}
-                                </option>
-                                @endforeach
-                            </select>
-
-                            <select id="filter_jurusan" class="form-select w-56">
-                                <option value="">Semua Jurusan</option>
-
-                                @foreach($jurusan as $item)
-                                <option value="{{ $item->id }}">
-                                    {{ $item->nama_jurusan }}
-                                </option>
-                                @endforeach
-                            </select>
-
-                            <select id="filter_kelas" class="form-select w-56">
-                                <option value="">Semua Kelas</option>
-                                @foreach($kelas as $item)
-                                <option value="{{ $item->idx }}">
-                                    {{ $item->nama_kelas }}
-                                </option>
-                                @endforeach
-                            </select>
-
-                            <select
-                                id="filter_semester"
-                                class="form-select w-56">
-
-                                <option value="">
-                                    Pilih Semester
-                                </option>
-
-                                <option value="1">
-                                    Ganjil
-                                </option>
-
-                                <option value="0">
-                                    Genap
-                                </option>
-
-                            </select>
-
-                            <select id="filter_angkatan" class="form-select w-56">
-                                <option value="">Angkatan</option>
-
-                                @foreach($tahun as $item)
-                                <option value="{{ $item->id }}">
-                                    {{ $item->thn_ajaran }}
-                                </option>
-                                @endforeach
-                            </select>
-
-                            <button
-                                class="btn btn-primary"
-                                onclick="loadData()">
-
-                                Cari
-
-                            </button>
-
-                            <button
-                                class="btn btn-secondary"
-                                onclick="resetFilter()">
-
-                                Reset
-
-                            </button>
-
-                        </div>
-
-                        <div id="table-jadwal"></div>
-
+                            @foreach($tahun as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->thn_ajaran }}
+                            </option>
+                            @endforeach
+                        </select>
                     </div>
+
+                    {{-- JURUSAN --}}
+                    <div>
+                        <label for="filter_jurusan" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Jurusan
+                        </label>
+
+                        <select id="filter_jurusan"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                            <option value="">Semua Jurusan</option>
+
+                            @foreach($jurusan as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->nama_jurusan }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- KELAS --}}
+                    <div>
+                        <label for="filter_kelas" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Kelas
+                        </label>
+
+                        <select id="filter_kelas"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                            <option value="">Semua Kelas</option>
+
+                            @foreach($kelas as $item)
+                            <option value="{{ $item->idx }}">
+                                {{ $item->nama_kelas }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- SEMESTER --}}
+                    <div>
+                        <label for="filter_semester" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Semester
+                        </label>
+
+                        <select id="filter_semester"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                            <option value="">Pilih Semester</option>
+                            <option value="1">Ganjil</option>
+                            <option value="0">Genap</option>
+                        </select>
+                    </div>
+
+                    {{-- ANGKATAN --}}
+                    <div>
+                        <label for="filter_angkatan" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                            Angkatan
+                        </label>
+
+                        <select id="filter_angkatan"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-[#02BC9C] focus:ring-2 focus:ring-[#02BC9C]/20">
+
+                            <option value="">Semua Angkatan</option>
+
+                            @foreach($tahun as $item)
+                            <option value="{{ $item->id }}">
+                                {{ $item->thn_ajaran }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                </div>
+
+                {{-- BUTTON --}}
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+
+                    <button type="button"
+                        onclick="loadData()"
+                        class="inline-flex items-center gap-2 rounded-xl bg-[#02BC9C] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#00A98C] focus:outline-none focus:ring-2 focus:ring-[#02BC9C]/30">
+
+                        <i data-lucide="search" class="h-4 w-4"></i>
+                        <span>Cari</span>
+                    </button>
+
+                    <button type="button"
+                        onclick="resetFilter()"
+                        class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-slate-800">
+
+                        <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+                        <span>Reset</span>
+                    </button>
 
                 </div>
 
             </div>
 
+            {{-- TABLE --}}
+            <div class="overflow-hidden rounded-xl border border-slate-200">
+                <div id="table-jadwal" class="w-full"></div>
+            </div>
+
         </div>
-
     </div>
-
 </div>
 
 <script>
@@ -131,31 +193,31 @@
         columns: [
 
             {
-                   title: "No",
-                    width: 70,
-                    hozAlign: "center",
-                    formatter: function(cell) {
+                title: "No",
+                width: 70,
+                hozAlign: "center",
+                formatter: function(cell) {
 
-                        let row = cell.getRow();
-                        let table = row.getTable();
+                    let row = cell.getRow();
+                    let table = row.getTable();
 
-                        let page = table.getPage();
-                        let size = table.getPageSize();
+                    let page = table.getPage();
+                    let size = table.getPageSize();
 
-                        return ((page - 1) * size) + row.getPosition(true);
-                    }
+                    return ((page - 1) * size) + row.getPosition(true);
+                }
             },
 
             {
                 title: "Tahun Ajaran",
                 field: "tahun_ajaran",
-                width: 180
+                width: 150
             },
 
             {
                 title: "Semester",
                 field: "semester",
-                width: 100,
+                width: 140,
                 hozAlign: "center",
 
                 formatter: function(cell) {
@@ -173,27 +235,18 @@
                     return "-";
                 }
             },
-
-            // {
-            //     title: "Kelas",
-            //     field: "nama_kelas",
-            //     width: 180
-            // },
-
+            
             {
                 title: "Mapel",
                 field: "nama_mapel",
-                width: 250
+                width: 300
             },
 
             {
                 title: "Guru",
                 field: "id_gtk",
-
-                  width: 250,
-
+                width: 300,
                 editor: "list",
-
                 editorParams: {
                     values: guruOptions,
                     autocomplete: true,
@@ -205,16 +258,7 @@
                     return guruOptions[cell.getValue()] ?? "-";
                 }
             },
-
-
-
-            {
-                title: "Jml Jam",
-                field: "jml_jam",
-                width: 100,
-                hozAlign: "center"
-            },
-
+    
             {
                 title: "Angkatan",
                 field: "angkatan",
@@ -222,72 +266,43 @@
                 hozAlign: "center"
             },
 
-            {
-                title: "Action",
-                hozAlign: "center",
-                width: 180,
-
-                formatter: function(cell) {
-
-                    let data = cell.getData();
-
-                    return `
-                    <button
-                        class="btn btn-primary btn-sm"
-                        data-tw-toggle="modal"
-                        data-tw-target="#modal-edit-jadwal"
-                        onclick='editJadwal(${JSON.stringify(data)})'>
-
-                        Edit
-
-                    </button>
-
-                    <button
-                        onclick="deleteJadwal(${data.id})"
-                        class="btn btn-danger btn-sm">
-
-                        Hapus
-
-                    </button>
-                `;
-                }
-            }
+            
         ]
     });
 
-      table.on("rowClick", function(e, row) {
+    table.on("rowClick", function(e, row) {
 
 
 
         showDetail(
-            
+
             row.getData()
         );
 
 
     });
 
-      function showDetail(data) {
+    function showDetail(data) {
 
-       // console.log(data);
+        // console.log(data);
 
-         if (window.tableRekap) {
+        if (window.tableRekap) {
             window.tableRekap.setData(
                 "{{ url('absensi/dataAbsensi') }}/" + data.id
             );
 
 
-                document.getElementById('id_jadwal').value = data.id;
+            document.getElementById('id_jadwal').value = data.id;
 
-                document.getElementById('filter_mapel_detail').value = data.nama_mapel;
-                document.getElementById('filter_guru_detail').value = data.nama_gtk;
-                document.getElementById('filter_kelas_detail').value = data.nama_kelas;
+            document.getElementById('filter_mapel_detail').value = data.nama_mapel;
+            document.getElementById('filter_guru_detail').value = data.nama_gtk;
+            document.getElementById('filter_kelas_detail').value = data.nama_kelas;
 
 
         }
 
 
-      }
+    }
 
     function loadData() {
         table.setData(
@@ -410,7 +425,7 @@
 
                 modal.hide();
 
-                 table.replaceData();
+                table.replaceData();
 
             });
     }
@@ -466,168 +481,152 @@
 
                 changedRows = [];
 
-               // table.replaceData();
+                // table.replaceData();
             });
     }
 
-   async function inisialisasiJadwal()
-{
-    let thn = document.getElementById('filter_tahun').value;
-    let smt = document.getElementById('filter_semester').value;
-    let jurusan = document.getElementById('filter_jurusan').value;
+    async function inisialisasiJadwal() {
+        let thn = document.getElementById('filter_tahun').value;
+        let smt = document.getElementById('filter_semester').value;
+        let jurusan = document.getElementById('filter_jurusan').value;
 
-    if(thn === '')
-    {
-        alert('Tahun Ajaran harus dipilih');
-        return;
-    }
-
-    if(smt === '')
-    {
-        alert('Semester harus dipilih');
-        return;
-    }
-
-    if(jurusan === '')
-    {
-        alert('Jurusan harus dipilih');
-        return;
-    }
-
-    if(
-        !confirm(
-            'Apakah Anda yakin akan melakukan inisialisasi data?\n\n' +
-            'Data jadwal yang sudah ada pada Tahun Ajaran, Semester, dan Jurusan yang dipilih akan dihapus dan dibuat ulang.'
-        )
-    )
-    {
-        return;
-    }
-
-    try {
-
-        const response = await fetch(
-            "{{ route('master-jadwal.inisialisasi') }}",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-
-                body: JSON.stringify({
-                    thn: thn,
-                    smt: smt,
-                    ang: thn,
-                    jurusan: jurusan
-                })
-            }
-        );
-
-        const res = await response.json();
-
-        alert(res.msg);
-
-        if(res.success)
-        {
-            table.replaceData();
+        if (thn === '') {
+            alert('Tahun Ajaran harus dipilih');
+            return;
         }
 
-    } catch (e) {
-
-        console.error(e);
-
-        alert('Gagal melakukan inisialisasi');
-    }
-}
-
-async function isiNilai()
-{
-    let thn      = document.getElementById('filter_tahun').value;
-    let smt      = document.getElementById('filter_semester').value;
-    let jurusan  = document.getElementById('filter_jurusan').value;
-    let kelas    = document.getElementById('filter_kelas').value;
-    let angkatan = document.getElementById('filter_angkatan').value;
-
-    let errors = [];
-
-    if(!thn)
-    {
-        errors.push('Tahun Ajaran');
-    }
-
-    if(!smt)
-    {
-        errors.push('Semester');
-    }
-
-    if(!angkatan)
-    {
-        errors.push('Angkatan');
-    }
-
-    if(!jurusan && !kelas)
-    {
-        errors.push('Jurusan atau Kelas');
-    }
-
-    if(errors.length > 0)
-    {
-        alert(
-            'Field berikut wajib dipilih:\n\n- ' +
-            errors.join('\n- ')
-        );
-
-        return;
-    }
-
-    if(
-        !confirm(
-            'Apakah Anda yakin akan melakukan proses Isi Nilai?\n\n' +
-            'Data nilai yang sudah ada akan dihapus dan dibuat ulang.'
-        )
-    )
-    {
-        return;
-    }
-
-    try {
-
-        const response = await fetch(
-            "{{ route('master-jadwal.isi-nilai') }}",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                },
-
-                body: JSON.stringify({
-                    thn: thn,
-                    smt: smt,
-                    jurusan: jurusan,
-                    kelas: kelas,
-                    angkatan: angkatan
-                })
-            }
-        );
-
-        const res = await response.json();
-
-        alert(res.msg);
-
-        if(res.success)
-        {
-            table.replaceData();
+        if (smt === '') {
+            alert('Semester harus dipilih');
+            return;
         }
 
-    } catch(error) {
+        if (jurusan === '') {
+            alert('Jurusan harus dipilih');
+            return;
+        }
 
-        console.error(error);
+        if (
+            !confirm(
+                'Apakah Anda yakin akan melakukan inisialisasi data?\n\n' +
+                'Data jadwal yang sudah ada pada Tahun Ajaran, Semester, dan Jurusan yang dipilih akan dihapus dan dibuat ulang.'
+            )
+        ) {
+            return;
+        }
 
-        alert('Gagal melakukan proses isi nilai');
+        try {
+
+            const response = await fetch(
+                "{{ route('master-jadwal.inisialisasi') }}", {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+
+                    body: JSON.stringify({
+                        thn: thn,
+                        smt: smt,
+                        ang: thn,
+                        jurusan: jurusan
+                    })
+                }
+            );
+
+            const res = await response.json();
+
+            alert(res.msg);
+
+            if (res.success) {
+                table.replaceData();
+            }
+
+        } catch (e) {
+
+            console.error(e);
+
+            alert('Gagal melakukan inisialisasi');
+        }
     }
-}
+
+    async function isiNilai() {
+        let thn = document.getElementById('filter_tahun').value;
+        let smt = document.getElementById('filter_semester').value;
+        let jurusan = document.getElementById('filter_jurusan').value;
+        let kelas = document.getElementById('filter_kelas').value;
+        let angkatan = document.getElementById('filter_angkatan').value;
+
+        let errors = [];
+
+        if (!thn) {
+            errors.push('Tahun Ajaran');
+        }
+
+        if (!smt) {
+            errors.push('Semester');
+        }
+
+        if (!angkatan) {
+            errors.push('Angkatan');
+        }
+
+        if (!jurusan && !kelas) {
+            errors.push('Jurusan atau Kelas');
+        }
+
+        if (errors.length > 0) {
+            alert(
+                'Field berikut wajib dipilih:\n\n- ' +
+                errors.join('\n- ')
+            );
+
+            return;
+        }
+
+        if (
+            !confirm(
+                'Apakah Anda yakin akan melakukan proses Isi Nilai?\n\n' +
+                'Data nilai yang sudah ada akan dihapus dan dibuat ulang.'
+            )
+        ) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                "{{ route('master-jadwal.isi-nilai') }}", {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+
+                    body: JSON.stringify({
+                        thn: thn,
+                        smt: smt,
+                        jurusan: jurusan,
+                        kelas: kelas,
+                        angkatan: angkatan
+                    })
+                }
+            );
+
+            const res = await response.json();
+
+            alert(res.msg);
+
+            if (res.success) {
+                table.replaceData();
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert('Gagal melakukan proses isi nilai');
+        }
+    }
 </script>

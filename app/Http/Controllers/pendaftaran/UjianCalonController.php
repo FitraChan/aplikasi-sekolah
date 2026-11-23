@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UjianCalonController extends Controller
 {
@@ -28,70 +29,78 @@ class UjianCalonController extends Controller
          * return auth()->user()->calonSiswa->id;auth()->user()->id
          */
 
-        $id = CalonSiswa::where('id_user',auth()->user()->id)->first();
+        $id = CalonSiswa::where('id_user', auth()->user()->id)->first();
 
         return auth()->user()->id;
     }
 
-    public function index(): View
-    {   
+    public function index()
+    {
+
+
         $calonSiswaId = $this->calonSiswaId();
+
+       // dd($calonSiswaId);
         $calonSiswa = CalonSiswa::query()
-        ->select('id', 'id_gelombang','no_daftar')
-        ->where('id_user',$calonSiswaId)->first();
+            ->select('id', 'id_gelombang', 'no_daftar')
+            ->where('id_user', $calonSiswaId)->first();
 
         $bayar = BayarCalonSiswa::query()
-        ->where('id_calon_siswa', $calonSiswa->no_daftar)
-                ->whereRaw('tot_bayar != 0')
+            ->where('id_calon_siswa', $calonSiswa->no_daftar)
+            ->whereRaw('tot_bayar != 0')
 
-        ->whereHas('detail', function ($query) {
-            $query->where('id_item', 1);
-        })->first();
+            ->whereHas('detail', function ($query) {
+                $query->where('id_item', 1);
+            })->first();
 
         $nominal = $bayar?->detail->first()?->jml_bayar ?? 0;
 
         $data = UjianCalon::query()
             ->where('status', 1)
-             ->where('id_gelombang', $calonSiswa->id_gelombang)
+            ->where('id_gelombang', $calonSiswa->id_gelombang)
 
-              ->whereDate('tanggal_mulai', '<=', now()->toDateString())
-        ->whereDate('tanggal_selesai', '>=', now()->toDateString())
+            ->whereDate('tanggal_mulai', '<=', now()->toDateString())
+            ->whereDate('tanggal_selesai', '>=', now()->toDateString())
 
             ->withCount([
-                'soal' => fn ($query) => $query->where('status', true),
+                'soal' => fn($query) => $query->where('status', true),
             ])
             ->with([
-                'peserta' => fn ($query) =>
-                    $query->where('id_calon_siswa', $calonSiswaId),
+                'peserta' => fn($query) =>
+                $query->where('id_calon_siswa', $calonSiswaId),
             ])
-             ->with([
+            ->with([
                 'gelombang',
-                'peserta' => fn ($query) =>
-                    $query->where('id_calon_siswa', $calonSiswaId),
+                'peserta' => fn($query) =>
+                $query->where('id_calon_siswa', $calonSiswaId),
             ])
             ->latest()
             ->paginate(10);
-
-        return view('pendaftaran.ujian.daftar-ujian', compact('data','nominal'), ['side'  => 'ujian']);
+//return $data;
+        return view('pendaftaran.ujian.daftar-ujian', compact('data', 'nominal', 'calonSiswa'), ['side'  => 'ujian']);
     }
 
     public function mulai(UjianCalon $ujian): RedirectResponse
     {
-//dd(auth()->user()->toArray());
+        //dd(auth()->user()->toArray());
         abort_unless($ujian->status, 404);
 
         $sekarang = now();
 
-        if ($ujian->tanggal_mulai &&
-            $sekarang->lt($ujian->tanggal_mulai)) {
+        if (
+            $ujian->tanggal_mulai &&
+            $sekarang->lt($ujian->tanggal_mulai)
+        ) {
             return back()->with(
                 'error',
                 'UjianCalon belum dapat dimulai.'
             );
         }
 
-        if ($ujian->tanggal_selesai &&
-            $sekarang->gt($ujian->tanggal_selesai)) {
+        if (
+            $ujian->tanggal_selesai &&
+            $sekarang->gt($ujian->tanggal_selesai)
+        ) {
             return back()->with(
                 'error',
                 'Waktu pelaksanaan ujian telah berakhir.'
@@ -138,7 +147,7 @@ class UjianCalonController extends Controller
 
     public function kerjakan(UjianPesertaCalon $peserta): View|RedirectResponse
     {
-  
+
         abort_if(
             (int) $peserta->id_calon_siswa !== (int) $this->calonSiswaId(),
             403
@@ -154,8 +163,8 @@ class UjianCalonController extends Controller
         $peserta->load('ujian');
 
         $batasWaktu = $peserta->waktu_mulai
-        ->copy()
-        ->addMinutes((int) $peserta->ujian->durasi);
+            ->copy()
+            ->addMinutes((int) $peserta->ujian->durasi);
 
         if (now()->greaterThanOrEqualTo($batasWaktu)) {
             return $this->prosesPenilaian($peserta, []);
@@ -169,35 +178,35 @@ class UjianCalonController extends Controller
             ? $query->inRandomOrder()->get()
             : $query->orderBy('id')->get();
 
-$questions = $soal->values()->map(function ($item) {
-    return [
-        'id' => $item->id,
-        'text' => $item->pertanyaan,
-
-        'options' => collect([
-            'A' => $item->pilihan_a,
-            'B' => $item->pilihan_b,
-            'C' => $item->pilihan_c,
-            'D' => $item->pilihan_d,
-            'E' => $item->pilihan_e,
-        ])
-        ->filter(function ($value) {
-            return !empty($value);
-        })
-        ->map(function ($value, $key) {
+        $questions = $soal->values()->map(function ($item) {
             return [
-                'key' => $key,
-                'text' => $value,
+                'id' => $item->id,
+                'text' => $item->pertanyaan,
+
+                'options' => collect([
+                    'A' => $item->pilihan_a,
+                    'B' => $item->pilihan_b,
+                    'C' => $item->pilihan_c,
+                    'D' => $item->pilihan_d,
+                    'E' => $item->pilihan_e,
+                ])
+                    ->filter(function ($value) {
+                        return !empty($value);
+                    })
+                    ->map(function ($value, $key) {
+                        return [
+                            'key' => $key,
+                            'text' => $value,
+                        ];
+                    })
+                    ->values()
+                    ->toArray(),
             ];
-        })
-        ->values()
-        ->toArray(),
-    ];
-});
+        });
 
         return view(
             'pendaftaran.ujian.pengerjaan-ujian',
-            compact('peserta', 'soal', 'batasWaktu','questions')
+            compact('peserta', 'soal', 'batasWaktu', 'questions')
         );
     }
 
@@ -205,7 +214,7 @@ $questions = $soal->values()->map(function ($item) {
         Request $request,
         UjianPesertaCalon $peserta
     ): RedirectResponse {
-         abort_if(
+        abort_if(
             (int) $peserta->id_calon_siswa !== (int) $this->calonSiswaId(),
             403
         );
@@ -219,7 +228,7 @@ $questions = $soal->values()->map(function ($item) {
 
         $jawaban = $request->input('jawaban', []);
 
-        CalonSiswa::where('id_user',$peserta->id_calon_siswa)->update(['status_daftar' => 3]);
+        CalonSiswa::where('id_user', $peserta->id_calon_siswa)->update(['status_daftar' => 3]);
 
         return $this->prosesPenilaian($peserta, $jawaban);
     }
@@ -298,7 +307,7 @@ $questions = $soal->values()->map(function ($item) {
 
     public function hasil(UjianPesertaCalon $peserta): View
     {
-         abort_if(
+        abort_if(
             (int) $peserta->id_calon_siswa !== (int) $this->calonSiswaId(),
             403
         );
@@ -313,5 +322,28 @@ $questions = $soal->values()->map(function ($item) {
         );
     }
 
-   
+    public function downloadKartu($id)
+    {
+        $peserta = UjianPesertaCalon::with([
+            'ujian',
+            'calonSiswa.jurusan'
+        ])->findOrFail($id);
+
+        // Pastikan data ujian dan calon siswa tersedia.
+        if (!$peserta->ujian || !$peserta->calonSiswa) {
+            abort(404, 'Data peserta atau jadwal ujian tidak ditemukan.');
+        }
+
+        $pdf = Pdf::loadView('pendaftaran.ujian.kartu-pdf', [
+            'peserta' => $peserta,
+            'ujian' => $peserta->ujian,
+            'siswa' => $peserta->calonSiswa,
+        ]);
+
+        $pdf->setPaper('a5', 'landscape');
+
+        return $pdf->stream(
+            'Kartu-Ujian-' . ($peserta->no_peserta ?? $peserta->id) . '.pdf'
+        );
+    }
 }

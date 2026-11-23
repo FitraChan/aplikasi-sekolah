@@ -25,30 +25,29 @@ class BayarController extends Controller
 {
 
     var $tahun, $smt;
-  
+
     public function __construct()
     {
         $konfig = Konfig::first();
         $this->tahun = $konfig->id_tahun;
         $this->smt = $konfig->smt;
-
-      
-    }   
+    }
     public function index()
     {
         $tahunSekarang = $this->tahun;
-
         $side = 'bayar';
         $tahun =  TahunAjaran::whereBetween('id', [
-                        $tahunSekarang - 3,
-                        $tahunSekarang
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->get();
+            $tahunSekarang - 3,
+            $tahunSekarang
+        ])
+            ->orderBy('id', 'desc')
+            ->get();
+
         $jurusan = Jurusan::orderBy('nama_jurusan')->get();
         $gelombang = Gelombang::orderBy('nama_gelombang')->get();
         $itemBayar = ItemBayar::orderBy('nama_item')->get();
         $kelas = Kelas::orderBy('nama_kelas')->get();
+        $status = DB::table('tb_status_transaksi')->get();
 
 
         return view(
@@ -59,8 +58,8 @@ class BayarController extends Controller
                 'jurusan',
                 'gelombang',
                 'itemBayar',
-                'kelas'
-
+                'kelas',
+                'status'
             )
         );
     }
@@ -80,7 +79,7 @@ class BayarController extends Controller
                 'keterangan'  => $request->keterangan,
             ]);
 
-           LogModel::create([
+            LogModel::create([
                 'tanggal' => now(),
                 'tabel' => 'tb_bayar',
                 'aksi' => 'update',
@@ -95,7 +94,6 @@ class BayarController extends Controller
                 'title'   => 'Sukses',
                 'msg'     => 'Data telah tersimpan'
             ]);
-
         } catch (\Exception $e) {
 
             return response()->json([
@@ -104,50 +102,51 @@ class BayarController extends Controller
                 'msg'     => 'Gagal mengubah data',
                 'error'   => $e->getMessage()
             ], 500);
-
         }
     }
 
     public function destroy(Request $request, $id)
     {
         try {
-
             $user = auth()->user();
-
-            
 
             DB::beginTransaction();
 
             $bayar = Bayar::findOrFail($id);
 
+            // Ambil detail pembayaran
             $detailBayar = DetBayar::where('id_bayar', $id)->get();
+
+            // Simpan data lama untuk log
+            $dataBayarLama = $bayar->toArray();
+            $dataDetailLama = $detailBayar->toArray();
 
             // Log tb_bayar
             LogModel::create([
                 'tanggal'    => now(),
                 'tabel'      => 'tb_bayar',
-                'aksi'       => 'delete',
+                'aksi'       => 'soft_delete',
                 'user'       => $user->id,
                 'ip'         => $request->ip(),
                 'serial'     => $request->userAgent(),
-                'keterangan' => json_encode($bayar),
+                'keterangan' => json_encode($dataBayarLama),
             ]);
 
             // Log tb_det_bayar
             LogModel::create([
                 'tanggal'    => now(),
                 'tabel'      => 'tb_det_bayar',
-                'aksi'       => 'delete',
+                'aksi'       => 'soft_delete',
                 'user'       => $user->id,
                 'ip'         => $request->ip(),
                 'serial'     => $request->userAgent(),
-                'keterangan' => json_encode($detailBayar),
+                'keterangan' => json_encode($dataDetailLama),
             ]);
 
-            // Hapus detail terlebih dahulu
+            // Soft delete detail terlebih dahulu
             DetBayar::where('id_bayar', $id)->delete();
 
-            // Hapus master
+            // Soft delete master
             $bayar->delete();
 
             DB::commit();
@@ -155,12 +154,13 @@ class BayarController extends Controller
             return response()->json([
                 'success' => true,
                 'title'   => 'Success',
-                'msg'     => 'Proses berhasil dilakukan'
+                'msg'     => 'Data pembayaran berhasil dihapus sementara.'
             ]);
-
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             DB::rollBack();
+
+            report($e);
 
             return response()->json([
                 'success' => false,
@@ -171,89 +171,95 @@ class BayarController extends Controller
         }
     }
 
-   public function data(Request $request)
-{
-    $query = Siswa::with([
-        'tahunAjaran:id,thn_ajaran',
-        'jurusan:id,nama_jurusan',
-        'gelombang:id,nama_gelombang',
-        'kelas:idx,nama_kelas',
-        'templateBayar:id,keterangan'
-    ]);
+    public function data(Request $request)
+    {
+        $query = Siswa::with([
+            'tahunAjaran:id,thn_ajaran',
+            'jurusan:id,nama_jurusan',
+            'gelombang:id,nama_gelombang',
+            'kelas:idx,nama_kelas',
+            'templateBayar:id,keterangan'
+        ]);
 
-    if ($request->filled('tahun')) {
-        $query->whereHas('tahunAjaran', function ($q) use ($request) {
-            $q->where('thn_ajaran', $request->tahun);
-        });
+        if ($request->filled('tahun')) {
+            $query->whereHas('tahunAjaran', function ($q) use ($request) {
+                $q->where('thn_ajaran', $request->tahun);
+            });
+        }
+
+        if ($request->filled('jurusan')) {
+            $query->where('id_jurusan', $request->jurusan);
+        }
+
+        if ($request->filled('kelas')) {
+            $query->whereHas('kelas', function ($q) use ($request) {
+                $q->where('nama_kelas', 'like', '%' . $request->kelas . '%');
+            });
+        }
+
+        if ($request->filled('keyword')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_lengkap', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('nipd', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('nisn', 'like', '%' . $request->keyword . '%');
+            });
+        }
+
+        if ($request->filled('sts_trans')) {
+            $query->whereHas('bayar', function ($q) use ($request) {
+                $q->where('sts_trans', $request->sts_trans);
+            });
+        }
+
+        $tahun = $this->tahun;
+
+
+        $data = $query
+            ->orderByDesc('nipd')
+            ->get()
+            ->map(function ($item) use ($tahun) {
+
+                $kelas;
+                $selisih = $tahun - $item->id_thn_ajaran;
+
+                if ($selisih == 0) {
+                    $kelas = 'X';
+                } elseif ($selisih == 1) {
+                    $kelas = 'XI';
+                } else {
+                    $kelas = 'XII';
+                }
+
+                return [
+                    'id' => $item->id,
+                    'nipd' => $item->nipd,
+                    'nama_lengkap' => $item->nama_lengkap,
+                    'nisn' => $item->nisn,
+
+                    'tahun_ajaran' => [
+                        'thn_ajaran' => $item->tahunAjaran?->thn_ajaran,
+                    ],
+
+                    'jurusan' => [
+                        'nama_jurusan' => $item->jurusan?->nama_jurusan,
+                    ],
+
+                    'kelas' => [
+                        'nama_kelas' =>  trim($kelas . ' ' . ($item->kelas?->nama_kelas ?? '')),
+                    ],
+
+                    'gelombang' => [
+                        'nama_gelombang' => $item->gelombang?->nama_gelombang,
+                    ],
+
+                    'template_bayar' => [
+                        'keterangan' => $item->templateBayar?->keterangan,
+                    ],
+                ];
+            });
+
+        return response()->json($data);
     }
-
-    if ($request->filled('jurusan')) {
-        $query->where('id_jurusan', $request->jurusan);
-    }
-
-    if ($request->filled('kelas')) {
-        $query->whereHas('kelas', function ($q) use ($request) {
-            $q->where('nama_kelas', 'like', '%' . $request->kelas . '%');
-        });
-    }
-
-    if ($request->filled('keyword')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('nama_lengkap', 'like', '%' . $request->keyword . '%')
-              ->orWhere('nipd', 'like', '%' . $request->keyword . '%')
-              ->orWhere('nisn', 'like', '%' . $request->keyword . '%');
-        });
-    }
-
-            $tahun = $this->tahun;
-
-
-    $data = $query
-        ->orderByDesc('nipd')
-        ->get()
-        ->map(function ($item) use ($tahun) {
-
-         $kelas;
-         $selisih = $tahun - $item->id_thn_ajaran;
-
-         if ($selisih == 0) {
-             $kelas = 'X';
-         } elseif ($selisih == 1) { 
-             $kelas = 'XI';
-         } else {
-             $kelas = 'XII';
-         }
-
-            return [
-                'id' => $item->id,
-                'nipd' => $item->nipd,
-                'nama_lengkap' => $item->nama_lengkap,
-                'nisn' => $item->nisn,
-
-                'tahun_ajaran' => [
-                    'thn_ajaran' => $item->tahunAjaran?->thn_ajaran,
-                ],
-
-                'jurusan' => [
-                    'nama_jurusan' => $item->jurusan?->nama_jurusan,
-                ],
-
-                'kelas' => [
-                    'nama_kelas' =>  trim($kelas . ' ' . ($item->kelas?->nama_kelas ?? '')),
-                ],
-
-                'gelombang' => [
-                    'nama_gelombang' => $item->gelombang?->nama_gelombang,
-                ],
-
-                'template_bayar' => [
-                    'keterangan' => $item->templateBayar?->keterangan,
-                ],
-            ];
-        });
-
-    return response()->json($data);
-}
 
     public function detail($nipd)
     {
@@ -273,6 +279,7 @@ class BayarController extends Controller
                     'keterangan'    => $row->keterangan,
                     'no_kwitansi'   => $row->no_kwitansi,
                     'bukti_bayar'   => $row->bukti_bayar,
+                    'status' => $row->statusTransaksi->nama,
 
                 ];
             });
@@ -297,220 +304,219 @@ class BayarController extends Controller
             });
     }
 
-   public function setDefBulan(Request $request)
-{
-    $request->validate([
-        'id_thn_ajaran' => ['required'],
-        'id_jurusan'    => ['required'],
-        'id_tahun'      => ['required', 'digits:4'],
-        'id_bulan'      => ['required'],
-    ]);
+    public function setDefBulan(Request $request)
+    {
+        $request->validate([
+            'id_thn_ajaran' => ['required'],
+            'id_jurusan'    => ['required'],
+            'id_tahun'      => ['required', 'digits:4'],
+            'id_bulan'      => ['required'],
+        ]);
 
-    $idTahunAjaran = $request->id_thn_ajaran;
-    $idJurusan     = $request->id_jurusan;
-    $idTahun       = $request->id_tahun;
-    $idBulan       = $request->id_bulan;
+        $idTahunAjaran = $request->id_thn_ajaran;
+        $idJurusan     = $request->id_jurusan;
+        $idTahun       = $request->id_tahun;
+        $idBulan       = $request->id_bulan;
 
-    $berhasil       = 0;
-    $gagal          = 0;
-    $duplikat       = 0;
-    $jumlahTagihan  = 0;
-    $siswaDiproses  = 0;
+        $berhasil       = 0;
+        $gagal          = 0;
+        $duplikat       = 0;
+        $jumlahTagihan  = 0;
+        $siswaDiproses  = 0;
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Tentukan bulan yang diproses
     |--------------------------------------------------------------------------
     */
 
-    $daftarBulan = $idBulan === 'all_bulan'
-        ? range(1, 12)
-        : [(int) $idBulan];
+        $daftarBulan = $idBulan === 'all_bulan'
+            ? range(1, 12)
+            : [(int) $idBulan];
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | Ambil siswa
     |--------------------------------------------------------------------------
     */
 
-    $querySiswa = Siswa::query()
-        ->where('id_thn_ajaran', $idTahunAjaran);
+        $querySiswa = Siswa::query()
+            ->where('id_thn_ajaran', $idTahunAjaran);
 
-    // Filter jurusan hanya jika bukan semua jurusan
-    if ($idJurusan !== 'all_jurusan') {
-        $querySiswa->where('id_jurusan', $idJurusan);
-    }
+        // Filter jurusan hanya jika bukan semua jurusan
+        if ($idJurusan !== 'all_jurusan') {
+            $querySiswa->where('id_jurusan', $idJurusan);
+        }
 
-    $siswa = $querySiswa->get();
+        $siswa = $querySiswa->get();
 
-    if ($siswa->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'title'   => 'Peringatan',
-            'msg'     => 'Tidak ada siswa yang ditemukan berdasarkan pilihan tersebut.',
-        ], 422);
-    }
+        if ($siswa->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'title'   => 'Peringatan',
+                'msg'     => 'Tidak ada siswa yang ditemukan berdasarkan pilihan tersebut.',
+            ], 422);
+        }
 
-    DB::beginTransaction();
+        DB::beginTransaction();
 
-    try {
+        try {
 
-        foreach ($siswa as $row) {
+            foreach ($siswa as $row) {
 
-            /*
+                /*
             |--------------------------------------------------------------------------
             | Ambil detail template pembayaran bulanan
             |--------------------------------------------------------------------------
             */
 
-            $detailTemplate = DetTempBayar::query()
-                ->where('id_template', $row->id_template_bayar)
-                ->whereHas('itemBayar', function ($query) {
-                    $query->where('id_kategori', 5);
-                })
-                ->get();
+                $detailTemplate = DetTempBayar::query()
+                    ->where('id_template', $row->id_template_bayar)
+                    ->whereHas('itemBayar', function ($query) {
+                        $query->where('id_kategori', 5);
+                    })
+                    ->get();
 
-            /*
+                /*
              * Jika siswa belum memiliki template pembayaran
              * atau tidak ada item kategori bulanan, lewati.
              */
-            if ($detailTemplate->isEmpty()) {
-                $gagal++;
-                continue;
-            }
+                if ($detailTemplate->isEmpty()) {
+                    $gagal++;
+                    continue;
+                }
 
-            foreach ($daftarBulan as $bulan) {
+                foreach ($daftarBulan as $bulan) {
 
-                /*
+                    /*
                 |--------------------------------------------------------------------------
                 | Cek apakah tagihan siswa pada tahun dan bulan sudah ada
                 |--------------------------------------------------------------------------
                 */
 
-                $sudahAda = Bayar::query()
-                    ->where('id_tahun', $idTahun)
-                    ->where('id_bulan', $bulan)
-                    ->where('id_siswa', $row->nipd)
-                    ->exists();
+                    $sudahAda = Bayar::query()
+                        ->where('id_tahun', $idTahun)
+                        ->where('id_bulan', $bulan)
+                        ->where('id_siswa', $row->nipd)
+                        ->exists();
 
-                if ($sudahAda) {
-                    $duplikat++;
-                    continue;
-                }
+                    if ($sudahAda) {
+                        $duplikat++;
+                        continue;
+                    }
 
-                /*
+                    /*
                 |--------------------------------------------------------------------------
                 | Buat header tagihan
                 |--------------------------------------------------------------------------
                 */
 
-                $bayar = Bayar::create([
-                    'id_tahun' => $idTahun,
-                    'id_bulan' => $bulan,
-                    'id_siswa' => $row->nipd,
-                ]);
+                    $bayar = Bayar::create([
+                        'id_tahun' => $idTahun,
+                        'id_bulan' => $bulan,
+                        'id_siswa' => $row->nipd,
+                    ]);
 
-                /*
+                    /*
                 |--------------------------------------------------------------------------
                 | Buat detail tagihan
                 |--------------------------------------------------------------------------
                 */
 
-                foreach ($detailTemplate as $item) {
+                    foreach ($detailTemplate as $item) {
 
-                    DetBayar::create([
-                        'id_bayar'       => $bayar->id,
-                        'id_item'        => $item->id_item,
-                        'kwajiban_bayar' => $item->jml_bayar,
-                        'potongan'       => 0,
-                        'jml_bayar'      => 0,
-                    ]);
+                        DetBayar::create([
+                            'id_bayar'       => $bayar->id,
+                            'id_item'        => $item->id_item,
+                            'kwajiban_bayar' => $item->jml_bayar,
+                            'potongan'       => 0,
+                            'jml_bayar'      => 0,
+                        ]);
 
-                    $berhasil++;
+                        $berhasil++;
+                    }
+
+                    $this->updateTotalBayar($bayar->id);
+
+                    $jumlahTagihan++;
                 }
 
-                $this->updateTotalBayar($bayar->id);
-
-                $jumlahTagihan++;
+                $siswaDiproses++;
             }
 
-            $siswaDiproses++;
+            LogModel::create([
+                'tanggal' => now(),
+                'tabel'   => 'tb_bayar',
+                'aksi'    => 'create',
+                'user'    => auth()->id(),
+                'ip'      => $request->ip(),
+
+                'keterangan' => json_encode([
+                    'id_thn_ajaran' => $idTahunAjaran,
+                    'id_tahun'       => $idTahun,
+                    'id_bulan'       => $idBulan,
+                    'id_jurusan'     => $idJurusan,
+                    'siswa_diproses' => $siswaDiproses,
+                    'jumlah_tagihan' => $jumlahTagihan,
+                    'detail_berhasil' => $berhasil,
+                    'gagal'          => $gagal,
+                    'duplikat'       => $duplikat,
+                ]),
+
+                'serial' => url('simpan'),
+            ]);
+
+            DB::commit();
+
+            $keteranganBulan = $idBulan === 'all_bulan'
+                ? 'Januari sampai Desember'
+                : $this->namaBulan((int) $idBulan);
+
+            $keteranganJurusan = $idJurusan === 'all_jurusan'
+                ? 'semua jurusan'
+                : "jurusan ID {$idJurusan}";
+
+            return response()->json([
+                'success' => true,
+                'title'   => $duplikat > 0 ? 'Warning' : 'Success',
+                'msg'     => "Proses selesai untuk {$keteranganJurusan}, bulan {$keteranganBulan}. "
+                    . "Siswa diproses: {$siswaDiproses}, "
+                    . "tagihan dibuat: {$jumlahTagihan}, "
+                    . "detail dibuat: {$berhasil}, "
+                    . "template tidak ditemukan: {$gagal}, "
+                    . "tagihan duplikat dilewati: {$duplikat}.",
+            ]);
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'title'   => 'Error',
+                'msg'     => $e->getMessage(),
+            ], 500);
         }
-
-        LogModel::create([
-            'tanggal' => now(),
-            'tabel'   => 'tb_bayar',
-            'aksi'    => 'create',
-            'user'    => auth()->id(),
-            'ip'      => $request->ip(),
-
-            'keterangan' => json_encode([
-                'id_thn_ajaran' => $idTahunAjaran,
-                'id_tahun'       => $idTahun,
-                'id_bulan'       => $idBulan,
-                'id_jurusan'     => $idJurusan,
-                'siswa_diproses' => $siswaDiproses,
-                'jumlah_tagihan' => $jumlahTagihan,
-                'detail_berhasil'=> $berhasil,
-                'gagal'          => $gagal,
-                'duplikat'       => $duplikat,
-            ]),
-
-            'serial' => url('simpan'),
-        ]);
-
-        DB::commit();
-
-        $keteranganBulan = $idBulan === 'all_bulan'
-            ? 'Januari sampai Desember'
-            : $this->namaBulan((int) $idBulan);
-
-        $keteranganJurusan = $idJurusan === 'all_jurusan'
-            ? 'semua jurusan'
-            : "jurusan ID {$idJurusan}";
-
-        return response()->json([
-            'success' => true,
-            'title'   => $duplikat > 0 ? 'Warning' : 'Success',
-            'msg'     => "Proses selesai untuk {$keteranganJurusan}, bulan {$keteranganBulan}. "
-                . "Siswa diproses: {$siswaDiproses}, "
-                . "tagihan dibuat: {$jumlahTagihan}, "
-                . "detail dibuat: {$berhasil}, "
-                . "template tidak ditemukan: {$gagal}, "
-                . "tagihan duplikat dilewati: {$duplikat}.",
-        ]);
-
-    } catch (\Throwable $e) {
-
-        DB::rollBack();
-
-        return response()->json([
-            'success' => false,
-            'title'   => 'Error',
-            'msg'     => $e->getMessage(),
-        ], 500);
     }
-}
 
-private function namaBulan(int $bulan): string
-{
-    $daftarBulan = [
-        1  => 'Januari',
-        2  => 'Februari',
-        3  => 'Maret',
-        4  => 'April',
-        5  => 'Mei',
-        6  => 'Juni',
-        7  => 'Juli',
-        8  => 'Agustus',
-        9  => 'September',
-        10 => 'Oktober',
-        11 => 'November',
-        12 => 'Desember',
-    ];
+    private function namaBulan(int $bulan): string
+    {
+        $daftarBulan = [
+            1  => 'Januari',
+            2  => 'Februari',
+            3  => 'Maret',
+            4  => 'April',
+            5  => 'Mei',
+            6  => 'Juni',
+            7  => 'Juli',
+            8  => 'Agustus',
+            9  => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
 
-    return $daftarBulan[$bulan] ?? '-';
-}
+        return $daftarBulan[$bulan] ?? '-';
+    }
 
 
 
@@ -556,6 +562,8 @@ private function namaBulan(int $bulan): string
                     'tgl_bayar'   => $request->tgl_bayar,
                     'keterangan'  => $keterangan,
                     'tot_bayar'   => $totalBayar,
+                    'sts_trans' => 2,
+                    'id_kasir' => auth()->user()->id
                 ]);
 
             DB::commit();
@@ -587,198 +595,195 @@ private function namaBulan(int $bulan): string
         }
     }
 
- public function simpanCicilan(Request $request)
-{
-    DB::beginTransaction();
+    public function simpanCicilan(Request $request)
+    {
+        DB::beginTransaction();
 
-    try {
+        try {
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | VALIDASI
         |--------------------------------------------------------------------------
         */
 
-        $request->validate([
-            'id_csiswa'   => 'required',
-            'tgl_bayar'   => 'nullable|date',
-            'no_kwitansi' => 'nullable|string|max:100',
-            'keterangan'  => 'nullable|string',
+            $request->validate([
+                'id_csiswa'   => 'required',
+                'tgl_bayar'   => 'nullable|date',
+                'no_kwitansi' => 'nullable|string|max:100',
+                'keterangan'  => 'nullable|string',
 
-            'jml_dpp'      => 'nullable|numeric|min:0',
-            'jml_seragam'  => 'nullable|numeric|min:0',
-            'jml_spp'      => 'nullable|numeric|min:0',
-            'jml_tabungan' => 'nullable|numeric|min:0',
-            'jml_osis'     => 'nullable|numeric|min:0',
-            'jml_lain'     => 'nullable|numeric|min:0',
+                'jml_dpp'      => 'nullable|numeric|min:0',
+                'jml_seragam'  => 'nullable|numeric|min:0',
+                'jml_spp'      => 'nullable|numeric|min:0',
+                'jml_tabungan' => 'nullable|numeric|min:0',
+                'jml_osis'     => 'nullable|numeric|min:0',
+                'jml_lain'     => 'nullable|numeric|min:0',
 
-            'bukti_bayar' => [
-                'nullable',
-                'file',
-                'mimes:jpg,jpeg,png,pdf',
-                'max:2048',
-            ],
-        ]);
+                'bukti_bayar' => [
+                    'nullable',
+                    'file',
+                    'mimes:jpg,jpeg,png,pdf',
+                    'max:2048',
+                ],
+            ]);
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | UPLOAD BUKTI BAYAR
         |--------------------------------------------------------------------------
         */
 
-        $namaBuktiBayar = null;
+            $namaBuktiBayar = null;
 
-        if ($request->hasFile('bukti_bayar')) {
+            if ($request->hasFile('bukti_bayar')) {
 
-            $file = $request->file('bukti_bayar');
+                $file = $request->file('bukti_bayar');
 
-            $namaBuktiBayar =
-                'bukti_cicilan_' .
-                date('YmdHis') .
-                '_' .
-                uniqid() .
-                '.' .
-                $file->getClientOriginalExtension();          
+                $namaBuktiBayar =
+                    'bukti_cicilan_' .
+                    date('YmdHis') .
+                    '_' .
+                    uniqid() .
+                    '.' .
+                    $file->getClientOriginalExtension();
 
-             $file->storeAs(
+                $file->storeAs(
                     'uploads/pembayaran',
                     $namaBuktiBayar,
                     'public'
                 );
+            }
 
-        }
-
-
-        /*
+            /*
         |--------------------------------------------------------------------------
         | SIMPAN PEMBAYARAN
         |--------------------------------------------------------------------------
         */
 
-        $bayar = Bayar::create([
-            'id_tahun'    => date('Y'),
-            'id_bulan'    => date('m'),
-            'id_siswa'    => $request->id_csiswa,
-            'no_kwitansi' => $request->no_kwitansi,
-            'tgl_bayar'   => date(
-                'Y-m-d',
-                strtotime($request->tgl_bayar ?? now())
-            ),
-            'id_kasir'    => auth()->user()->id,
-            'keterangan'  => $request->keterangan,
+            $bayar = Bayar::create([
+                'id_tahun'    => date('Y'),
+                'id_bulan'    => date('m'),
+                'id_siswa'    => $request->id_csiswa,
+                'no_kwitansi' => $request->no_kwitansi,
+                'tgl_bayar'   => date(
+                    'Y-m-d',
+                    strtotime($request->tgl_bayar ?? now())
+                ),
+                'id_kasir'    => auth()->user()->id,
+                'keterangan'  => $request->keterangan,
+                'sts_trans' => 2,
 
-            // bukti pembayaran
-            'bukti_bayar' =>  'uploads/pembayaran/' .$namaBuktiBayar,
-        ]);
-
-
-        $idBayar = $bayar->id;
+                // bukti pembayaran
+                'bukti_bayar' =>  'uploads/pembayaran/' . $namaBuktiBayar,
+            ]);
 
 
-        /*
+            $idBayar = $bayar->id;
+
+
+            /*
         |--------------------------------------------------------------------------
         | DETAIL PEMBAYARAN
         |--------------------------------------------------------------------------
         */
 
-        $items = [
-            [
-                'nominal' => $request->jml_dpp ?? 0,
-                'id_item' => 2,
-            ],
-            [
-                'nominal' => $request->jml_seragam ?? 0,
-                'id_item' => 5,
-            ],
-            [
-                'nominal' => $request->jml_spp ?? 0,
-                'id_item' => 6,
-            ],
-            [
-                'nominal' => $request->jml_tabungan ?? 0,
-                'id_item' => 7,
-            ],
-            [
-                'nominal' => $request->jml_osis ?? 0,
-                'id_item' => 8,
-            ],
-        ];
+            $items = [
+                [
+                    'nominal' => $request->jml_dpp ?? 0,
+                    'id_item' => 2,
+                ],
+                [
+                    'nominal' => $request->jml_seragam ?? 0,
+                    'id_item' => 5,
+                ],
+                [
+                    'nominal' => $request->jml_spp ?? 0,
+                    'id_item' => 6,
+                ],
+                [
+                    'nominal' => $request->jml_tabungan ?? 0,
+                    'id_item' => 7,
+                ],
+                [
+                    'nominal' => $request->jml_osis ?? 0,
+                    'id_item' => 8,
+                ],
+            ];
 
 
-        foreach ($items as $item) {
+            foreach ($items as $item) {
 
-            if ((float) $item['nominal'] > 0) {
+                if ((float) $item['nominal'] > 0) {
 
-                DetBayar::create([
-                    'id_bayar'   => $idBayar,
-                    'id_item'    => $item['id_item'],
-                    'jml_bayar'  => $item['nominal'],
-                    'id_cicilan' => $request->cicilan,
-                ]);
+                    DetBayar::create([
+                        'id_bayar'   => $idBayar,
+                        'id_item'    => $item['id_item'],
+                        'jml_bayar'  => $item['nominal'],
+                        'id_cicilan' => $request->cicilan,
+                    ]);
+                }
             }
-        }
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | UPDATE KEWAJIBAN DAN PEMBAYARAN
         |--------------------------------------------------------------------------
         */
 
-        $this->updateKewajiban($idBayar);
+            $this->updateKewajiban($idBayar);
 
-        $this->updateBayar($idBayar);
+            $this->updateBayar($idBayar);
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | LOG
         |--------------------------------------------------------------------------
         */
 
-        LogModel::create([
-            'tanggal' => now(),
-            'tabel' => 'tb_bayar',
-            'aksi' => 'create',
-            'user' => auth()->user()->id,
-            'ip' => $request->ip(),
-            'keterangan' => json_encode($bayar),
-            'serial' => url('simpanCicilan'),
-        ]);
+            LogModel::create([
+                'tanggal' => now(),
+                'tabel' => 'tb_bayar',
+                'aksi' => 'create',
+                'user' => auth()->user()->id,
+                'ip' => $request->ip(),
+                'keterangan' => json_encode($bayar),
+                'serial' => url('simpanCicilan'),
+            ]);
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | COMMIT
         |--------------------------------------------------------------------------
         */
 
-        DB::commit();
+            DB::commit();
 
 
-        return response()->json([
-            'success' => true,
-            'title'   => 'Sukses',
-            'bayar'   => $bayar,
-            'detail'  => $items,
-            'msg'     => 'Data telah tersimpan. ID : ' . $idBayar,
-            'id'      => $idBayar,
-        ]);
+            return response()->json([
+                'success' => true,
+                'title'   => 'Sukses',
+                'bayar'   => $bayar,
+                'detail'  => $items,
+                'msg'     => 'Data telah tersimpan. ID : ' . $idBayar,
+                'id'      => $idBayar,
+            ]);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
 
 
-    } catch (\Exception $e) {
-
-        DB::rollBack();
-
-
-        return response()->json([
-            'success' => false,
-            'title'   => 'Peringatan',
-            'msg'     => $e->getMessage(),
-        ], 500);
+            return response()->json([
+                'success' => false,
+                'title'   => 'Peringatan',
+                'msg'     => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
     public function updateBayar($id)
     {
@@ -818,6 +823,7 @@ private function namaBulan(int $bulan): string
                 DB::raw('SUM(tb_det_bayar.potongan) as SUMP')
             )
             ->where('tb_bayar.id_siswa', $id)
+            ->where('tb_bayar.sts_trans',2)
             ->groupBy(
                 'tb_bayar.id_siswa',
                 'tb_det_bayar.id_item',
@@ -847,6 +853,150 @@ private function namaBulan(int $bulan): string
         return $pdf->stream('laporan-kewajiban-' . $atas->nipd . '.pdf');
     }
 
+    public function detailVerifikasi($id)
+    {
+        $dataBayar = Bayar::with([
+            'siswa',
+            'tahunAjaran',
+            'kasir',
+            'approver',
+            'detail.itemBayar',
+            'bankPenerima',
+            'bankPengirim',
+            'statusTransaksi'
 
+        ])->findOrFail($id);
+
+        $siswa = $dataBayar->siswa;
+
+        $detBayar = $dataBayar->detail;
+
+
+        return view(
+            'keuangan.bayar.detail_verifikasi_pembayaran',
+            compact(
+                'dataBayar',
+                'siswa',
+                'detBayar'
+            )
+        );
+    }
+
+    public function updateStatusTransaksi($id,Request $request)
+    {
+        
+        $updated = Bayar::where('id', $id)
+            ->where('sts_trans', 1)
+            
+            ->update([
+                'sts_trans' => 2,
+                'id_kasir' => auth()->user()->id,
+            ]);
+
+                  LogModel::create([
+                'tanggal' => now(),
+                'tabel' => 'tb_bayar',
+                'aksi' => 'create',
+                'user' => auth()->user()->id,
+                'ip' => $request->ip(),
+                'keterangan' => json_encode($updated),
+                'serial' => url('updateStatusTransaksi').'/'.$id,
+            ]);
+
+
+        if ($updated > 0) {
+            return redirect()->back()->with(
+                'success',
+                'Status transaksi berhasil diubah menjadi Lunas.'
+            );
+        }
+
+        return redirect()->back()->with(
+            'error',
+            'Data tidak ditemukan atau status bukan 1.'
+        );
+    }
+
+    public function updateStatusDanBayarTransaksi(Request $request)
+    {
+        $request->validate([
+            'id_detail_bayar' => 'required|integer',
+            'id_bayar'        => 'required|integer',
+            'jml_bayar'       => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
     
+            $bayar = Bayar::where('id', $request->id_bayar)       
+                ->firstOrFail();
+
+            $detail = DetBayar::where('id', $request->id_detail_bayar)
+                    ->firstOrFail();
+
+            // Update nominal detail pembayaran
+            $detail->update([
+                'jml_bayar' => $request->jml_bayar,
+            ]);
+
+            // Update status transaksi
+            $bayar->update([
+                'sts_trans' => 2,
+                'id_kasir'  => auth()->user()->id,
+            ]);
+
+            $this->uptotalbayar($request->id_bayar);
+
+            // Logging
+            LogModel::create([
+                'tanggal'    => now(),
+                'tabel'      => 'tb_bayar',
+                'aksi'       => 'update',
+                'user'       => auth()->user()->id,
+                'ip'         => $request->ip(),
+                'keterangan' => json_encode([
+                    'id_bayar'        => $bayar->id,
+                    'id_detail_bayar' => $detail->id,
+                    'jml_bayar'       => $request->jml_bayar,
+                    'sts_trans'       => 2,
+                ]),
+                'serial' => url('update-status-dan-bayar'),
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with(
+                'success',
+                'Nominal pembayaran berhasil diperbarui dan status transaksi lunas.'
+            );
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            
+
+            return redirect()->back()->with(
+                'error',
+                'Gagal memperbarui pembayaran. Silakan coba kembali.'
+            );
+        }
+    }
+
+     private function uptotalbayar($id)
+    {
+        $total = DetBayar::where('id_bayar', $id)
+        ->selectRaw('
+            COALESCE(SUM(jml_bayar),0) as tot_bayar,
+            COALESCE(SUM(kwajiban_bayar),0) - COALESCE(SUM(potongan),0) as tot_kwajiban
+        ')->first();
+
+        Bayar::where('id', $id)
+            ->update([
+                'tot_bayar'    => $total->tot_bayar,
+                'tot_kwajiban' => $total->tot_kwajiban,
+            ]);
+    }
+
 }
