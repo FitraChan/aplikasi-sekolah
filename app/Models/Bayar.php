@@ -34,7 +34,7 @@ class Bayar extends Model
         'via', // bank penerima
         'bank_pengirim',
         'bank_penerima',
-        'sts_trans',
+        'sts_trans',// 1. menunggu konfirmasi; 2.Lunas; 3.belum lunas 
         'id_tmp_bayar',
     ];
 

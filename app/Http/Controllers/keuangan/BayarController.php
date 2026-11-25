@@ -893,7 +893,7 @@ class BayarController extends Controller
                 'id_kasir' => auth()->user()->id,
             ]);
 
-                  LogModel::create([
+            LogModel::create([
                 'tanggal' => now(),
                 'tabel' => 'tb_bayar',
                 'aksi' => 'create',
@@ -903,86 +903,102 @@ class BayarController extends Controller
                 'serial' => url('updateStatusTransaksi').'/'.$id,
             ]);
 
-
-        if ($updated > 0) {
-            return redirect()->back()->with(
-                'success',
-                'Status transaksi berhasil diubah menjadi Lunas.'
-            );
+        if (!$updated) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data transaksi tidak ditemukan atau tidak berubah.'
+            ], 404);
         }
 
-        return redirect()->back()->with(
-            'error',
-            'Data tidak ditemukan atau status bukan 1.'
-        );
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran berhasil disetujui.'
+        ]);
+        
     }
 
-    public function updateStatusDanBayarTransaksi(Request $request)
-    {
-        $request->validate([
+   public function updateStatusDanBayarTransaksi(Request $request)
+{
+    $request->validate([
             'id_detail_bayar' => 'required|integer',
             'id_bayar'        => 'required|integer',
             'jml_bayar'       => 'required|numeric|min:0',
         ]);
+   
 
-        DB::beginTransaction();
+    DB::beginTransaction();
 
-        try {
-    
-            $bayar = Bayar::where('id', $request->id_bayar)       
-                ->firstOrFail();
+    try {
 
-            $detail = DetBayar::where('id', $request->id_detail_bayar)
-                    ->firstOrFail();
+        $bayar = Bayar::where('id', $request->id_bayar)
+            ->lockForUpdate()
+            ->firstOrFail();
 
-            // Update nominal detail pembayaran
-            $detail->update([
-                'jml_bayar' => $request->jml_bayar,
-            ]);
+        // Pastikan detail pembayaran terkait dengan transaksi tersebut.
+        $detail = DetBayar::where('id', $request->id_detail_bayar)
+            ->where('id_bayar', $bayar->id)
+            ->firstOrFail();
 
-            // Update status transaksi
-            $bayar->update([
-                'sts_trans' => 2,
-                'id_kasir'  => auth()->user()->id,
-            ]);
+        // Update nominal detail pembayaran
+        $detail->update([
+            'jml_bayar' => $request->jml_bayar,
+        ]);
 
-            $this->uptotalbayar($request->id_bayar);
+        // Update status transaksi
+        $bayar->update([
+            'sts_trans' => 2,
+            'id_kasir'  => auth()->id(),
+        ]);
 
-            // Logging
-            LogModel::create([
-                'tanggal'    => now(),
-                'tabel'      => 'tb_bayar',
-                'aksi'       => 'update',
-                'user'       => auth()->user()->id,
-                'ip'         => $request->ip(),
-                'keterangan' => json_encode([
-                    'id_bayar'        => $bayar->id,
-                    'id_detail_bayar' => $detail->id,
-                    'jml_bayar'       => $request->jml_bayar,
-                    'sts_trans'       => 2,
-                ]),
-                'serial' => url('update-status-dan-bayar'),
-            ]);
+        // Hitung ulang total pembayaran
+        $this->uptotalbayar($bayar->id);
 
-            DB::commit();
+        // Logging
+        LogModel::create([
+            'tanggal' => now(),
+            'tabel' => 'tb_bayar',
+            'aksi' => 'update',
+            'user' => auth()->id(),
+            'ip' => $request->ip(),
+            'keterangan' => json_encode([
+                'id_bayar'        => $bayar->id,
+                'id_detail_bayar' => $detail->id,
+                'jml_bayar'       => $request->jml_bayar,
+                'sts_trans'       => 2,
+            ]),
+            'serial' => url('update-status-dan-bayar'),
+        ]);
 
-            return redirect()->back()->with(
-                'success',
-                'Nominal pembayaran berhasil diperbarui dan status transaksi lunas.'
-            );
+        DB::commit();
 
-        } catch (\Throwable $e) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Nominal pembayaran berhasil diperbarui dan status transaksi berhasil diubah.',
+            'data' => [
+                'id_bayar' => $bayar->id,
+                'id_detail_bayar' => $detail->id,
+                'jml_bayar' => $detail->jml_bayar,
+                'sts_trans' => $bayar->sts_trans,
+            ],
+        ]);
 
-            DB::rollBack();
+    } catch (\Throwable $e) {
 
-            
+        DB::rollBack();
 
-            return redirect()->back()->with(
-                'error',
-                'Gagal memperbarui pembayaran. Silakan coba kembali.'
-            );
-        }
+        // Catat detail error di Laravel log
+        
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal memperbarui pembayaran.',
+            'error' => config('app.debug') ? $e->getMessage() : null,
+            'location' => config('app.debug')
+                ? basename($e->getFile()) . ':' . $e->getLine()
+                : null,
+        ], 500);
     }
+}
 
      private function uptotalbayar($id)
     {

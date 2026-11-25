@@ -235,16 +235,13 @@ class AuthController extends Controller
 
            
 
-            // DB::table('tb_notifikasi')->insert([
-            //     'judul'      => 'Daftar Online',
-            //     'isi'        => 'Pendaftar siswa baru online a.n '
-            //         . $nama .
-            //         '<br> No. Telp ' . $telp,
-            //     'tujuan'     => 'PSB',
-            //     'dari'       => 'Laravel',
-            //     'created_at' => now(),
-            //     'updated_at' => now(),
-            // ]);
+        DB::table('tb_pesan')->insert([
+
+            'id_tujuan' => '',
+            'isi' =>  $nama. ' Telah Melakukan Registrasi Sebagai Calon Siswa',
+            
+            'status' => 0,
+        ]);
 
             Session::put('ppdb_in', [
                 'id'            => $id,       // id tb_tmp_siswa
@@ -315,6 +312,7 @@ class AuthController extends Controller
             'id_tahun'        => $idTahun,
             'id_bulan'        => $bulan,
             'id_calon_siswa'  => $siswa->no_daftar,
+            'sts_trans' => 3
         ]);
 
         $detailTemplate = DetTempBayar::query()

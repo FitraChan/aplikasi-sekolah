@@ -550,6 +550,13 @@ class BayarController extends Controller
         | LOG
         |--------------------------------------------------------------------------
         */
+        DB::table('tb_pesan')->insert([
+
+            'id_tujuan' => $nipd->nipd,
+            'isi' =>  'nipd '.$nipd->nipd. ' Telah Melakukan Upload Bukti Pembayaran Dan Menunggu konfirmasi Admin',
+            'iduser' => auth()->user()->id,
+            'status' => 0,
+        ]);
 
             LogModel::create([
                 'tanggal' => now(),

@@ -1,713 +1,803 @@
- @extends('layout.app')
+<main class="w-full flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-w-0">
 
- @section('title', 'Pembayaran')
+    @php
+    $dataBayar = $dataBayar ?? null;
 
- @section('page_title', 'Pembayaran')
+    $rupiah = fn($value) =>
+    'Rp ' . number_format((float) ($value ?? 0), 0, ',', '.');
 
- @section('content')
- <main class="w-full flex-1 p-4 sm:p-6 lg:p-8 space-y-6 min-w-0">
+    $tanggal = $dataBayar?->tgl_bayar
+    ? $dataBayar->tgl_bayar->format('d M Y')
+    : '-';
 
-     @php
-     $rupiah = fn($value) => 'Rp ' . number_format((float) ($value ?? 0), 0, ',', '.');
+    $jam = $dataBayar?->jam_bayar
+    ? $dataBayar->jam_bayar->format('H:i:s')
+    : '-';
 
-     $tanggal = $dataBayar->tgl_bayar
-     ? $dataBayar->tgl_bayar->format('d M Y')
-     : '-';
+    $bukti = $dataBayar?->bukti_bayar
+    ? asset('storage/app/public/' . ltrim($dataBayar->bukti_bayar, '/'))
+    : null;
+    @endphp
 
-     $jam = $dataBayar->jam_bayar
-     ? $dataBayar->jam_bayar->format('H:i:s')
-     : '-';
+    <!-- HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
-     $bukti = $dataBayar->bukti_bayar
-     ? asset('storage/app/public/' . ltrim($dataBayar->bukti_bayar, '/'))
-     : null;
-     @endphp
+        <div class="flex items-center gap-3">
 
-     <!-- HEADER -->
-     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <button onclick="history.back()"
+                class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition text-slate-600">
+                <i class="w-5 h-5" data-lucide="arrow-left"></i>
+            </button>
 
-         <div class="flex items-center gap-3">
+            <div>
+                <div class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
+                    <span>Keuangan</span>
+                    <i class="w-3.5 h-3.5" data-lucide="chevron-right"></i>
+                    <span>Verifikasi Pembayaran</span>
+                    <i class="w-3.5 h-3.5" data-lucide="chevron-right"></i>
+                    <span class="text-teal-600 font-semibold">Detail</span>
+                </div>
 
-             <button onclick="history.back()"
-                 class="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition text-slate-600">
-                 <i class="w-5 h-5" data-lucide="arrow-left"></i>
-             </button>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+                    Detail Verifikasi Pembayaran
+                </h1>
 
-             <div>
-                 <div class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
-                     <span>Keuangan</span>
-                     <i class="w-3.5 h-3.5" data-lucide="chevron-right"></i>
-                     <span>Verifikasi Pembayaran</span>
-                     <i class="w-3.5 h-3.5" data-lucide="chevron-right"></i>
-                     <span class="text-teal-600 font-semibold">Detail</span>
-                 </div>
 
-                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-                     Detail Verifikasi Pembayaran
-                 </h1>
+            </div>
 
-                 <p class="text-xs text-slate-500 mt-1">
-                     No. Kwitansi:
-                     <span class="font-bold text-slate-700">
-                         {{ $dataBayar->no_kwitansi ?? '-' }}
-                     </span>
-                 </p>
-             </div>
+        </div>
 
-         </div>
+        <div class="flex items-center gap-3 flex-wrap" id="status-transaksi-container">
 
-         <div class="flex items-center gap-3 flex-wrap">
-
-             <span class="flex items-center gap-2 px-3 py-2 text-xs font-bold
+            <span class="flex items-center gap-2 px-3 py-2 text-xs font-bold
                 text-amber-700 bg-amber-100 rounded-full">
 
-                 <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
 
-                 STATUS: {{ $dataBayar->statusTransaksi?->nama ?? '-' }}
+                STATUS: {{ $dataBayar->statusTransaksi?->nama ?? '-' }}
 
-             </span>
-
-
-
-         </div>
-
-     </div>
+            </span>
 
 
-     <!-- GRID UTAMA -->
-     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        </div>
+
+    </div>
 
 
-         <!-- KOLOM KIRI -->
-         <div class="lg:col-span-6 space-y-6">
+    <!-- GRID UTAMA -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
 
-             <!-- DATA SISWA -->
-             <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-
-                 <div class="flex items-center justify-between pb-5 border-b border-slate-100">
-
-                     <div class="flex items-center gap-2.5">
-
-                         <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-teal-50 text-teal-600">
-                             <i class="w-5 h-5" data-lucide="user-round"></i>
-                         </div>
-
-                         <div>
-                             <h2 class="text-base font-bold text-slate-900">
-                                 Data Siswa
-                             </h2>
-
-                             <p class="text-xs text-slate-400">
-                                 Informasi identitas siswa
-                             </p>
-                         </div>
-
-                     </div>
-
-                     <span class="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-bold">
-                         NIPD: {{ $siswa->nipd ?? '-' }}
-                     </span>
-
-                 </div>
+        <!-- KOLOM KIRI -->
+        <div class="lg:col-span-6 space-y-6">
 
 
-                 <div class="pt-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <!-- DATA SISWA -->
+            <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
 
-                     <div class="sm:col-span-2">
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                             Nama Lengkap
-                         </span>
+                <div class="flex items-center justify-between pb-5 border-b border-slate-100">
 
-                         <p class="text-base font-bold text-slate-900">
-                             {{ $siswa->nama_lengkap ?? '-' }}
-                         </p>
-                     </div>
+                    <div class="flex items-center gap-2.5">
 
+                        <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                            <i class="w-5 h-5" data-lucide="user-round"></i>
+                        </div>
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                             NIPD
-                         </span>
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">
+                                Data Siswa
+                            </h2>
 
-                         <p class="text-sm font-semibold text-slate-700">
-                             {{ $siswa->nipd ?? '-' }}
-                         </p>
-                     </div>
+                            <p class="text-xs text-slate-400">
+                                Informasi identitas siswa
+                            </p>
+                        </div>
 
+                    </div>
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                             Kelas
-                         </span>
+                    <span class="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-xs font-bold">
+                        NIPD: {{ $siswa->nipd ?? '-' }}
+                    </span>
 
-                         <p class="text-sm font-semibold text-slate-700">
-                             {{ data_get($siswa, 'kelas.nama_kelas', '-') }}
-                         </p>
-                     </div>
+                </div>
 
 
-                     <div class="sm:col-span-2">
+                <div class="pt-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
 
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                             Jurusan
-                         </span>
+                    <div class="sm:col-span-2">
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                            Nama Lengkap
+                        </span>
 
-                         <span class="inline-flex items-center gap-2 px-3 py-2
+                        <p class="text-base font-bold text-slate-900">
+                            {{ $siswa->nama_lengkap ?? '-' }}
+                        </p>
+                    </div>
+
+
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                            NIPD
+                        </span>
+
+                        <p class="text-sm font-semibold text-slate-700">
+                            {{ $siswa->nipd ?? '-' }}
+                        </p>
+                    </div>
+
+
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                            Kelas
+                        </span>
+
+                        @php
+                        $siswa = $siswa ?? null;
+                        @endphp
+
+                        <p class="text-sm font-semibold text-slate-700">
+                            {{ data_get($siswa, 'kelas.nama_kelas', '-') }}
+                        </p>
+                    </div>
+
+
+                    <div class="sm:col-span-2">
+
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                            Jurusan
+                        </span>
+
+                        <span class="inline-flex items-center gap-2 px-3 py-2
                             text-xs font-bold text-teal-700 bg-teal-50 rounded-lg">
 
-                             <i class="w-4 h-4" data-lucide="graduation-cap"></i>
+                            <i class="w-4 h-4" data-lucide="graduation-cap"></i>
 
-                             {{ data_get($siswa, 'jurusan.nama_jurusan', '-') }}
+                            {{ data_get($siswa, 'jurusan.nama_jurusan', '-') }}
 
-                         </span>
+                        </span>
 
-                     </div>
+                    </div>
 
-                 </div>
+                </div>
 
-             </section>
+            </section>
 
 
-             <!-- DETAIL TRANSAKSI -->
-             <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <!-- DETAIL TRANSAKSI -->
+            <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
 
-                 <div class="flex items-center gap-3 pb-5 border-b border-slate-100">
+                <div class="flex items-center gap-3 pb-5 border-b border-slate-100">
 
-                     <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                         <i class="w-5 h-5" data-lucide="receipt"></i>
-                     </div>
+                    <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                        <i class="w-5 h-5" data-lucide="receipt"></i>
+                    </div>
 
-                     <div>
-                         <h2 class="text-base font-bold text-slate-900">
-                             Informasi Transaksi
-                         </h2>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900">
+                            Informasi Transaksi
+                        </h2>
 
-                         <p class="text-xs text-slate-400">
-                             Informasi pembayaran siswa
-                         </p>
-                     </div>
+                        <p class="text-xs text-slate-400">
+                            Informasi pembayaran siswa
+                        </p>
+                    </div>
 
-                 </div>
+                </div>
 
 
-                 <div class="pt-5 grid grid-cols-2 gap-5">
+                <div class="pt-5 grid grid-cols-2 gap-5">
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
-                             No. Kwitansi
-                         </span>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                            No. Kwitansi
+                        </span>
 
-                         <p class="text-sm font-bold text-slate-800">
-                             {{ $dataBayar->no_kwitansi ?? '-' }}
-                         </p>
-                     </div>
+                        <p class="text-sm font-bold text-slate-800">
+                            {{ $dataBayar->no_kwitansi ?? '-' }}
+                        </p>
+                    </div>
 
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
-                             Tahun Ajaran
-                         </span>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                            Tahun Ajaran
+                        </span>
 
-                         <p class="text-sm font-semibold text-slate-800">
-                             {{ $dataBayar->tahunAjaran->thn_ajaran ?? '-' }}
-                         </p>
-                     </div>
+                        <p class="text-sm font-semibold text-slate-800">
+                            {{ $dataBayar->tahunAjaran->thn_ajaran ?? '-' }}
+                        </p>
+                    </div>
 
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
-                             Tanggal Pembayaran
-                         </span>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                            Tanggal Pembayaran
+                        </span>
 
-                         <p class="text-sm font-semibold text-slate-800">
-                             {{ $tanggal }}
-                         </p>
-                     </div>
+                        <p class="text-sm font-semibold text-slate-800">
+                            {{ $tanggal }}
+                        </p>
+                    </div>
 
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
-                             Bank Pengirim
-                         </span>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                            Bank Pengirim
+                        </span>
 
-                         <p class="text-sm font-semibold text-slate-800">
-                             {{$dataBayar->bankPengirim->nama_bank ?? '-' }}
-                         </p>
-                     </div>
+                        <p class="text-sm font-semibold text-slate-800">
+                            {{$dataBayar->bankPengirim->nama_bank ?? '-' }}
+                        </p>
+                    </div>
 
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
-                             Bank Penerima
-                         </span>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                            Bank Penerima
+                        </span>
 
-                         <span class="inline-flex px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold">
-                             {{ $dataBayar->bankPenerima->nama_bank ?? '-' }}
-                         </span>
-                     </div>
+                        <span class="inline-flex px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 text-xs font-bold">
+                            {{ $dataBayar->bankPenerima->nama_bank ?? '-' }}
+                        </span>
+                    </div>
 
 
-                     <div>
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
-                             Admin
-                         </span>
+                    <div>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-1">
+                            Admin
+                        </span>
 
-                         <p class="text-sm font-semibold text-slate-800">
-                             {{ $dataBayar->kasir->name ?? '-' }}
-                         </p>
-                     </div>
+                        <p class="text-sm font-semibold text-slate-800">
+                            {{ $dataBayar->kasir->name ?? '-' }}
+                        </p>
+                    </div>
 
 
-                     <div class="col-span-2 pt-4 border-t border-slate-100">
+                    <div class="col-span-2 pt-4 border-t border-slate-100">
 
-                         <span class="block text-[11px] font-bold text-slate-400 uppercase mb-2">
-                             Keterangan
-                         </span>
+                        <span class="block text-[11px] font-bold text-slate-400 uppercase mb-2">
+                            Keterangan
+                        </span>
 
-                         <p class="text-sm text-slate-600 leading-relaxed">
-                             {{ $dataBayar->keterangan ?: 'Tidak ada keterangan pembayaran.' }}
-                         </p>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            {{ $dataBayar?->keterangan ?: 'Tidak ada keterangan pembayaran.' }}
+                        </p>
 
-                     </div>
+                    </div>
 
-                 </div>
+                </div>
 
-             </section>
+            </section>
 
 
-         </div>
+        </div>
 
 
 
-         <!-- KOLOM KANAN -->
-         <div class="lg:col-span-6 space-y-6">
+        <!-- KOLOM KANAN -->
+        <div class="lg:col-span-6 space-y-6">
 
 
-             <!-- BUKTI PEMBAYARAN -->
-             <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <!-- BUKTI PEMBAYARAN -->
+            <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
 
-                 <div class="px-6 py-5 flex items-center justify-between border-b border-slate-100">
+                <div class="px-6 py-5 flex items-center justify-between border-b border-slate-100">
 
-                     <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3">
 
-                         <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                             <i class="w-5 h-5" data-lucide="image"></i>
-                         </div>
+                        <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                            <i class="w-5 h-5" data-lucide="image"></i>
+                        </div>
 
-                         <div>
-                             <h2 class="text-base font-bold text-slate-900">
-                                 Bukti Pembayaran
-                             </h2>
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">
+                                Bukti Pembayaran
+                            </h2>
 
-                             <p class="text-xs text-slate-400">
-                                 Dokumen bukti transaksi
-                             </p>
-                         </div>
+                            <p class="text-xs text-slate-400">
+                                Dokumen bukti transaksi
+                            </p>
+                        </div>
 
-                     </div>
+                    </div>
 
-                     @if($bukti)
-                     <button onclick="openImageModal()"
-                         class="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800">
+                    @if($bukti)
+                    <button onclick="openImageModal()"
+                        class="flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800">
 
-                         <i class="w-4 h-4" data-lucide="zoom-in"></i>
-                         Perbesar
+                        <i class="w-4 h-4" data-lucide="zoom-in"></i>
+                        Perbesar
 
-                     </button>
-                     @endif
+                    </button>
+                    @endif
 
-                 </div>
+                </div>
 
 
-                 <div class="p-6 bg-slate-50 flex items-center justify-center min-h-[250px]">
+                <div class="p-6 bg-slate-50 flex items-center justify-center min-h-[250px]">
 
-                     @if($bukti)
+                    @if($bukti)
 
-                     <div onclick="openImageModal()"
-                         class="w-full max-w-md rounded-xl overflow-hidden shadow-md border border-slate-200 bg-white cursor-pointer group">
+                    <div onclick="openImageModal()"
+                        class="w-full max-w-md rounded-xl overflow-hidden shadow-md border border-slate-200 bg-white cursor-pointer group">
 
-                         <img id="proof-image"
-                             src="{{ $bukti }}"
-                             alt="Bukti Pembayaran"
-                             class="w-full h-auto object-contain max-h-[450px] group-hover:scale-[1.02] transition duration-300">
+                        <img id="proof-image"
+                            src="{{ $bukti }}"
+                            alt="Bukti Pembayaran"
+                            class="w-full h-auto object-contain max-h-[450px] group-hover:scale-[1.02] transition duration-300">
 
-                     </div>
+                    </div>
 
-                     @else
+                    @else
 
-                     <div class="text-center py-10">
+                    <div class="text-center py-10">
 
-                         <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
-                             <i class="w-8 h-8" data-lucide="image-off"></i>
-                         </div>
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
+                            <i class="w-8 h-8" data-lucide="image-off"></i>
+                        </div>
 
-                         <p class="text-sm font-bold text-slate-500">
-                             Bukti pembayaran tidak tersedia
-                         </p>
+                        <p class="text-sm font-bold text-slate-500">
+                            Bukti pembayaran tidak tersedia
+                        </p>
 
-                         <p class="text-xs text-slate-400 mt-1">
-                             Tidak ada file bukti yang dilampirkan.
-                         </p>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Tidak ada file bukti yang dilampirkan.
+                        </p>
 
-                     </div>
+                    </div>
 
-                     @endif
+                    @endif
 
-                 </div>
+                </div>
 
-             </section>
+            </section>
 
 
 
-             <!-- RINCIAN ITEM PEMBAYARAN -->
-             <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <!-- RINCIAN ITEM PEMBAYARAN -->
+            <section class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
 
-                 <div class="px-6 py-5 flex items-center justify-between border-b border-slate-100">
+                <div class="px-6 py-5 flex items-center justify-between border-b border-slate-100">
 
-                     <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3">
 
-                         <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                             <i class="w-5 h-5" data-lucide="list-checks"></i>
-                         </div>
+                        <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                            <i class="w-5 h-5" data-lucide="list-checks"></i>
+                        </div>
 
-                         <div>
-                             <h2 class="text-base font-bold text-slate-900">
-                                 Rincian Item Pembayaran
-                             </h2>
+                        <div>
+                            <h2 class="text-base font-bold text-slate-900">
+                                Rincian Item Pembayaran
+                            </h2>
 
-                             <p class="text-xs text-slate-400">
-                                 Detail kewajiban dan pembayaran
-                             </p>
-                         </div>
+                            <p class="text-xs text-slate-400">
+                                Detail kewajiban dan pembayaran
+                            </p>
+                        </div>
 
-                     </div>
+                    </div>
 
 
-                     <span class="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 text-xs font-bold">
-                         {{ $detBayar->count() }} Item
-                     </span>
+                    <span class="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 text-xs font-bold">
+                        {{ $detBayar?->count() ?? 0 }} Item
+                    </span>
 
-                 </div>
+                </div>
 
 
 
-                 <div class="overflow-x-auto rounded-xl">
+                <div class="overflow-x-auto rounded-xl">
+                    @php
+                    /*
+                    |--------------------------------------------------------------------------
+                    | DEFAULT DATA
+                    |--------------------------------------------------------------------------
+                    */
 
-                     @php
-                     $totBayar = 0;
-                     @endphp
+                    $dataBayar = $dataBayar ?? null;
+                    $siswa = $siswa ?? null;
+                    $detBayar = collect($detBayar ?? []);
 
-                     <table class="w-full text-sm">
+                    $totBayar = 0;
 
-                         <thead class="bg-slate-50 border-b border-slate-200">
-                             <tr class="text-[10px] uppercase tracking-wider text-slate-500">
-                                 <th class="px-4 py-3 text-left font-bold">Item Pembayaran</th>
-                                 <th class="px-4 py-3 text-center font-bold">Tanggal Bayar</th>
-                                 <th class="px-4 py-3 text-right font-bold">Kewajiban</th>
-                                 <th class="px-4 py-3 text-right font-bold">Bayar</th>
-                                 <th class="px-4 py-3 text-center font-bold">Aksi</th>
-                             </tr>
-                         </thead>
+                    $rupiah = fn($value) =>
+                    'Rp ' . number_format((float) ($value ?? 0), 0, ',', '.');
+                    @endphp
 
-                         <tbody class="divide-y divide-slate-100">
+                    <table class="w-full text-sm">
 
-                             @forelse($detBayar as $item)
+                        {{-- HEADER --}}
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr class="text-[10px] uppercase tracking-wider text-slate-500">
 
-                             @php
-                             $dibayar = (float) ($item->jml_bayar ?? 0);
-                             $totBayar += $dibayar;
+                                <th class="px-4 py-3 text-left font-bold">
+                                    Item Pembayaran
+                                </th>
 
-                             $namaItem = $item->itemBayar->nama_item
-                             ?? 'Item tidak tersedia';
+                                <th class="px-4 py-3 text-center font-bold">
+                                    Tanggal Bayar
+                                </th>
 
-                             $tanggalBayar = $item->tgl_bayar
-                             ? \Carbon\Carbon::parse($item->tgl_bayar)->format('Y-m-d')
-                             : '';
-                             @endphp
+                                <th class="px-4 py-3 text-right font-bold">
+                                    Kewajiban
+                                </th>
 
-                             <tr class="hover:bg-teal-50/50 transition-colors">
+                                <th class="px-4 py-3 text-right font-bold">
+                                    Bayar
+                                </th>
 
-                                 <td class="px-4 py-4">
-                                     <div class="flex items-center gap-3">
-                                         <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
-                                             <i data-lucide="receipt" class="w-4 h-4"></i>
-                                         </div>
+                                <th class="px-4 py-3 text-center font-bold">
+                                    Aksi
+                                </th>
 
-                                         <div>
-                                             <p class="font-bold text-slate-800 text-sm">
-                                                 {{ $namaItem }}
-                                             </p>
-                                             <p class="text-xs text-slate-400 mt-0.5">
-                                                 Rincian pembayaran
-                                             </p>
-                                         </div>
-                                     </div>
-                                 </td>
+                            </tr>
+                        </thead>
 
-                                 <td class="px-4 py-4 text-center whitespace-nowrap">
-                                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500">
-                                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
-                                         {{ date('d-m-Y', strtotime($dataBayar->tgl_bayar)) }}
-                                     </span>
-                                 </td>
 
-                                 <td class="px-4 py-4 text-right whitespace-nowrap">
-                                     <span class="font-semibold text-slate-600">
-                                         Rp 0
-                                     </span>
-                                 </td>
+                        {{-- BODY --}}
+                        <tbody class="divide-y divide-slate-100">
 
-                                 <td class="px-4 py-4 text-right whitespace-nowrap">
-                                     <span class="inline-flex px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-extrabold">
-                                         Rp {{ number_format($dibayar, 0, ',', '.') }}
-                                     </span>
-                                 </td>
+                            @forelse($detBayar as $item)
 
-                                 {{-- AKSI --}}
-                                 <td class="px-4 py-4 text-center">
-                                     <button
-                                         type="button"
-                                         onclick="editDetailBayar(this)"
-                                         data-id="{{ $item->id }}"
-                                         data-nama="{{ $namaItem }}"
-                                         data-tanggal="{{ $tanggalBayar }}"
-                                         data-nominal="{{ $dibayar }}"
-                                         class="inline-flex items-center gap-1.5 px-3 py-2
-                                   rounded-lg bg-blue-50 text-blue-600
-                                   hover:bg-blue-100 font-bold text-xs transition">
+                            @php
+                            $dibayar = (float) ($item->jml_bayar ?? 0);
 
-                                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                                         Edit
-                                     </button>
-                                 </td>
+                            $totBayar += $dibayar;
 
-                             </tr>
+                            $namaItem = $item->itemBayar->nama_item
+                            ?? 'Item tidak tersedia';
 
-                             @empty
+                            $tanggalBayar = $dataBayar?->tgl_bayar
+                            ? $dataBayar->tgl_bayar->format('d M Y')
+                            : '-';
+                            @endphp
 
-                             <tr>
-                                 <td colspan="5" class="text-center py-12 text-slate-400">
-                                     <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-40"></i>
-                                     <p class="text-sm font-semibold">
-                                         Belum ada rincian pembayaran.
-                                     </p>
-                                     <p class="text-xs mt-1">
-                                         Data pembayaran belum tersedia.
-                                     </p>
-                                 </td>
-                             </tr>
+                            <tr class="hover:bg-teal-50/50 transition-colors">
 
-                             @endforelse
+                                {{-- ITEM PEMBAYARAN --}}
+                                <td class="px-4 py-4">
 
-                         </tbody>
+                                    <div class="flex items-center gap-3">
 
-                         @if($detBayar->isNotEmpty())
-                         <tfoot class="bg-slate-50 border-t border-slate-200">
-                             <tr>
-                                 <td colspan="4" class="px-4 py-4 text-right font-bold text-slate-600">
-                                     Total Pembayaran
-                                 </td>
+                                        <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
 
-                                 <td class="px-4 py-4 text-center whitespace-nowrap">
-                                     <span class="inline-flex px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-black text-sm">
-                                         Rp {{ number_format($totBayar, 0, ',', '.') }}
-                                     </span>
-                                 </td>
-                             </tr>
-                         </tfoot>
-                         @endif
+                                            <i data-lucide="receipt" class="w-4 h-4"></i>
 
-                     </table>
+                                        </div>
 
+                                        <div>
 
-                     <div id="modalEditBayar"
-                         class="fixed inset-0 z-[999] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+                                            <p class="font-bold text-slate-800 text-sm">
+                                                {{ $namaItem }}
+                                            </p>
 
-                         <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+                                            <p class="text-xs text-slate-400 mt-0.5">
+                                                Rincian pembayaran
+                                            </p>
 
-                             {{-- HEADER --}}
-                             <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+                                        </div>
 
-                                 <div>
-                                     <h3 class="text-lg font-black text-slate-800">
-                                         Edit Pembayaran
-                                     </h3>
-                                     <p class="text-xs text-slate-400 mt-1">
-                                         Ubah rincian nominal pembayaran.
-                                     </p>
-                                 </div>
+                                    </div>
 
-                                 <button type="button"
-                                     onclick="tutupModalBayar()"
-                                     class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
-                                     <i data-lucide="x" class="w-5 h-5"></i>
-                                 </button>
+                                </td>
 
-                             </div>
 
-                             {{-- FORM --}}
-                             <form id="formEditBayar" method="POST" action="{{ route('updateStatusDanBayarTransaksi') }}">
+                                {{-- TANGGAL BAYAR --}}
+                                <td class="px-4 py-4 text-center whitespace-nowrap">
 
-                                 @csrf
-                                 @method('PUT')
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500">
 
-                                 <input type="hidden" name="id_detail_bayar" id="edit_id_detail">
-                                 <input type="hidden" name="id_bayar" id="edit_id_bayar" value="<?= $dataBayar->id; ?>">
+                                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
 
-                                 <div class="p-6 space-y-5">
+                                        {{ $tanggalBayar ? \Carbon\Carbon::parse($tanggalBayar)->format('d-m-Y') : '-' }}
 
-                                     {{-- ITEM --}}
-                                     <div>
-                                         <label class="block text-xs font-bold text-slate-500 mb-2">
-                                             ITEM PEMBAYARAN
-                                         </label>
+                                    </span>
 
-                                         <input type="text"
-                                             id="edit_nama"
-                                             readonly
-                                             class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-bold text-sm">
-                                     </div>
+                                </td>
 
 
+                                {{-- KEWAJIBAN --}}
+                                <td class="px-4 py-4 text-right whitespace-nowrap">
 
-                                     {{-- NOMINAL --}}
-                                     <div>
-                                         <label class="block text-xs font-bold text-slate-500 mb-2">
-                                             NOMINAL PEMBAYARAN
-                                         </label>
+                                    <span class="font-semibold text-slate-600">
+                                        {{ $rupiah($item->jml_kewajiban ?? 0) }}
+                                    </span>
 
-                                         <div class="relative">
-                                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
-                                                 Rp
-                                             </span>
+                                </td>
 
-                                             <input type="number"
-                                                 name="jml_bayar"
-                                                 id="edit_nominal"
-                                                 min="0"
-                                                 step="1"
-                                                 required
-                                                 class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none font-bold text-slate-800">
-                                         </div>
-                                     </div>
 
-                                 </div>
+                                {{-- NOMINAL BAYAR --}}
+                                <td class="px-4 py-4 text-right whitespace-nowrap">
 
-                                 {{-- FOOTER --}}
-                                 <div class="flex gap-3 px-6 py-5 bg-slate-50 border-t border-slate-100">
+                                    <span class="inline-flex px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-extrabold">
 
-                                     <button type="button"
-                                         onclick="tutupModalBayar()"
-                                         class="flex-1 py-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm hover:bg-slate-100">
-                                         Batal
-                                     </button>
+                                        {{ $rupiah($dibayar) }}
 
-                                     <button type="submit"
-                                         class="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm flex items-center justify-center gap-2">
-                                         <i data-lucide="save" class="w-4 h-4"></i>
-                                         Simpan Perubahan
-                                     </button>
+                                    </span>
 
-                                 </div>
+                                </td>
 
-                             </form>
 
-                         </div>
-                     </div>
+                                {{-- AKSI --}}
+                                <td class="px-4 py-4 text-center">
 
-                 </div>
+                                    <button
+                                        type="button"
+                                        onclick="editDetailBayar(this)"
+                                        data-id="{{ $item->id }}"
+                                        data-nama="{{ $namaItem }}"
+                                        data-tanggal="{{ $tanggalBayar }}"
+                                        data-nominal="{{ $dibayar }}"
+                                        class="inline-flex items-center gap-1.5 px-3 py-2
+                               rounded-lg bg-blue-50 text-blue-600
+                               hover:bg-blue-100 font-bold text-xs transition">
 
+                                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
 
-             </section>
+                                        Edit
 
+                                    </button>
 
+                                </td>
 
-             <!-- AKSI VERIFIKASI -->
-             <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                            </tr>
 
-                 <div class="flex items-center gap-3 mb-5">
+                            @empty
 
-                     <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                         <i class="w-5 h-5" data-lucide="shield-check"></i>
-                     </div>
+                            <tr>
 
-                     <div>
-                         <h2 class="text-base font-bold text-slate-900">
-                             Aksi Verifikasi
-                         </h2>
+                                <td colspan="5" class="text-center py-12 text-slate-400">
 
-                         <p class="text-xs text-slate-400">
-                             Tentukan hasil pemeriksaan pembayaran
-                         </p>
-                     </div>
+                                    <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-40"></i>
 
-                 </div>
+                                    <p class="text-sm font-semibold">
+                                        Belum ada rincian pembayaran.
+                                    </p>
 
-                 <div id="verification-action-container">
+                                    <p class="text-xs mt-1">
+                                        Data pembayaran belum tersedia.
+                                    </p>
 
-                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                </td>
 
-                         @if ($dataBayar->sts_trans == 1)
+                            </tr>
 
-                         <form action="{{ route('updateStatusTransaksi', $dataBayar->id) }}"
-                             method="GET">
+                            @endforelse
 
-                             @csrf
+                        </tbody>
 
-                             <button type="submit"
-                                 onclick="return confirm('Apakah Anda yakin ingin menyetujui pembayaran ini?')"
-                                 class="flex items-center justify-center gap-2 py-3 px-4
-               bg-emerald-500 hover:bg-emerald-600
-               text-white font-bold text-sm rounded-xl shadow-sm transition">
 
-                                 <i class="w-4 h-4" data-lucide="check-circle-2"></i>
-                                 Setujui Pembayaran
+                        {{-- FOOTER TOTAL --}}
+                        @if($detBayar->isNotEmpty())
 
-                             </button>
-                         </form>
+                        <tfoot class="bg-slate-50 border-t border-slate-200">
 
-                         @endif
+                            <tr>
 
+                                <td colspan="4" class="px-4 py-4 text-right font-bold text-slate-600">
+                                    Total Pembayaran
+                                </td>
 
+                                <td class="px-4 py-4 text-center whitespace-nowrap">
 
-                     </div>
+                                    <span class="inline-flex px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 font-black text-sm">
 
-                 </div>
+                                        {{ $rupiah($totBayar) }}
 
-             </section>
+                                    </span>
 
-         </div>
+                                </td>
 
-     </div>
+                            </tr>
 
- </main>
- <script>
-     function editDetailBayar(button) {
+                        </tfoot>
 
-         const id = button.dataset.id;
+                        @endif
 
-         document.getElementById('edit_id_detail').value = id;
+                    </table>
 
-         document.getElementById('edit_nominal').value = button.dataset.nominal;
 
-       
+                    {{-- =========================================================
+     MODAL EDIT PEMBAYARAN
+========================================================== --}}
 
-         const modal = document.getElementById('modalEditBayar');
+                    <div
+                        id="modalEditBayar"
+                        class="fixed inset-0 z-[999] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
 
-         modal.classList.remove('hidden');
-         modal.classList.add('flex');
+                        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
 
-         if (window.lucide) {
-             lucide.createIcons();
-         }
-     }
 
-     function tutupModalBayar() {
-         const modal = document.getElementById('modalEditBayar');
+                            {{-- HEADER --}}
+                            <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
 
-         modal.classList.add('hidden');
-         modal.classList.remove('flex');
-     }
- </script>
- @endsection
+                                <div>
+
+                                    <h3 class="text-lg font-black text-slate-800">
+                                        Edit Pembayaran
+                                    </h3>
+
+                                    <p class="text-xs text-slate-400 mt-1">
+                                        Ubah rincian nominal pembayaran.
+                                    </p>
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="tutupModalBayar()"
+                                    class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500">
+
+                                    <i data-lucide="x" class="w-5 h-5"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            {{-- FORM --}}
+                            <form
+                                id="formEditBayar">
+
+                                @csrf
+                                @method('PUT')
+
+                                <input type="hidden" name="id_detail_bayar" id="edit_id_detail">
+
+                                <input
+                                    type="hidden"
+                                    name="id_bayar"
+                                    id="edit_id_bayar"
+                                    value="{{ $dataBayar?->id ?? '' }}">
+
+                                <div class="p-6 space-y-5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-2">
+                                            ITEM PEMBAYARAN
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="edit_nama"
+                                            readonly
+                                            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-bold text-sm">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 mb-2">
+                                            NOMINAL PEMBAYARAN
+                                        </label>
+
+                                        <div class="relative">
+                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+                                                Rp
+                                            </span>
+
+                                            <input
+                                                type="number"
+                                                name="jml_bayar"
+                                                id="edit_nominal"
+                                                min="0"
+                                                step="1"
+                                                required
+                                                class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 outline-none font-bold text-slate-800">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3 px-6 py-5 bg-slate-50 border-t border-slate-100">
+                                    <button
+                                        type="button"
+                                        onclick="tutupModalBayar()"
+                                        class="flex-1 py-3 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm hover:bg-slate-100">
+                                        Batal
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        id="btnSimpanEditBayar"
+                                          onclick="simpanEditBayar()"
+                                        class="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm flex items-center justify-center gap-2">
+
+                                        <i data-lucide="save" class="w-4 h-4"></i>
+                                        <span>Simpan Perubahan</span>
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </section>
+
+
+
+            <!-- AKSI VERIFIKASI -->
+            <section
+                id="verification-section"
+                class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+
+                <div class="flex items-center gap-3 mb-5">
+
+                    <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                        <i class="w-5 h-5" data-lucide="shield-check"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="text-base font-bold text-slate-900">
+                            Aksi Verifikasi
+                        </h2>
+
+                        <p class="text-xs text-slate-400">
+                            Tentukan hasil pemeriksaan pembayaran
+                        </p>
+                    </div>
+
+                </div>
+
+                <div id="verification-action-container">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                        @if (($dataBayar?->sts_trans ?? null) == 1)
+
+                            <button
+                                type="button"
+                                id="btnSetujuiPembayaran"
+                                onclick="setujuiPembayaran('{{ route('updateStatusTransaksi', $dataBayar->id) }}','{{$dataBayar->id}}')"
+                                class="flex items-center justify-center gap-2 py-3 px-4
+                                bg-emerald-500 hover:bg-emerald-600
+                                text-white font-bold text-sm rounded-xl shadow-sm transition">
+
+                                <i class="w-4 h-4" data-lucide="check-circle-2"></i>
+                                Setujui Pembayaran
+
+                            </button>
+
+                        @endif
+
+                    </div>  
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</main>
+<script>
+    function editDetailBayar(button) {
+
+        const id = button.dataset.id;
+
+        document.getElementById('edit_id_detail').value = id;
+
+        document.getElementById('edit_nominal').value = button.dataset.nominal;
+
+
+
+        const modal = document.getElementById('modalEditBayar');
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    }
+
+    function tutupModalBayar() {
+        const modal = document.getElementById('modalEditBayar');
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+
+</script>

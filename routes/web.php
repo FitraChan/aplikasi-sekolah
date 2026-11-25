@@ -216,11 +216,21 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
 
     Route::get('/updateStatusTransaksi/{id}', [BayarController::class, 'updateStatusTransaksi'])->name('updateStatusTransaksi');
 
+    Route::get('/updateStatusTransaksiCalonSiswa/{id}', [BayarCalonSiswaController::class, 'updateStatusTransaksi'])->name('updateStatusTransaksiCalonSiswa');
+
+
     Route::put('/updateStatusDanBayarTransaksi', [BayarController::class, 'updateStatusDanBayarTransaksi'])->name('updateStatusDanBayarTransaksi');
+
+    
+
+    Route::put('/updateStatusDanBayarTransaksiCalonSiswa', [BayarCalonSiswaController::class, 'updateStatusDanBayarTransaksi'])->name('updateStatusDanBayarTransaksiCalonSiswa');
 
 
     Route::get('/detailVerifikasi/{id}', [BayarController::class, 'detailVerifikasi'])
         ->name('detailVerifikasi');
+
+    Route::get('/detailVerifikasiCalonSiswa/{id}', [BayarCalonSiswaController::class, 'detailVerifikasi'])
+        ->name('detailVerifikasiCalonSiswa');
 
     Route::put('/bayar/{id}', [BayarController::class, 'update'])
         ->name('bayar.update');
@@ -659,7 +669,7 @@ Route::middleware(['auth', 'role:admin|Pendaftaran|keuangan|Akademik'])->group(f
     )->name('detail-jadwal.data');
 
 
-     Route::get(
+    Route::get(
         '/detail-jadwal-modal/data',
         [MasterJadwalController::class, 'dataDetailModal']
     )->name('detail-jadwal-modal.data');
@@ -929,6 +939,9 @@ Route::middleware(['auth', 'role:admin|Akademik|Pendaftaran|keuangan'])->group(f
     Route::get('/admin', [Home::class, 'index'])
         ->name('admin');
 
+    Route::post('/baca', [Home::class, 'baca'])
+        ->name('baca');
+
     Route::get('/gelombang', [GelombangController::class, 'index'])->name('gelombang.index');
     Route::get('/gelombang/data', [GelombangController::class, 'data'])->name('gelombang.data');
     Route::post('/gelombang/store', [GelombangController::class, 'store'])->name('gelombang.store');
@@ -1070,7 +1083,7 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
         '/calon-siswa/update/registrasi/{id}',
         [CalonSiswaController::class, 'updateRegistrasi']
     )->name('calon-siswa.update.registrasi');
-   
+
 
     Route::post('/calon-siswa/upload/{id}', [CalonSiswaController::class, 'updateUpload'])->name('calon-siswa.update.upload');
 
@@ -1098,9 +1111,9 @@ Route::middleware(['auth', 'role:calon'])->group(function () {
     )->name('calon-siswa.pembayaran');
 
 
-   
+
     Route::get('ujianCalon/kartu/{id}', [CalonSiswaUjianController::class, 'downloadKartu'])
-    ->name('ujianCalon.kartu');
+        ->name('ujianCalon.kartu');
 
     Route::get(
         'ujianCalon',

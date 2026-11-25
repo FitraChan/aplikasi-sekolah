@@ -100,4 +100,9 @@ class CalonSiswa extends Model
             'id'
         );
     }
+
+    public function bayarCalonSiswa()
+    {
+        return $this->hasMany(BayarCalonSiswa::class, 'id_calon_siswa', 'no_daftar');
+    }
 }

@@ -25,10 +25,10 @@
 
                     <!-- SET BULANAN -->
 
-                   <button
-    type="button"
-    onclick="openModalBulananAllSiswa()"
-    class="inline-flex items-center justify-center
+                    <button
+                        type="button"
+                        onclick="openModalBulananAllSiswa()"
+                        class="inline-flex items-center justify-center
            gap-2
            px-4 py-2
            rounded-lg
@@ -37,24 +37,21 @@
            text-white
            text-sm font-medium
            transition-colors
-           shadow-sm"
->
-    <svg
-        class="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        viewBox="0 0 24 24"
-    >
-        <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 5v14M5 12h14"
-        />
-    </svg>
+           shadow-sm">
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 5v14M5 12h14" />
+                        </svg>
 
-    Set Bulanan All Siswa
-</button>
+                        Set Bulanan All Siswa
+                    </button>
 
 
                     <!-- CETAK KEWAJIBAN -->
@@ -83,8 +80,7 @@
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M6 9V2h12v7"
-                            />
+                                d="M6 9V2h12v7" />
 
                             <path
                                 stroke-linecap="round"
@@ -92,14 +88,12 @@
                                 d="M6 18H4a2 2 0 0 1-2-2v-5
                                    a2 2 0 0 1 2-2h16
                                    a2 2 0 0 1 2 2v5
-                                   a2 2 0 0 1-2 2h-2"
-                            />
+                                   a2 2 0 0 1-2 2h-2" />
 
                             <path
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
-                                d="M6 14h12v8H6z"
-                            />
+                                d="M6 14h12v8H6z" />
 
                         </svg>
 
@@ -161,9 +155,9 @@
 
                                 @foreach($tahun as $row)
 
-                                    <option value="{{ $row->thn_ajaran }}">
-                                        {{ $row->thn_ajaran }}
-                                    </option>
+                                <option value="{{ $row->thn_ajaran }}">
+                                    {{ $row->thn_ajaran }}
+                                </option>
 
                                 @endforeach
 
@@ -203,9 +197,9 @@
 
                                 @foreach($jurusan as $row)
 
-                                    <option value="{{ $row->id }}">
-                                        {{ $row->nama_jurusan }}
-                                    </option>
+                                <option value="{{ $row->id }}">
+                                    {{ $row->nama_jurusan }}
+                                </option>
 
                                 @endforeach
 
@@ -245,9 +239,46 @@
 
                                 @foreach($kelas as $row)
 
-                                    <option value="{{ $row->idx }}">
-                                        {{ $row->nama_kelas }}
-                                    </option>
+                                <option value="{{ $row->idx }}">
+                                    {{ $row->nama_kelas }}
+                                </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                         <!-- STATUS TRANSAKSI -->
+                        <div class="lg:col-span-2">
+
+                            <label
+                                for="filter_sts_trans"
+                                class="block text-xs font-medium text-slate-600 mb-1">
+                                Status
+                            </label>
+
+                            <select
+                                id="filter_sts_trans"
+                                class="w-full rounded-lg
+                                       border border-slate-300
+                                       bg-white
+                                       px-3 py-2
+                                       text-sm text-slate-700
+                                       focus:border-[#02BC9C]
+                                       focus:ring-2
+                                       focus:ring-[#02BC9C]/20
+                                       outline-none">
+
+                                <option value="">
+                                    Status Transaksi
+                                </option>
+
+                                @foreach($status as $row)
+
+                                <option value="{{ $row->id }}">
+                                    {{ $row->nama }}
+                                </option>
 
                                 @endforeach
 
@@ -315,13 +346,11 @@
                                     <circle
                                         cx="11"
                                         cy="11"
-                                        r="7"
-                                    />
+                                        r="7" />
 
                                     <path
                                         stroke-linecap="round"
-                                        d="m20 20-4-4"
-                                    />
+                                        d="m20 20-4-4" />
 
                                 </svg>
 
@@ -397,13 +426,11 @@
                                 y="5"
                                 width="20"
                                 height="14"
-                                rx="2"
-                            />
+                                rx="2" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M2 10h20"
-                            />
+                                d="M2 10h20" />
 
                         </svg>
 
@@ -440,23 +467,19 @@
                                 y="5"
                                 width="20"
                                 height="14"
-                                rx="2"
-                            />
+                                rx="2" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M2 10h20"
-                            />
+                                d="M2 10h20" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M7 15h.01"
-                            />
+                                d="M7 15h.01" />
 
                             <path
                                 stroke-linecap="round"
-                                d="M11 15h6"
-                            />
+                                d="M11 15h6" />
 
                         </svg>
 
@@ -481,14 +504,12 @@
                     <input
                         type="hidden"
                         id="id_bayar"
-                        value=""
-                    >
+                        value="">
 
                     <input
                         type="hidden"
                         id="id_calon_siswa"
-                        value=""
-                    >
+                        value="">
 
 
                     <!-- TABLE -->
@@ -514,13 +535,13 @@
 ============================================================== -->
 
 @include(
-    'keuangan.bayar_calon_siswa.modal_history.modal_bulanan_all_siswa'
+'keuangan.bayar_calon_siswa.modal_history.modal_bulanan_all_siswa'
 )
 
 @include(
-    'keuangan.bayar_calon_siswa.modal_history.modal_bayar'
+'keuangan.bayar_calon_siswa.modal_history.modal_bayar'
 )
 
 @include(
-    'keuangan.bayar_calon_siswa.modal_history.modal_cicilan'
+'keuangan.bayar_calon_siswa.modal_history.modal_cicilan'
 )

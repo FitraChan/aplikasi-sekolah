@@ -14,6 +14,57 @@
 
     });
 
+     window.muatDetailBayar = async function(idBayar) {
+
+        const url = "{{ route('detailVerifikasiCalonSiswa', ':id') }}"
+            .replace(':id', idBayar);
+
+        const container = document.getElementById('content-detail-bayar-calon-siswa');
+
+        container.innerHTML = `
+        <div class="text-center py-12 text-slate-400">
+            <span class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 inline-block"></span>
+            <p class="mt-3">Memuat detail pembayaran...</p>
+        </div>
+    `;
+
+        try {
+
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Gagal memuat detail pembayaran.');
+            }
+
+            const html = await response.text();
+
+            container.innerHTML = html;
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+           
+
+        } catch (error) {
+
+            console.error('Error muatDetailBayar:', error);
+
+            container.innerHTML = `
+            <div class="text-center py-12 text-red-500">
+                Gagal memuat detail pembayaran.
+            </div>
+        `;
+
+            throw error;
+        }
+    };
+
 
     /* =========================================================
        MODAL BULANAN ALL SISWA
@@ -228,7 +279,7 @@
                             ajaxURL: "{{ url('/bayar-calon-siswa/detailBayar') }}/" +
                                 data.id,
 
-                            layout: "fitColumns",
+                            layout: "fitData",
 
                             placeholder: "Tidak ada detail pembayaran",
 
@@ -322,6 +373,52 @@
                     },
 
                     {
+                        title: "Status",
+                        field: "status",
+                        width: 150,
+
+                        headerSort: false,
+
+                        formatter: function(cell) {
+
+                            const status = Number(cell.getValue());
+
+                            let label = '';
+                            let warna = '';
+
+                            switch (status) {
+
+                                case 1:
+                                    label = 'Menunggu Konfirmasi';
+                                    warna = 'bg-amber-100 text-amber-700 border-amber-200';
+                                    break;
+
+                                case 2:
+                                    label = 'Lunas';
+                                    warna = 'bg-emerald-100 text-emerald-700 border-emerald-200';
+                                    break;
+
+                                case 3:
+                                    label = 'Belum Lunas';
+                                    warna = 'bg-rose-100 text-rose-700 border-rose-200';
+                                    break;
+
+                                default:
+                                    label = 'Tidak Diketahui';
+                                    warna = 'bg-slate-100 text-slate-600 border-slate-200';
+                            }
+
+                            return `
+                                <span class="inline-flex items-center
+                                            px-3 py-1.5 rounded-full
+                                            text-xs font-semibold border
+                                            ${warna}">
+                                    ${label}
+                                </span>
+                            `;
+                        }
+                    },
+                    {
                         title: "Tanggal Bayar",
                         field: "tgl_bayar",
 
@@ -388,10 +485,86 @@
                         }
                     },
 
+
                     {
-                        title: "Keterangan",
-                        field: "keterangan",
-                        width: 250
+                        title: "Detail",
+                        width: 100,
+                        hozAlign: "center",
+                        headerSort: false,
+
+                        formatter: function(cell) {
+
+                            const data = cell.getRow().getData();
+
+                            return `
+                                <button
+                                    type="button"
+                                    class="btn-detail-siswa"
+                                    data-id="${data.id}"
+                                >
+                                    Detail
+                                </button>
+                            `;
+                        },
+
+                        cellClick: async function(e, cell) {
+
+                            if (!e.target.closest('.btn-detail-siswa')) return;
+
+                            let data = cell.getData();
+
+                            let url = "{{ route('detailVerifikasiCalonSiswa', ':id') }}";
+                            url = url.replace(':id', data.id);
+
+                            // Aktifkan tab detail pembayaran
+                            aktifkanTab('detail-bayar-calon-siswa');
+
+                            const container = document.getElementById(
+                                'content-detail-bayar-calon-siswa'
+                            );
+
+                            container.innerHTML = `
+                                <div class="text-center py-12 text-slate-400">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-3"></div>
+                                    Memuat detail pembayaran...
+                                </div>
+                            `;
+
+                            try {
+
+                                const response = await fetch(url, {
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'Accept': 'text/html'
+                                    }
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error('Gagal mengambil detail pembayaran.');
+                                }
+
+                                const html = await response.text();
+
+                                container.innerHTML = html;
+
+                                // Render ulang icon Lucide jika digunakan
+                                if (window.lucide) {
+                                    lucide.createIcons();
+                                }
+
+                            } catch (error) {
+
+                                console.error(error);
+
+                                container.innerHTML = `
+                                    <div class="text-center py-12 text-red-500">
+                                        Gagal memuat detail pembayaran.
+                                    </div>
+                                `;
+
+                            }
+
+                        }
                     }
 
                 ]
@@ -651,8 +824,7 @@
             Swal.fire({
 
                 icon: result.success ?
-                    "success" :
-                    "error",
+                    "success" : "error",
 
                 title: result.title,
 
@@ -1270,7 +1442,11 @@
 
                 keyword: document.getElementById(
                     'filter_keyword'
-                ).value
+                ).value,
+
+                sts_trans: document.getElementById(
+                    'filter_sts_trans'
+                ).value,
 
             }
         );
@@ -1331,6 +1507,195 @@
             `${cetakUrl}/${selectedSiswaId}`,
             '_blank'
         );
+
+    }
+
+    function aktifkanTab(targetId) {
+
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(function(btn) {
+
+            const aktif = btn.dataset.tabTarget === targetId;
+
+            btn.classList.toggle('border-[#00B686]', aktif);
+            btn.classList.toggle('text-[#00B686]', aktif);
+            btn.classList.toggle('font-semibold', aktif);
+
+            btn.classList.toggle('border-transparent', !aktif);
+            btn.classList.toggle('text-slate-500', !aktif);
+            btn.classList.toggle('font-medium', !aktif);
+
+            btn.setAttribute('aria-selected', aktif ? 'true' : 'false');
+
+        });
+
+        tabContents.forEach(function(content) {
+
+            content.classList.toggle('hidden', content.id !== targetId);
+
+        });
+
+    }
+
+    window.simpanEditBayar = async function() {
+
+
+
+        const form = document.getElementById('formEditBayar');
+        const btn = document.getElementById('btnSimpanEditBayar');
+
+        if (btn.disabled) return;
+
+        const teksAwal = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = `
+        <span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+        Menyimpan...
+    `;
+
+        try {
+
+            const formData = new FormData(form);
+
+            const idBayar = formData.get('id_bayar');
+
+            // UPDATE PEMBAYARAN
+            const response = await fetch(
+                "{{ route('updateStatusDanBayarTransaksiCalonSiswa') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                const errors = Object.values(result.errors || {})
+                    .flat()
+                    .join('\n');
+
+                throw new Error(
+                    errors || result.message || 'Gagal menyimpan pembayaran.'
+                );
+            }
+
+            // Tutup modal
+            tutupModalBayar();
+
+            tableDetail.replaceData();
+
+            // Tampilkan notifikasi
+            alert(result.message || 'Pembayaran berhasil diperbarui.');
+
+            // MUAT ULANG DETAIL TRANSAKSI
+            if (typeof window.muatDetailBayar === 'function') {
+
+                await window.muatDetailBayar(idBayar);
+
+            } else {
+
+                console.warn('Fungsi muatDetailBayar() belum tersedia.');
+
+            }
+
+
+
+        } catch (error) {
+
+            console.group('ERROR SIMPAN PEMBAYARAN');
+            console.error('Pesan:', error.message);
+            console.error('Stack:', error.stack);
+            console.trace('Lokasi pemanggilan error');
+            console.groupEnd();
+
+            alert(error.message);
+
+        } finally {
+
+            btn.disabled = false;
+            btn.innerHTML = teksAwal;
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        }
+
+    }
+
+
+    async function setujuiPembayaran(url, idBayar) {
+
+        if (!confirm('Apakah Anda yakin ingin menyetujui pembayaran ini?')) {
+            return;
+        }
+
+        const btn = document.getElementById('btnSetujuiPembayaran');
+
+        if (btn.disabled) return;
+
+        const teksAwal = btn.innerHTML;
+
+        btn.disabled = true;
+
+        btn.innerHTML = `
+        <span class="animate-spin rounded-full h-4 w-4 border-2
+        border-white border-t-transparent"></span>
+        Memproses...
+    `;
+
+        try {
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Gagal menyetujui pembayaran.');
+            }
+
+            tableDetail.replaceData();
+
+
+            alert(result.message || 'Pembayaran berhasil disetujui.');
+
+            // Muat ulang detail pembayaran jika diperlukan
+            // window.muatDetailBayar(idBayar);
+
+            // MUAT ULANG DETAIL TRANSAKSI
+            if (typeof window.muatDetailBayar === 'function') {
+
+                await window.muatDetailBayar(idBayar);
+
+            } else {
+
+                console.warn('Fungsi muatDetailBayar() belum tersedia.');
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(error.message || 'Terjadi kesalahan.');
+
+            btn.disabled = false;
+            btn.innerHTML = teksAwal;
+
+        }
 
     }
 </script>

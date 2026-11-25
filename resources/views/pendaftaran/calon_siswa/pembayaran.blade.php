@@ -427,21 +427,22 @@
 
                     @csrf
 
-                    <!-- Nama Pengirim -->
-                    <div>
+            
+
+                     <div>
 
                         <label for="sender_name"
                             class="block text-xs font-bold text-slate-700 mb-1.5">
 
-                            Nama Pengirim
+                            Nominal
 
                         </label>
 
                         <input
                             type="text"
-                            id="sender_name"
-                            name="sender_name"
-                            placeholder="Contoh: Devin Garmenta"
+                            id="nominal"
+                            name="nominal"
+                            placeholder="Rp.."
                             class="w-full text-xs sm:text-sm rounded-lg border-slate-300 px-3.5 py-2.5 sm:py-3 text-slate-700 placeholder:text-slate-400 focus:border-emerald-500 focus:ring-emerald-500 transition">
 
                     </div>
@@ -460,7 +461,8 @@
                         <select
                             id="id_item_bayar"
                             name="id_item_bayar"
-                            class="w-full text-xs sm:text-sm rounded-lg border-slate-300 px-3.5 py-2.5 sm:py-3 text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition">
+                            class="w-full text-xs sm:text-sm rounded-lg border-slate-300 px-3.5 py-2.5 sm:py-3 text-slate-700 focus:border-emerald-500 focus:ring-emerald-500 transition"
+                            required>
 
                             <option value="">
                                 Pilih Item Pembayaran
@@ -545,6 +547,7 @@
 
                         <button
                             type="submit"
+                            id="btnUploadPembayaran"
                             class="w-full py-3 sm:py-3.5 px-4 bg-[#00b074] hover:bg-[#009b64] active:scale-[0.99] text-white font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2.5 transition shadow-sm">
 
                             <svg class="w-4 h-4"
@@ -561,9 +564,7 @@
 
                             </svg>
 
-                            <span>
-                                Unggah Bukti Pembayaran
-                            </span>
+                            <span>Unggah Bukti Pembayaran</span>
 
                         </button>
 
@@ -711,6 +712,31 @@
         });
 
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+    const btn = document.getElementById('btnUploadPembayaran');
+
+    if (!btn) return;
+
+    btn.closest('form').addEventListener('submit', function () {
+
+        if (btn.disabled) return;
+
+        btn.disabled = true;
+
+        btn.innerHTML = `
+            <span class="animate-spin rounded-full h-4 w-4 border-2
+            border-white border-t-transparent"></span>
+
+            <span>Harap Menunggu...</span>
+        `;
+
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+    });
+
+});
 </script>
 
 @endpush

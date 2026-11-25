@@ -27,6 +27,9 @@ class BayarCalonSiswa extends Model
         'no_daftar',
         'nipd',
         'bukti_bayar',
+        'sts_trans', //1. menunggu konfirmasi; 2.Lunas; 3.belum lunas 
+        'bank_pengirim',
+        'bank_penerima'
     ];
 
     protected $casts = [
@@ -109,5 +112,32 @@ class BayarCalonSiswa extends Model
             ->update([
                 'total_kwajiban' => $total
             ]);
+    }
+
+    public function bankPenerima()
+    {
+        return $this->belongsTo(
+            Bank::class,
+            'bank_penerima',
+            'id'
+        );
+    }
+
+    public function bankPengirim()
+    {
+        return $this->belongsTo(
+            Bank::class,
+            'bank_pengirim',
+            'id'
+        );
+    }
+
+    public function statusTransaksi()
+    {
+        return $this->belongsTo(
+            StatusTransaksi::class,
+            'sts_trans',
+            'id'
+        );
     }
 }

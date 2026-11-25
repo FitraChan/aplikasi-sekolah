@@ -34,11 +34,8 @@
                         stroke-width="2.2"
                         viewBox="0 0 24 24"
                     >
-
                         <line x1="19" x2="5" y1="12" y2="12"></line>
-
                         <polyline points="12 19 5 12 12 5"></polyline>
-
                     </svg>
 
                     Kembali
@@ -81,10 +78,9 @@
             <div class="border-b border-slate-200">
 
                 <nav
-                    class="grid grid-cols-2"
+                    class="grid grid-cols-3"
                     aria-label="Tabs"
                 >
-
 
                     <!-- =========================================
                          HISTORY PEMBAYARAN
@@ -216,6 +212,64 @@
 
                     </button>
 
+
+                    <!-- =========================================
+                         DETAIL BAYAR SISWA
+                    ========================================== -->
+
+                    <button
+                        type="button"
+                        data-tab-target="detail-bayar-siswa"
+                        aria-selected="false"
+                        class="tab-btn
+                               flex flex-col items-center justify-center
+                               gap-2
+                               px-2 py-4
+                               border-b-2
+                               border-transparent
+                               text-slate-500
+                               font-medium
+                               transition-all duration-200
+                               hover:bg-slate-50"
+                    >
+
+                        <svg
+                            class="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            viewBox="0 0 24 24"
+                        >
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M16 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"
+                            />
+
+                            <circle
+                                cx="10"
+                                cy="7"
+                                r="4"
+                            />
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M20 8v6m3-3h-6"
+                            />
+
+                        </svg>
+
+
+                        <span class="text-xs sm:text-sm whitespace-nowrap">
+
+                            Detail Bayar Siswa
+
+                        </span>
+
+                    </button>
+
                 </nav>
 
             </div>
@@ -236,7 +290,6 @@
                     id="history-pembayaran"
                     class="tab-content"
                     role="tabpanel"
-                    aria-labelledby="tab-history-pembayaran"
                 >
 
                     @include(
@@ -254,12 +307,30 @@
                     id="detail-transaksi"
                     class="tab-content hidden"
                     role="tabpanel"
-                    aria-labelledby="tab-detail-transaksi"
                 >
 
                     @include(
                         'keuangan.bayar.detail_transaksi'
                     )
+
+                </div>
+
+
+                <!-- =============================================
+                     DETAIL BAYAR SISWA
+                ============================================== -->
+
+                <div
+                    id="detail-bayar-siswa"
+                    class="tab-content hidden"
+                    role="tabpanel"
+                >
+                <div id="content-detail-bayar-siswa">
+
+                    @include(
+                        'keuangan.bayar.detail_verifikasi_pembayaran'
+                    )
+                </div>
 
                 </div>
 

@@ -1101,6 +1101,41 @@ class CalonSiswaController extends Controller
                 'updated_at' => now(),
             ]);
 
+             $id_csiswa = CalonSiswa::where('id',$id)->first();
+
+             $bayar = BayarCalonSiswa::create([
+                'id_tahun'    => date('Y'),
+                'id_bulan'    => date('m'),
+                'id_calon_siswa'    => $id_csiswa->no_daftar,
+               
+                'tgl_bayar'   => date('Y-m-d', strtotime($request->tgl_bayar ?? now())),
+                'id_kasir'    => auth()->user()->id,
+                'sts_trans'    => 1,
+                'bukti_bayar' =>  $data['bukti_transfer'],
+            ]);
+
+              $idBayar = $bayar->id;
+
+             $detail =  DetBayarCalonSiswa::create([
+                        'id_bayar'   => $idBayar,
+                        'id_item'    => $request->id_item_bayar,
+                        'jml_bayar'  => $request->nominal,
+                       
+                    ]);
+
+
+        DB::table('tb_pesan')->insert([
+
+            'id_tujuan' => '',
+            'isi' =>  'Calon Siswa no daftar '.$id_csiswa->no_daftar. ' Telah Melakukan Pembayaran Dan Masih Menunggu Konfirmasi',
+            'iduser' => auth()->user()->id,
+            'status' => 0,
+        ]);        
+
+
+
+            
+
             LogModel::create([
                 'tanggal' => now(),
                 'tabel' => 'tb_bukti_bayar_calon',

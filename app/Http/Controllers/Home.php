@@ -274,4 +274,19 @@ $jregis = DB::table('tb_tmp_siswa')
     // return response()->json($data);
 
   }
+
+    public function baca()
+    {
+        DB::table('tb_pesan')
+            ->where('status', 0)
+            // Tambahkan filter penerima di sini
+            ->update([
+                'status' => 1
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notifikasi berhasil dibaca.'
+        ]);
+    }
 }
