@@ -205,6 +205,7 @@ class Home extends Controller
         END) AS jml_belum_bayar
     ')
       ->groupBy('tb_bayar_regis.id_tahun');
+      
     $union = $bayarSiswa->unionAll($bayarRegistrasi);
 
     $hasil = DB::query()

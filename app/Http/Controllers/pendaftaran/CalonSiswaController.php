@@ -1123,6 +1123,8 @@ class CalonSiswaController extends Controller
                        
                     ]);
 
+            $this->uptotalbayar($idBayar);
+
 
         DB::table('tb_pesan')->insert([
 
@@ -1167,6 +1169,21 @@ class CalonSiswaController extends Controller
                 ->withInput()
                 ->with('error', 'Upload dokumen gagal. ' . $e->getMessage());
         }
+    }
+
+    private function uptotalbayar($id)
+    {
+        $total = DetBayarCalonSiswa::where('id_bayar', $id)
+            ->selectRaw('
+            COALESCE(SUM(jml_bayar),0) as tot_bayar,
+            COALESCE(SUM(kwajiban_bayar),0) - COALESCE(SUM(potongan),0) as total_kwajiban
+        ')->first();
+
+        BayarCalonSiswa::where('id', $id)
+            ->update([
+                'tot_bayar'    => $total->tot_bayar,
+                'total_kwajiban' => $total->total_kwajiban,
+            ]);
     }
 
 

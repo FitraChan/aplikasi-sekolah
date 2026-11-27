@@ -24,29 +24,18 @@
                 <div class="flex flex-wrap gap-2">
 
                     <!-- SET BULANAN -->
-
                     <button
                         type="button"
                         onclick="openModalBulananAllSiswa()"
                         class="inline-flex items-center justify-center
-           gap-2
-           px-4 py-2
-           rounded-lg
-           bg-[#02BC9C]
-           hover:bg-[#00AF8F]
-           text-white
-           text-sm font-medium
-           transition-colors
-           shadow-sm">
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+            gap-2 px-4 py-2 rounded-lg
+            bg-[#02BC9C] hover:bg-[#00AF8F]
+            text-white text-sm font-medium
+            transition-colors shadow-sm">
+
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M12 5v14M5 12h14" />
                         </svg>
 
@@ -55,50 +44,34 @@
 
 
                     <!-- CETAK KEWAJIBAN -->
-
                     <button
                         type="button"
                         onclick="cetakKewajiban()"
                         class="inline-flex items-center justify-center
-                               gap-2
-                               px-4 py-2
-                               rounded-lg
-                               bg-emerald-600
-                               hover:bg-emerald-700
-                               text-white
-                               text-sm font-medium
-                               transition-colors
-                               shadow-sm">
+            gap-2 px-4 py-2 rounded-lg
+            bg-emerald-600 hover:bg-emerald-700
+            text-white text-sm font-medium
+            transition-colors shadow-sm">
 
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 9V2h12v7" />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18H4a2 2 0 0 1-2-2v-5
-                                   a2 2 0 0 1 2-2h16
-                                   a2 2 0 0 1 2 2v5
-                                   a2 2 0 0 1-2 2h-2" />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 14h12v8H6z" />
-
-                        </svg>
+                        <i data-lucide="printer" class="w-4 h-4"></i>
 
                         Cetak Kewajiban
+                    </button>
 
+
+                    <!-- CETAK PDF -->
+                    <button
+                        type="button"
+                        onclick="cetakPdfCalonSiswa()"
+                        class="inline-flex items-center justify-center
+                            gap-2 px-4 py-2 rounded-lg
+                            bg-red-600 hover:bg-red-700
+                            text-white text-sm font-medium
+                            transition-colors shadow-sm">
+
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+
+                        Cetak PDF
                     </button>
 
                 </div>
@@ -249,7 +222,7 @@
 
                         </div>
 
-                         <!-- STATUS TRANSAKSI -->
+                        <!-- STATUS TRANSAKSI -->
                         <div class="lg:col-span-2">
 
                             <label
@@ -359,6 +332,8 @@
                             </button>
 
                         </div>
+
+
 
                     </div>
 

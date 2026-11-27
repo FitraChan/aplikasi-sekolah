@@ -50,7 +50,7 @@
                 lucide.createIcons();
             }
 
-           
+
 
         } catch (error) {
 
@@ -173,7 +173,45 @@
                     `;
                     }
                 },
+                {
+                    title: "Tot Bayar",
+                    field: "total_bayar",
+                    minWidth: 150,
 
+                    formatter: function(cell) {
+                        const nilai = Number(cell.getValue() ?? 0);
+
+                        return `
+                            <span class="siswa-tahun">
+                                <i data-lucide="wallet"></i>
+                                ${nilai.toLocaleString('id-ID', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </span>
+                        `;
+                    }
+                },
+
+                {
+                    title: "Sisa Bayar",
+                    field: "sisa",
+                    minWidth: 150,
+
+                    formatter: function(cell) {
+                        const nilai = Number(cell.getValue() ?? 0);
+
+                        return `
+                            <span class="siswa-tahun">
+                                <i data-lucide="wallet"></i>
+                                ${nilai.toLocaleString('id-ID', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </span>
+                        `;
+                    }
+                },
                 {
                     title: "Kelas",
                     field: "kelas.nama_kelas",
@@ -189,20 +227,7 @@
                     }
                 },
 
-                {
-                    title: "Tahun Ajaran",
-                    field: "tahun_ajaran.thn_ajaran",
-                    minWidth: 130,
-
-                    formatter: function(cell) {
-                        return `
-                        <span class="siswa-tahun">
-                            <i data-lucide="calendar-days"></i>
-                            ${cell.getValue() ?? '-'}
-                        </span>
-                    `;
-                    }
-                }
+               
 
             ],
 
@@ -273,6 +298,17 @@
                 layout: "fitData",
 
                 height: "500px",
+                processing: true,
+                serverSide: true,
+
+                dom: 'Bfrtip',
+
+                buttons: [{
+                    text: '<i class="fa fa-refresh"></i> Reload',
+                    action: function(e, dt) {
+                        dt.ajax.reload(null, false);
+                    }
+                }],
 
                 selectableRows: 1,
 
@@ -1315,52 +1351,30 @@
        SAVE BULANAN ALL SISWA
     ========================================================== */
 
+
     async function saveDefBulan() {
 
-        const tombol =
-            document.getElementById(
-                'btn-save-def-bulan'
-            );
+        const tombol = document.getElementById('btn-save-def-bulan');
 
+        if (!tombol || tombol.disabled) return;
 
-        const teksAwal =
-            tombol.innerHTML;
-
+        const teksAwal = tombol.innerHTML;
 
         try {
 
-            const idThnAjaran =
-                document
-                .getElementById(
-                    'id_thn_ajaran'
-                )
+            /*
+            |--------------------------------------------------------------------------
+            | AMBIL DATA
+            |--------------------------------------------------------------------------
+            */
+
+            const idTahun = document
+                .getElementById('id_tahun')
                 .value
                 .trim();
 
-
-            const idJurusan =
-                document
-                .getElementById(
-                    'id_jurusan'
-                )
-                .value
-                .trim();
-
-
-            const idTahun =
-                document
-                .getElementById(
-                    'id_tahun'
-                )
-                .value
-                .trim();
-
-
-            const idBulan =
-                document
-                .getElementById(
-                    'id_bulan'
-                )
+            const idBulan = document
+                .getElementById('id_bulan')
                 .value
                 .trim();
 
@@ -1371,53 +1385,57 @@
             |--------------------------------------------------------------------------
             */
 
-            if (
-                idThnAjaran === '' ||
-                idJurusan === '' ||
-                idTahun === '' ||
-                idBulan === ''
-            ) {
+            if (idTahun === '' || idBulan === '') {
 
                 Swal.fire({
-
                     icon: "warning",
-
                     title: "Peringatan",
-
-                    text: "Semua data wajib diisi."
-
+                    text: "Tahun pembayaran dan bulan wajib diisi."
                 });
 
                 return;
-
             }
 
-
-            if (
-                idTahun.length !== 4
-            ) {
+            if (!/^\d{4}$/.test(idTahun)) {
 
                 Swal.fire({
-
                     icon: "warning",
-
                     title: "Peringatan",
-
                     text: "Tahun harus terdiri dari 4 digit."
-
                 });
 
-
-                document
-                    .getElementById(
-                        'id_tahun'
-                    )
-                    .focus();
-
+                document.getElementById('id_tahun').focus();
 
                 return;
-
             }
+
+            const daftarBulan = [
+                'all_bulan',
+                '1', '2', '3', '4', '5', '6',
+                '7', '8', '9', '10', '11', '12'
+            ];
+
+            if (!daftarBulan.includes(idBulan)) {
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Peringatan",
+                    text: "Pilihan bulan tidak valid."
+                });
+
+                document.getElementById('id_bulan').focus();
+
+                return;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | KONFIRMASI
+            |--------------------------------------------------------------------------
+            */
+
+           
 
 
             /*
@@ -1426,23 +1444,14 @@
             |--------------------------------------------------------------------------
             */
 
-            tombol.disabled =
-                true;
-
+            tombol.disabled = true;
 
             tombol.innerHTML = `
-                <span
-                    class="animate-spin
-                           inline-block
-                           w-4 h-4
-                           border-2
-                           border-white
-                           border-t-transparent
-                           rounded-full
-                           mr-2">
-                </span>
-                Mohon tunggu...
-            `;
+            <span class="animate-spin inline-block w-4 h-4
+                border-2 border-white border-t-transparent
+                rounded-full mr-2"></span>
+            Mohon tunggu...
+        `;
 
 
             /*
@@ -1451,46 +1460,46 @@
             |--------------------------------------------------------------------------
             */
 
-            const response =
-                await fetch(
-                    "{{ route('bayar.setDefBulan') }}", {
+            const response = await fetch(
+                "{{ route('bayar.setDefBulan') }}", {
+                    method: "POST",
 
-                        method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    },
 
-                        headers: {
-
-                            "Content-Type": "application/json",
-
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-
-                            "Accept": "application/json"
-
-                        },
-
-
-                        body: JSON.stringify({
-
-                            id_thn_ajaran: idThnAjaran,
-
-                            id_jurusan: idJurusan,
-
-                            id_tahun: idTahun,
-
-                            id_bulan: idBulan
-
-                        })
-
-                    }
-                );
-
-
-            const result =
-                await response.json();
-
-
-            console.log(
-                result
+                    body: JSON.stringify({
+                        id_tahun: idTahun,
+                        id_bulan: idBulan
+                    })
+                }
             );
+
+            const result = await response.json();
+
+            console.log(result);
+
+            closeModalBulananAllSiswa();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HASIL REQUEST
+            |--------------------------------------------------------------------------
+            */
+
+            if (!response.ok || !result.success) {
+
+                Swal.fire({
+                    icon: "error",
+                    title: result.title || "Gagal",
+                    text: result.msg || "Terjadi kesalahan saat membuat tagihan."
+                });
+
+                return;
+            }
 
 
             /*
@@ -1499,73 +1508,45 @@
             |--------------------------------------------------------------------------
             */
 
-            if (result.success) {
+            await Swal.fire({
+                icon: "success",
+                title: result.title || "Success",
+                text: result.msg,
+                confirmButtonText: "OK"
+            });
 
-                Swal.fire({
-
-                    icon: "success",
-
-                    title: result.title,
-
-                    text: result.msg
-
-                });
+            
 
 
-                closeModalBulananAllSiswa();
+            /*
+            |--------------------------------------------------------------------------
+            | RELOAD TABEL
+            |--------------------------------------------------------------------------
+            */
 
-
-                if (tableSiswa) {
-
-                    tableSiswa.replaceData();
-
-                }
-
-
-            } else {
-
-                Swal.fire({
-
-                    icon: "error",
-
-                    title: result.title,
-
-                    text: result.msg
-
-                });
-
+            if (typeof tableSiswa !== 'undefined' && tableSiswa) {
+                tableSiswa.replaceData();
             }
-
 
         } catch (error) {
 
-            console.error(
-                error
-            );
-
+            console.error(error);
 
             Swal.fire({
-
                 icon: "error",
-
                 title: "Error",
-
-                text: error.message
-
+                text: error.message || "Terjadi kesalahan pada server."
             });
-
 
         } finally {
 
-            tombol.disabled =
-                false;
-
-            tombol.innerHTML =
-                teksAwal;
+            tombol.disabled = false;
+            tombol.innerHTML = teksAwal;
 
         }
 
     }
+
 
 
     /* =========================================================
@@ -1692,162 +1673,175 @@
     }
 
     window.simpanEditBayar = async function() {
-    
-   
 
-    const form = document.getElementById('formEditBayar');
-    const btn = document.getElementById('btnSimpanEditBayar');
 
-    if (btn.disabled) return;
 
-    const teksAwal = btn.innerHTML;
+        const form = document.getElementById('formEditBayar');
+        const btn = document.getElementById('btnSimpanEditBayar');
 
-    btn.disabled = true;
-    btn.innerHTML = `
+        if (btn.disabled) return;
+
+        const teksAwal = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = `
         <span class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
         Menyimpan...
     `;
 
-    try {
+        try {
 
-        const formData = new FormData(form);
+            const formData = new FormData(form);
 
-        const idBayar = formData.get('id_bayar');
+            const idBayar = formData.get('id_bayar');
 
-        // UPDATE PEMBAYARAN
-        const response = await fetch(
-            "{{ route('updateStatusDanBayarTransaksi') }}",
-            {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                },
-                body: formData
-            }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            const errors = Object.values(result.errors || {})
-                .flat()
-                .join('\n');
-
-            throw new Error(
-                errors || result.message || 'Gagal menyimpan pembayaran.'
+            // UPDATE PEMBAYARAN
+            const response = await fetch(
+                "{{ route('updateStatusDanBayarTransaksi') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                }
             );
-        }
 
-        // Tutup modal
-        tutupModalBayar();
+            const result = await response.json();
 
-        tableDetail.replaceData();
+            if (!response.ok) {
+                const errors = Object.values(result.errors || {})
+                    .flat()
+                    .join('\n');
 
-        // Tampilkan notifikasi
-        alert(result.message || 'Pembayaran berhasil diperbarui.');
+                throw new Error(
+                    errors || result.message || 'Gagal menyimpan pembayaran.'
+                );
+            }
 
-        // MUAT ULANG DETAIL TRANSAKSI
-        if (typeof window.muatDetailBayar === 'function') {
+            // Tutup modal
+            tutupModalBayar();
 
-            await window.muatDetailBayar(idBayar);
+            tableDetail.replaceData();
 
-        } else {
+            // Tampilkan notifikasi
+            alert(result.message || 'Pembayaran berhasil diperbarui.');
 
-            console.warn('Fungsi muatDetailBayar() belum tersedia.');
+            // MUAT ULANG DETAIL TRANSAKSI
+            if (typeof window.muatDetailBayar === 'function') {
 
-        }
+                await window.muatDetailBayar(idBayar);
 
-    
+            } else {
 
-    } catch (error) {
+                console.warn('Fungsi muatDetailBayar() belum tersedia.');
 
-        console.group('ERROR SIMPAN PEMBAYARAN');
-        console.error('Pesan:', error.message);
-        console.error('Stack:', error.stack);
-        console.trace('Lokasi pemanggilan error');
-        console.groupEnd();
+            }
 
-        alert(error.message);
 
-    } finally {
 
-        btn.disabled = false;
-        btn.innerHTML = teksAwal;
+        } catch (error) {
 
-        if (window.lucide) {
-            lucide.createIcons();
+            console.group('ERROR SIMPAN PEMBAYARAN');
+            console.error('Pesan:', error.message);
+            console.error('Stack:', error.stack);
+            console.trace('Lokasi pemanggilan error');
+            console.groupEnd();
+
+            alert(error.message);
+
+        } finally {
+
+            btn.disabled = false;
+            btn.innerHTML = teksAwal;
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
         }
 
     }
 
-}
+    async function setujuiPembayaran(url, idBayar) {
 
-async function setujuiPembayaran(url,idBayar) {
+        if (!confirm('Apakah Anda yakin ingin menyetujui pembayaran ini?')) {
+            return;
+        }
 
-    if (!confirm('Apakah Anda yakin ingin menyetujui pembayaran ini?')) {
-        return;
-    }
+        const btn = document.getElementById('btnSetujuiPembayaran');
 
-    const btn = document.getElementById('btnSetujuiPembayaran');
+        if (btn.disabled) return;
 
-    if (btn.disabled) return;
+        const teksAwal = btn.innerHTML;
 
-    const teksAwal = btn.innerHTML;
+        btn.disabled = true;
 
-    btn.disabled = true;
-
-    btn.innerHTML = `
+        btn.innerHTML = `
         <span class="animate-spin rounded-full h-4 w-4 border-2
         border-white border-t-transparent"></span>
         Memproses...
     `;
 
-    try {
+        try {
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Gagal menyetujui pembayaran.');
             }
-        });
 
-        const result = await response.json();
+            tableDetail.replaceData();
 
-        if (!response.ok) {
-            throw new Error(result.message || 'Gagal menyetujui pembayaran.');
+
+            alert(result.message || 'Pembayaran berhasil disetujui.');
+
+            // Muat ulang detail pembayaran jika diperlukan
+            // window.muatDetailBayar(idBayar);
+
+            // MUAT ULANG DETAIL TRANSAKSI
+            if (typeof window.muatDetailBayar === 'function') {
+
+                await window.muatDetailBayar(idBayar);
+
+            } else {
+
+                console.warn('Fungsi muatDetailBayar() belum tersedia.');
+
+            }
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(error.message || 'Terjadi kesalahan.');
+
+            btn.disabled = false;
+            btn.innerHTML = teksAwal;
+
         }
-
-                tableDetail.replaceData();
-
-
-        alert(result.message || 'Pembayaran berhasil disetujui.');
-
-        // Muat ulang detail pembayaran jika diperlukan
-        // window.muatDetailBayar(idBayar);
-
-          // MUAT ULANG DETAIL TRANSAKSI
-        if (typeof window.muatDetailBayar === 'function') {
-
-            await window.muatDetailBayar(idBayar);
-
-        } else {
-
-            console.warn('Fungsi muatDetailBayar() belum tersedia.');
-
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(error.message || 'Terjadi kesalahan.');
-
-        btn.disabled = false;
-        btn.innerHTML = teksAwal;
 
     }
 
-}
+    function cetakPdf() {
+        const params = new URLSearchParams();
+
+        params.set('tahun', document.getElementById('filter_tahun')?.value ?? '');
+        params.set('jurusan', document.getElementById('filter_jurusan')?.value ?? '');
+        params.set('kelas', document.getElementById('filter_kelas')?.value ?? '');
+        params.set('keyword', document.getElementById('filter_keyword')?.value ?? '');
+
+        window.open(
+            `{{ route('siswa.cetakPdf') }}?${params.toString()}`,
+            '_blank'
+        );
+    }
 </script>

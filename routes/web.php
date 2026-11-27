@@ -214,9 +214,20 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
     Route::get('/bayar', [BayarController::class, 'index'])
         ->name('bayar.index');
 
+   
+
+    Route::get('/siswa/cetak-pdf', [BayarController::class, 'cetakPdf'])
+    ->name('siswa.cetakPdf');
+
+       
+
     Route::get('/updateStatusTransaksi/{id}', [BayarController::class, 'updateStatusTransaksi'])->name('updateStatusTransaksi');
 
     Route::get('/updateStatusTransaksiCalonSiswa/{id}', [BayarCalonSiswaController::class, 'updateStatusTransaksi'])->name('updateStatusTransaksiCalonSiswa');
+
+
+    Route::get('/calon-siswa/cetak-pdf', [BayarCalonSiswaController::class, 'cetakPdf'])
+    ->name('calonSiswa.cetakPdf');
 
 
     Route::put('/updateStatusDanBayarTransaksi', [BayarController::class, 'updateStatusDanBayarTransaksi'])->name('updateStatusDanBayarTransaksi');
@@ -224,6 +235,7 @@ Route::middleware(['auth', 'role:admin|keuangan'])->group(function () {
     
 
     Route::put('/updateStatusDanBayarTransaksiCalonSiswa', [BayarCalonSiswaController::class, 'updateStatusDanBayarTransaksi'])->name('updateStatusDanBayarTransaksiCalonSiswa');
+
 
 
     Route::get('/detailVerifikasi/{id}', [BayarController::class, 'detailVerifikasi'])

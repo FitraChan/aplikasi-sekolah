@@ -143,8 +143,43 @@
                 },
 
                 {
-                    title: "Jurusan",
-                    field: "jurusan.nama_jurusan"
+                    title: "Tot Bayar",
+                    field: "total_bayar",
+                    minWidth: 150,
+
+                    formatter: function(cell) {
+                        const nilai = Number(cell.getValue() ?? 0);
+
+                        return `
+                            <span class="siswa-tahun">
+                                <i data-lucide="wallet"></i>
+                                ${nilai.toLocaleString('id-ID', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </span>
+                        `;
+                    }
+                },
+
+                {
+                    title: "Sisa Bayar",
+                    field: "sisa",
+                    minWidth: 150,
+
+                    formatter: function(cell) {
+                        const nilai = Number(cell.getValue() ?? 0);
+
+                        return `
+                            <span class="siswa-tahun">
+                                <i data-lucide="wallet"></i>
+                                ${nilai.toLocaleString('id-ID', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </span>
+                        `;
+                    }
                 },
 
                 {
@@ -1698,4 +1733,24 @@
         }
 
     }
+
+    function cetakPdfCalonSiswa() {
+    const params = new URLSearchParams();
+
+    const tahun = document.getElementById('filter_tahun')?.value;
+    const jurusan = document.getElementById('filter_jurusan')?.value;
+    const kelas = document.getElementById('filter_kelas')?.value;
+    const keyword = document.getElementById('filter_keyword')?.value;
+    const stsTrans = document.getElementById('filter_sts_trans')?.value;
+
+    if (tahun) params.append('tahun', tahun);
+    if (jurusan) params.append('jurusan', jurusan);
+    if (kelas) params.append('kelas', kelas);
+    if (keyword) params.append('keyword', keyword);
+    if (stsTrans) params.append('sts_trans', stsTrans);
+
+    const url = "{{ route('calonSiswa.cetakPdf') }}?" + params.toString();
+
+    window.open(url, '_blank');
+}
 </script>

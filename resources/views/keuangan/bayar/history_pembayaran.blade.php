@@ -24,89 +24,84 @@
                 <div class="flex flex-wrap gap-2">
 
                     <!-- SET BULANAN ALL SISWA -->
-
                     <button
                         type="button"
                         onclick="openModalBulananAllSiswa()"
                         class="inline-flex items-center justify-center
-                               gap-2
-                               px-4 py-2
-                               rounded-lg
-                               bg-[#02BC9C]
-                               hover:bg-[#00AF8F]
-                               text-white
-                               text-sm font-medium
-                               transition-colors
-                               shadow-sm">
+                                gap-2 px-4 py-2 rounded-lg
+                                bg-[#02BC9C] hover:bg-[#00AF8F]
+                                text-white text-sm font-medium
+                                transition-colors shadow-sm">
 
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-
-                            <path
-                                stroke-linecap="round"
+                        <svg class="w-4 h-4"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
                                 stroke-linejoin="round"
                                 d="M12 5v14M5 12h14" />
-
                         </svg>
 
                         Set Bulanan All Siswa
-
                     </button>
 
 
                     <!-- CETAK KEWAJIBAN -->
-
                     <button
                         type="button"
                         onclick="cetakKewajiban()"
                         class="inline-flex items-center justify-center
-                               gap-2
-                               px-4 py-2
-                               rounded-lg
-                               bg-emerald-600
-                               hover:bg-emerald-700
-                               text-white
-                               text-sm font-medium
-                               transition-colors
-                               shadow-sm">
+                                gap-2 px-4 py-2 rounded-lg
+                                bg-emerald-600 hover:bg-emerald-700
+                                text-white text-sm font-medium
+                                transition-colors shadow-sm">
 
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            viewBox="0 0 24 24">
-
-                            <path
-                                stroke-linecap="round"
+                        <svg class="w-4 h-4"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
                                 stroke-linejoin="round"
                                 d="M6 9V2h12v7" />
-
-                            <path
-                                stroke-linecap="round"
+                            <path stroke-linecap="round"
                                 stroke-linejoin="round"
                                 d="M6 18H4a2 2 0 0 1-2-2v-5
-                                   a2 2 0 0 1 2-2h16
-                                   a2 2 0 0 1 2 2v5
-                                   a2 2 0 0 1-2 2h-2" />
-
-                            <path
-                                stroke-linecap="round"
+                                    a2 2 0 0 1 2-2h16
+                                    a2 2 0 0 1 2 2v5
+                                    a2 2 0 0 1-2 2h-2" />
+                            <path stroke-linecap="round"
                                 stroke-linejoin="round"
                                 d="M6 14h12v8H6z" />
-
                         </svg>
 
                         Cetak Kewajiban
+                    </button>
 
+
+                    <!-- CETAK PDF -->
+                    <button
+                        type="button"
+                        onclick="cetakPdf()"
+                        class="inline-flex items-center justify-center
+               gap-2 px-4 py-2 rounded-lg
+               bg-blue-600 hover:bg-blue-700
+               text-white text-sm font-medium
+               transition-colors shadow-sm">
+
+                        <svg class="w-4 h-4"
+                            fill="none" stroke="currentColor"
+                            stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 3v12m0 0 4-4m-4 4-4-4" />
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M4 17v3a1 1 0 0 0 1 1h14
+                     a1 1 0 0 0 1-1v-3" />
+                        </svg>
+
+                        Cetak PDF
                     </button>
 
                 </div>
-
             </div>
 
 
@@ -137,7 +132,7 @@
                                 class="block text-xs font-medium
                                        text-slate-600 mb-1">
 
-                                Tahun Ajaran
+                                Angkatan
 
                             </label>
 
@@ -154,7 +149,7 @@
                                        outline-none">
 
                                 <option value="">
-                                    Semua Tahun Ajaran
+                                    Semua Tahun Angkatan
                                 </option>
 
                                 @foreach($tahun as $row)
@@ -324,7 +319,7 @@
 
                         <!-- CARI -->
 
-                        <div class="lg:col-span-1 flex items-end">
+                        <div class="lg:col-span-2 flex items-end">
 
                             <button
                                 type="button"

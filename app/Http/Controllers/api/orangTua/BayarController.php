@@ -40,9 +40,22 @@ class BayarController extends Controller
                 'tb_bayar.id_siswa',
                 'tb_det_bayar.id_item',
                 'tb_itembayar.nama_item',
-                DB::raw('SUM(tb_det_bayar.jml_bayar) as dibayar'),
+                //DB::raw('SUM(tb_det_bayar.jml_bayar) as dibayar'),
                 DB::raw('SUM(tb_det_bayar.kwajiban_bayar) as kewajiban'),
-                DB::raw('SUM(tb_det_bayar.potongan) as potongan')
+                DB::raw('SUM(tb_det_bayar.potongan) as potongan'),
+
+
+                DB::raw('SUM(
+                    CASE WHEN tb_bayar.sts_trans = 2
+                    THEN tb_det_bayar.jml_bayar
+                    ELSE 0 END
+                ) as dibayar'),
+
+                DB::raw('SUM(
+                    CASE WHEN tb_bayar.sts_trans = 2
+                    THEN tb_bayar.tot_bayar
+                    ELSE 0 END
+                ) as SUMT1'),
             )
             ->where('tb_bayar.id_siswa', $sis->nipd)
             ->groupBy(
@@ -433,12 +446,17 @@ class BayarController extends Controller
                 ],
             ]);
 
+            //cek tagihan
+
+
 
             /*
         |--------------------------------------------------------------------------
         | UPLOAD BUKTI BAYAR
         |--------------------------------------------------------------------------
         */
+
+
 
             $namaBuktiBayar = null;
 
@@ -550,13 +568,13 @@ class BayarController extends Controller
         | LOG
         |--------------------------------------------------------------------------
         */
-        DB::table('tb_pesan')->insert([
+            DB::table('tb_pesan')->insert([
 
-            'id_tujuan' => $nipd->nipd,
-            'isi' =>  'nipd '.$nipd->nipd. ' Telah Melakukan Upload Bukti Pembayaran Dan Menunggu konfirmasi Admin',
-            'iduser' => auth()->user()->id,
-            'status' => 0,
-        ]);
+                'id_tujuan' => $nipd->nipd,
+                'isi' =>  'nipd ' . $nipd->nipd . ' Telah Melakukan Upload Bukti Pembayaran Dan Menunggu konfirmasi Admin',
+                'iduser' => auth()->user()->id,
+                'status' => 0,
+            ]);
 
             LogModel::create([
                 'tanggal' => now(),

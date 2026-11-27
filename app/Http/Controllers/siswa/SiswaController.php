@@ -147,6 +147,7 @@ class SiswaController extends Controller
 
         $tahun = $this->tahun;
         $query = Siswa::query()
+            ->where('is_aktif',1)
             ->with([
                 'kelas',
                 'jurusan',

@@ -181,12 +181,83 @@ class BayarCalonSiswaController extends Controller
 
     public function data(Request $request)
     {
-        $query = CalonSiswa::with([
-            'tahunAjaran:id,thn_ajaran',
-            'jurusan:id,nama_jurusan',
-            'gelombang:id,nama_gelombang',
-            'kelas:idx,nama_kelas',
-        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Subquery Rekap Pembayaran Registrasi
+        |--------------------------------------------------------------------------
+        */
+
+        $pembayaran = DB::table('tb_bayar_regis as b')
+            ->join('tb_det_bayar_regis as c', 'b.id', '=', 'c.id_bayar')
+            ->whereNull('b.deleted_at')
+            ->whereNull('c.deleted_at')
+            ->select(
+                'b.id_calon_siswa',
+
+                DB::raw('SUM(c.kwajiban_bayar) as total_kewajiban'),
+
+                DB::raw('SUM(c.potongan) as total_potongan'),
+
+                DB::raw("
+                SUM(
+                    CASE
+                        WHEN b.sts_trans = 2 THEN c.jml_bayar
+                        ELSE 0
+                    END
+                ) as total_bayar
+            ")
+            )
+            ->groupBy('b.id_calon_siswa');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query Calon Siswa
+        |--------------------------------------------------------------------------
+        */
+
+        $query = CalonSiswa::query()
+            ->with([
+                'tahunAjaran:id,thn_ajaran',
+                'jurusan:id,nama_jurusan',
+                'gelombang:id,nama_gelombang',
+                'kelas:idx,nama_kelas',
+                'statusDaftar',
+            ])
+
+            ->leftJoinSub($pembayaran, 'p', function ($join) {
+
+                // Jika id_calon_siswa menyimpan tb_tmp_siswa.id
+                $join->on('p.id_calon_siswa', '=', 'tb_tmp_siswa.no_daftar');
+
+                // Jika menggunakan id_calon_siswa, ganti menjadi:
+                // $join->on('p.id_calon_siswa', '=', 'tb_tmp_siswa.id_calon_siswa');
+
+            })
+
+            ->select(
+                'tb_tmp_siswa.*',
+
+                DB::raw('COALESCE(p.total_bayar, 0) as total_bayar'),
+
+                DB::raw('COALESCE(p.total_kewajiban, 0) as kewajiban'),
+
+                DB::raw('COALESCE(p.total_potongan, 0) as potongan'),
+
+                DB::raw('
+                COALESCE(p.total_kewajiban, 0)
+                - COALESCE(p.total_potongan, 0)
+                - COALESCE(p.total_bayar, 0)
+                as sisa
+            ')
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Tahun Ajaran
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('tahun')) {
             $query->whereHas('tahunAjaran', function ($q) use ($request) {
@@ -194,9 +265,23 @@ class BayarCalonSiswaController extends Controller
             });
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Jurusan
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->filled('jurusan')) {
-            $query->where('id_jurusan', $request->jurusan);
+            $query->where('tb_tmp_siswa.id_jurusan', $request->jurusan);
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Kelas
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('kelas')) {
             $query->whereHas('kelas', function ($q) use ($request) {
@@ -204,12 +289,26 @@ class BayarCalonSiswaController extends Controller
             });
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Keyword
+        |--------------------------------------------------------------------------
+        */
+
         if ($request->filled('keyword')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_lengkap', 'like', '%' . $request->keyword . '%')
-                    ->orWhere('no_daftar', 'like', '%' . $request->keyword . '%');
+                $q->where('tb_tmp_siswa.nama_lengkap', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('tb_tmp_siswa.no_daftar', 'like', '%' . $request->keyword . '%');
             });
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Status Transaksi
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('sts_trans')) {
             $query->whereHas('bayarCalonSiswa', function ($q) use ($request) {
@@ -217,10 +316,36 @@ class BayarCalonSiswaController extends Controller
             });
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ambil Data
+        |--------------------------------------------------------------------------
+        */
+
         $data = $query
-            ->orderByDesc('nipd')
+            ->orderByDesc('tb_tmp_siswa.no_daftar')
             ->get()
             ->map(function ($item) {
+
+                $totalBayar = (float) $item->total_bayar;
+                $kewajiban  = (float) $item->kewajiban;
+                $potongan   = (float) $item->potongan;
+                $sisa       = (float) $item->sisa;
+
+                /*
+            |--------------------------------------------------------------------------
+            | Status Pembayaran
+            |--------------------------------------------------------------------------
+            */
+
+                if ($kewajiban <= 0) {
+                    $statusBayar = 'Belum Ada Tagihan';
+                } elseif ($sisa <= 0) {
+                    $statusBayar = 'Lunas';
+                } else {
+                    $statusBayar = 'Belum Lunas';
+                }
 
                 return [
                     'id' => $item->id,
@@ -228,6 +353,7 @@ class BayarCalonSiswaController extends Controller
                     'no_daftar' => $item->no_daftar,
                     'nama_lengkap' => $item->nama_lengkap,
                     'jk' => $item->jk,
+
                     'status_daftar' => $item->statusDaftar?->keterangan,
 
                     'no_hp' => $item->no_hp,
@@ -247,6 +373,13 @@ class BayarCalonSiswaController extends Controller
                     'gelombang' => [
                         'nama_gelombang' => $item->gelombang?->nama_gelombang,
                     ],
+
+                    // Rekap pembayaran
+                    'total_bayar' => $totalBayar,
+                    'kewajiban' => $kewajiban,
+                    'potongan' => $potongan,
+                    'sisa' => $sisa,
+                    'status_bayar' => $statusBayar,
                 ];
             });
 
@@ -707,13 +840,26 @@ class BayarCalonSiswaController extends Controller
                 'tb_bayar_regis.id_calon_siswa',
                 'tb_det_bayar_regis.id_item',
                 'tb_itembayar.nama_item',
-                DB::raw('SUM(tb_bayar_regis.tot_bayar) as SUMT1'),
+                //DB::raw('SUM(tb_bayar_regis.tot_bayar) as SUMT1'),
                 DB::raw('SUM(tb_bayar_regis.total_kwajiban) as SUMK1'),
-                DB::raw('SUM(tb_det_bayar_regis.jml_bayar) as SUMB'),
+                DB::raw('SUM(
+                    CASE WHEN tb_bayar_regis.sts_trans = 2
+                    THEN tb_det_bayar_regis.jml_bayar
+                    ELSE 0 END
+                ) as SUMB'),
+
+                DB::raw('SUM(
+                    CASE WHEN tb_bayar_regis.sts_trans = 2
+                    THEN tb_bayar_regis.tot_bayar
+                    ELSE 0 END
+                ) as SUMT1'),
                 DB::raw('SUM(tb_det_bayar_regis.kwajiban_bayar) as SUMK2'),
                 DB::raw('SUM(tb_det_bayar_regis.potongan) as SUMP')
             )
+            ->whereNull('tb_bayar_regis.deleted_at')
+            ->whereNull('tb_det_bayar_regis.deleted_at')
             ->where('tb_bayar_regis.id_calon_siswa', $id)
+            //  ->where('sts_trans',2)
             ->groupBy(
                 'tb_bayar_regis.id_calon_siswa',
                 'tb_det_bayar_regis.id_item',
@@ -1049,81 +1195,121 @@ class BayarCalonSiswaController extends Controller
 
     public function updateStatusTransaksi($id, Request $request)
     {
+        $kirimKartu = false;
+        $dc = null;
+        $bayar = null;
 
-        $dataBayar = BayarCalonSiswa::with('detail')
-            ->where('id', $id)
-            ->first();
+        try {
 
-        $updated = BayarCalonSiswa::where('id', $id)
-            ->where('sts_trans', 1)
-            ->update([
-                'sts_trans' => 2,
-                'id_kasir' => auth()->user()->id,
-            ]);
+            DB::transaction(function () use ($id, $request, &$kirimKartu, &$dc, &$bayar) {
 
-        $dc = CalonSiswa::where('no_daftar', $dataBayar->id_calon_siswa)->first();
+                // Ambil transaksi dan kunci
+                $bayar = BayarCalonSiswa::with('detail')
+                    ->where('id', $id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        BuktiBayarCalon::where('id_calon_siswa', $dc->id)->update(['status' => 2]);
+                // Pastikan status masih menunggu konfirmasi
+                if ($bayar->sts_trans != 1) {
+                    throw new \Exception(
+                        'Transaksi sudah diproses atau bukan dalam status menunggu konfirmasi.'
+                    );
+                }
 
+                // Ambil data calon siswa
+                $dc = CalonSiswa::where(
+                    'no_daftar',
+                    $bayar->id_calon_siswa
+                )->firstOrFail();
 
-        foreach ($dataBayar->detail as $item) {
-            if ($item->id_item == 1) {
-                CalonSiswa::where('no_daftar', $dataBayar->id_calon_siswa)->update([
-                    'status_daftar' => 0,
-                    'kartu_ujian_terbit'  => 1,
-                    'tanggal_kartu_ujian' => now()
+                // Update status transaksi
+                $bayar->update([
+                    'sts_trans' => 2,
+                    'id_kasir'  => auth()->id(),
                 ]);
 
+                // Update status bukti pembayaran
+                BuktiBayarCalon::where(
+                    'id_calon_siswa',
+                    $dc->id
+                )->update([
+                    'status' => 2,
+                ]);
 
+                // Periksa apakah transaksi memiliki item registrasi
+                $adaRegistrasi = $bayar->detail->contains('id_item', 1);
 
-                $linkKartuUjian = URL::temporarySignedRoute(
-                    'kartuUjian.download',
-                    now()->addDays(7),
-                    [
-                        'calonSiswa' => $dc->id,
-                    ]
-                );
+                if ($adaRegistrasi) {
 
-                if (!empty($calonSiswa->email)) {
-                    Mail::to($calonSiswa->email)->send(
+                    CalonSiswa::where('id', $dc->id)->update([
+                        'status_daftar'       => 0,
+                        'kartu_ujian_terbit'   => 1,
+                        'tanggal_kartu_ujian' => now(),
+                    ]);
+
+                    $kirimKartu = true;
+                }
+
+                // Logging
+                LogModel::create([
+                    'tanggal' => now(),
+                    'tabel' => 'tb_bayar_regis',
+                    'aksi' => 'update',
+                    'user' => auth()->id(),
+                    'ip' => $request->ip(),
+                    'keterangan' => json_encode([
+                        'id_bayar' => $bayar->id,
+                        'sts_trans' => 2,
+                        'status' => 'Lunas',
+                    ]),
+                    'serial' => url('updateStatusTransaksiCalonSiswa') . '/' . $id,
+                ]);
+            });
+
+            // Email dikirim setelah transaksi database berhasil
+            if ($kirimKartu && !empty($dc->email)) {
+
+                try {
+
+                    $linkKartuUjian = URL::temporarySignedRoute(
+                        'kartuUjian.download',
+                        now()->addDays(7),
+                        [
+                            'calonSiswa' => $dc->id,
+                        ]
+                    );
+
+                    Mail::to($dc->email)->send(
                         new KartuUjianMail(
-                            $calonSiswa,
+                            $dc,
                             $linkKartuUjian
                         )
                     );
+                } catch (\Throwable $e) {
+
+                    Log::error('Gagal mengirim kartu ujian: ' . $e->getMessage());
                 }
-            } //  if ($item->id_item == 1) {
+            }
 
-        }
-
-
-
-        LogModel::create([
-            'tanggal' => now(),
-            'tabel' => 'tb_bayar_regis',
-            'aksi' => 'update',
-            'user' => auth()->user()->id,
-            'ip' => $request->ip(),
-            'keterangan' => json_encode($updated),
-            'serial' => url('updateStatusTransaksiCalonSiswa') . '/' . $id,
-        ]);
-
-        if ($updated > 0) {
             return response()->json([
                 'success' => true,
                 'message' => 'Status transaksi berhasil diubah menjadi Lunas.',
                 'data' => [
                     'id' => $id,
                     'sts_trans' => 2,
-                    'status' => 'Lunas'
-                ]
+                    'status' => 'Lunas',
+                ],
             ], 200);
-        }
+        } catch (\Throwable $e) {
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Data tidak ditemukan atau status bukan 1.'
-        ], 404);
+            Log::error('Gagal update status transaksi: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengubah status transaksi.',
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 
     public function updateStatusDanBayarTransaksi(Request $request)
@@ -1131,24 +1317,42 @@ class BayarCalonSiswaController extends Controller
         $request->validate([
             'id_detail_bayar' => 'required|integer',
             'id_bayar'        => 'required|integer',
-            'jml_bayar'       => 'required|numeric|min:0',
+            'jml_bayar'       => 'required|numeric|min:0.01',
         ]);
 
+        $kirimKartu = false;
+        $dc = null;
+        $linkKartuUjian = null;
 
         DB::beginTransaction();
 
         try {
 
-            $bayar = BayarCalonSiswa::with('detail')->where('id', $request->id_bayar)
+            // Ambil transaksi dan kunci agar tidak diproses bersamaan
+            $bayar = BayarCalonSiswa::with('detail')
+                ->where('id', $request->id_bayar)
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            // Pastikan detail pembayaran terkait dengan transaksi tersebut.
+            // Pastikan transaksi masih menunggu konfirmasi
+            if ($bayar->sts_trans != 1) {
+                throw new \Exception(
+                    'Transaksi sudah diproses atau tidak dalam status menunggu konfirmasi.'
+                );
+            }
+
+            // Ambil data calon siswa
+            $dc = CalonSiswa::where(
+                'no_daftar',
+                $bayar->id_calon_siswa
+            )->firstOrFail();
+
+            // Pastikan detail pembayaran merupakan bagian dari transaksi
             $detail = DetBayarCalonSiswa::where('id', $request->id_detail_bayar)
                 ->where('id_bayar', $bayar->id)
                 ->firstOrFail();
 
-            // Update nominal detail pembayaran
+            // Update nominal pembayaran
             $detail->update([
                 'jml_bayar' => $request->jml_bayar,
             ]);
@@ -1159,8 +1363,32 @@ class BayarCalonSiswaController extends Controller
                 'id_kasir'  => auth()->id(),
             ]);
 
-            // Hitung ulang total pembayaran
+            // Update total pembayaran
             $this->uptotalbayar($bayar->id);
+
+            BuktiBayarCalon::where(
+                'id_calon_siswa',
+                $dc->id
+            )->update([
+                'status' => 2,
+            ]);
+
+
+            // Jika transaksi memiliki item registrasi (id_item = 1)
+            $adaRegistrasi = $bayar->detail->contains('id_item', 1);
+
+            if ($adaRegistrasi) {
+
+                CalonSiswa::where('id', $dc->id)->update([
+                    'status_daftar'       => 0,
+                    'kartu_ujian_terbit'   => 1,
+                    'tanggal_kartu_ujian' => now(),
+                ]);
+
+                // Update status bukti pembayaran
+
+                $kirimKartu = true;
+            }
 
             // Logging
             LogModel::create([
@@ -1179,23 +1407,9 @@ class BayarCalonSiswaController extends Controller
             ]);
 
             DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Nominal pembayaran berhasil diperbarui dan status transaksi berhasil diubah.',
-                'data' => [
-                    'id_bayar' => $bayar->id,
-                    'id_detail_bayar' => $detail->id,
-                    'jml_bayar' => $detail->jml_bayar,
-                    'sts_trans' => $bayar->sts_trans,
-                ],
-            ]);
         } catch (\Throwable $e) {
 
             DB::rollBack();
-
-            // Catat detail error di Laravel log
-
 
             return response()->json([
                 'success' => false,
@@ -1206,6 +1420,42 @@ class BayarCalonSiswaController extends Controller
                     : null,
             ], 500);
         }
+
+        // Kirim email setelah transaksi database berhasil
+        if ($kirimKartu && !empty($dc->email)) {
+
+            try {
+
+                $linkKartuUjian = URL::temporarySignedRoute(
+                    'kartuUjian.download',
+                    now()->addDays(7),
+                    [
+                        'calonSiswa' => $dc->id,
+                    ]
+                );
+
+                Mail::to($dc->email)->send(
+                    new KartuUjianMail(
+                        $dc,
+                        $linkKartuUjian
+                    )
+                );
+            } catch (\Throwable $e) {
+
+                Log::error('Gagal mengirim kartu ujian: ' . $e->getMessage());
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran berhasil dikonfirmasi.',
+            'data' => [
+                'id_bayar'        => $bayar->id,
+                'id_detail_bayar' => $detail->id,
+                'jml_bayar'       => $detail->jml_bayar,
+                'sts_trans'       => 2,
+            ],
+        ]);
     }
 
     private function uptotalbayar($id)
@@ -1221,5 +1471,218 @@ class BayarCalonSiswaController extends Controller
                 'tot_bayar'    => $total->tot_bayar,
                 'total_kwajiban' => $total->total_kwajiban,
             ]);
+    }
+
+    public function cetakPdf(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Subquery Rekap Pembayaran Registrasi
+        |--------------------------------------------------------------------------
+        */
+
+        $pembayaran = DB::table('tb_bayar_regis as b')
+            ->join('tb_det_bayar_regis as c', 'b.id', '=', 'c.id_bayar')
+            ->whereNull('b.deleted_at')
+            ->whereNull('c.deleted_at')
+            ->select(
+                'b.id_calon_siswa',
+                DB::raw('SUM(c.kwajiban_bayar) as total_kewajiban'),
+                DB::raw('SUM(c.potongan) as total_potongan'),
+                DB::raw("
+                SUM(
+                    CASE
+                        WHEN b.sts_trans = 2 THEN c.jml_bayar
+                        ELSE 0
+                    END
+                ) as total_bayar
+            ")
+            )
+            ->groupBy('b.id_calon_siswa');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Query Calon Siswa
+        |--------------------------------------------------------------------------
+        */
+
+        $query = CalonSiswa::query()
+            ->with([
+                'tahunAjaran:id,thn_ajaran',
+                'jurusan:id,nama_jurusan',
+                'gelombang:id,nama_gelombang',
+                'kelas:idx,nama_kelas',
+                'statusDaftar',
+            ])
+            ->leftJoinSub($pembayaran, 'p', function ($join) {
+                $join->on(
+                    'p.id_calon_siswa',
+                    '=',
+                    'tb_tmp_siswa.no_daftar'
+                );
+            })
+            ->select(
+                'tb_tmp_siswa.*',
+                DB::raw('COALESCE(p.total_bayar, 0) as total_bayar'),
+                DB::raw('COALESCE(p.total_kewajiban, 0) as kewajiban'),
+                DB::raw('COALESCE(p.total_potongan, 0) as potongan'),
+                DB::raw('
+                COALESCE(p.total_kewajiban, 0)
+                - COALESCE(p.total_potongan, 0)
+                - COALESCE(p.total_bayar, 0)
+                as sisa
+            ')
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Tahun Ajaran
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('tahun')) {
+            $query->whereHas('tahunAjaran', function ($q) use ($request) {
+                $q->where('thn_ajaran', $request->tahun);
+            });
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Jurusan
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('jurusan')) {
+            $query->where('tb_tmp_siswa.id_jurusan', $request->jurusan);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Kelas
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('kelas')) {
+            $query->whereHas('kelas', function ($q) use ($request) {
+                $q->where(
+                    'id_kelas',
+                    'like',
+                    '%' . $request->kelas . '%'
+                );
+            });
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Keyword
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('keyword')) {
+            $query->where(function ($q) use ($request) {
+                $q->where(
+                    'tb_tmp_siswa.nama_lengkap',
+                    'like',
+                    '%' . $request->keyword . '%'
+                )->orWhere(
+                    'tb_tmp_siswa.no_daftar',
+                    'like',
+                    '%' . $request->keyword . '%'
+                );
+            });
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Status Transaksi
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('sts_trans')) {
+            $query->whereHas('bayarCalonSiswa', function ($q) use ($request) {
+                $q->where('sts_trans', $request->sts_trans);
+            });
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ambil Data
+        |--------------------------------------------------------------------------
+        */
+
+        $data = $query
+            ->orderByDesc('tb_tmp_siswa.no_daftar')
+            ->get()
+            ->map(function ($item) {
+
+                $totalBayar = (float) $item->total_bayar;
+                $kewajiban  = (float) $item->kewajiban;
+                $potongan   = (float) $item->potongan;
+                $sisa       = (float) $item->sisa;
+
+                if ($kewajiban <= 0) {
+                    $statusBayar = 'Belum Ada Tagihan';
+                } elseif ($sisa <= 0) {
+                    $statusBayar = 'Lunas';
+                } else {
+                    $statusBayar = 'Belum Lunas';
+                }
+
+                return [
+                    'no_daftar' => $item->no_daftar,
+                    'nama_lengkap' => $item->nama_lengkap,
+                    'tahun_ajaran' => $item->tahunAjaran?->thn_ajaran,
+                    'jurusan' => $item->jurusan?->nama_jurusan,
+                    'kelas' => $item->kelas?->nama_kelas,
+                    'gelombang' => $item->gelombang?->nama_gelombang,
+
+                    'total_bayar' => $totalBayar,
+                    'kewajiban' => $kewajiban,
+                    'potongan' => $potongan,
+                    'sisa' => $sisa,
+                    'status_bayar' => $statusBayar,
+                ];
+            });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Total Keseluruhan
+        |--------------------------------------------------------------------------
+        */
+
+        $totalKewajiban = $data->sum('kewajiban');
+        $totalPotongan  = $data->sum('potongan');
+        $totalBayar     = $data->sum('total_bayar');
+        $totalSisa      = $data->sum('sisa');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate PDF
+        |--------------------------------------------------------------------------
+        */
+
+        $pdf = Pdf::loadView(
+            'keuangan.bayar_calon_siswa.rekap_pembayaran_pdf',
+            compact(
+                'data',
+                'totalKewajiban',
+                'totalPotongan',
+                'totalBayar',
+                'totalSisa'
+            )
+        );
+
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->stream('rekap-pembayaran-calon-siswa.pdf');
     }
 }
